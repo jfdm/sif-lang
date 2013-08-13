@@ -1,0 +1,40 @@
+## ----------------------------- [ Tropyc: A Pattern Language for Cryptography ]
+
+catalogue "Tropyc" as tropyc
+
+p1 <- Abstract Pattern("Generic OO Crypto Architecture")
+
+infosec <- Pattern("Information Secrecy"){
+    :extends p1
+}
+
+senderauth <- Pattern("Sender Authentication"){
+    :extends p1
+}
+
+sig <- Pattern("Signature"){
+	:extends p1
+}
+
+misgint <- Pattern("Message Integrity"){
+		:extends p1
+}
+
+swa		<- Pattern("Secrecy with Authentication")
+sws		<- Pattern("Secrecy with Signature")
+sigapp	<- Pattern("Signature with Appendix")
+swi		<- Pattern("Secrecy with Integrity")
+ssa		<- Pattern("Secrecy with Signature with Appendix")
+
+swa		uses [ infosec, senderauth ]
+sws		uses [ infosec, sig ]
+sigapp	uses [ senderauth, msgint ]
+swi		uses infosec
+swi		uses msgint
+ssa		uses sws
+ssa		uses sigapp
+
+# Braga, A., Rubira, C., and Dahab, R. 1998. Tropyc: A pattern
+# language for cryptographic object-oriented software. Chapter 16 in
+# Pattern Languages of Program Design 4 (N. Harrison, B. Foote, and
+# H. Rohnert, Eds.). Also in Procs. of PLoP'98, 

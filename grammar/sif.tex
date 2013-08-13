@@ -1,0 +1,47 @@
+%% --------------------------------------- [ An eBNF grammar for the Sif-Lang. ]
+\documentclass[pdftex]{article}
+
+\usepackage{geometry}
+\usepackage{syntax}
+
+\title{eBNF for Sif-Lang}
+
+\begin{document}
+\maketitle
+    
+
+\begin{grammar}
+<plang> ::= <catalogueDecl> <imports>* <expression>+
+
+
+<catalogueDecl> ::= `catalogue' <string> `as' <ident>
+
+
+<imports> ::= `from' <ident> `import' <ident> (`as' <ident>)?
+  \alt `import' <ident>
+
+
+<expression> ::= <patternDecl>
+\alt <relation>
+
+<patternDecl> ::= <ident> `<-' <modifier>? `Pattern' `(' <string>? `)'
+\alt <ident> `<-' `Pattern' `(' <string>? `)' `{' <property>+ `}'
+
+
+<property> ::= <typeProp>
+\alt <relationProp>
+
+
+<typeProp> ::= `:ofType' <modifier>
+
+<modifier> ::= `abstract' \alt `integration'
+
+<relationProp> ::= ( `:extends' | `:implements' ) ( <ident> | <identlist> )
+
+<relation> ::= <ident> ( `uses' | `linkedTo' ) ( <ident> ( `:' <string>)? | <identlist>)
+
+<identlist> ::= <ident>  \alt `[' <ident> ( `,' <ident> )* `]'
+
+\end{grammar}
+
+\end{document}

@@ -1,0 +1,14 @@
+%% -------------------------------------------- [ Sif Listings Package Setting ]
+
+\usepackage{listings}
+
+\lstdefinelanguage{sif}
+  {%
+  % Keywords
+  keywords={linkedTo, uses, ofType, extends, implements,
+    Pattern, Abstract, Integration, catalogue, from, import, as},
+  % Comments
+  comment=[l]\#,
+  % Literate
+  literate={<-}{{$\leftarrow$}}{1}
+}
