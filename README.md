@@ -10,11 +10,11 @@ Sif: A Specification Language for Pattern Languages
                                                                                
 
 
-Named after the Norse God Sif who was renowned for his knowledge and
-wisdom. Project Mímir is provided as part of the doctoral research by
-Jan de Muijnck-Hughes. In his research he looks to investigate how to
-facilitate the uptake of novel cryptographic schemes through the use
-of pattern languages.
+Named after the Norse Goddess Sif who was married to Thor and
+associated with fertility, family and wedlock. Sif-lang is provided as
+part of the doctoral research by Jan de Muijnck-Hughes. In his
+research he looks to investigate how to facilitate the uptake of novel
+cryptographic schemes through the use of pattern languages.
 
 ## What is Sif-Lang
 
