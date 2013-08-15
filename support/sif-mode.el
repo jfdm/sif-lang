@@ -20,7 +20,7 @@
 ))
 ;; ------------------------------------------------------ [ Keywords ]
 (defvar sif-keywords '(
-  "from" "import" "as" "end"
+  "from" "import" "as" "end" "language"
 ))
 ;; --------------------------------------------------------- [ Types ]
 (defvar sif-types '(
@@ -32,7 +32,7 @@
 ))
 ;; ----------------------------------------------------- [ Structure ]
 (defvar sif-functions '(
-                       "pattern"  "catalogue"
+                    
 ))
 ;; -------------------------------------------------- [ Assign Faces ]
 (defvar sif-font-lock-defaults
@@ -59,26 +59,33 @@
   (defgroup sif-mode nil
     "Derived mode for SIF Files" :group 'languages)
   (defvar sif-mode-hook nil "Hook for sif-mode")
-  (modify-syntax-entry ?# "<" sif-mode-syntax-table)
+  (modify-syntax-entry ?-  "_ 123" sif-mode-syntax-table)
   (modify-syntax-entry ?\n ">" sif-mode-syntax-table)
+           (modify-syntax-entry ?\{  "(}1nb" sif-mode-syntax-table)
+           (modify-syntax-entry ?\}  "){4nb" sif-mode-syntax-table)
 
   (make-local-variable 'sif-font-lock-defaults)
   (make-local-variable 'comment-start)
   (make-local-variable 'comment-end)
   (make-local-variable 'comment-start-skip)
+  (make-local-variable 'comment-end-skip)
   (make-local-variable 'comment-column)
+  (make-local-variable 'comment-padding)
   (make-local-variable 'comment-multi-line)
   (make-local-variable 'comment-indent-function)
 
   (setq font-lock-defaults sif-font-lock-defaults
-        comment-start           "# "
+        comment-start           "-- "
         comment-end             ""
-        comment-start-skip      "+ #+ \n"
+        comment-start-skip      "[-{]-[ \t]*"
+        comment-end-skip        "[ \t]*\\(-}\\|\\s>\\)"
         comment-column          60
+        comment-padding         0
         comment-multi-line      nil
         comment-indent-function 'java-comment-indent
         indent-tabs-mode        t
   )
  (run-hooks 'sif-mode-hook)
 )
+
 (provide 'sif-mode)

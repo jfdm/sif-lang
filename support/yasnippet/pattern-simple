@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: simple pattern
+# key: p
+# --
+$1 <-$0 Pattern("$3")

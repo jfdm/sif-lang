@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: pattern
+# key: pa
+# --
+$1 <- Pattern("$2"){
+  :implements [$0 ]
+  :extends [ ]
+}
