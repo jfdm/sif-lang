@@ -1,0 +1,58 @@
+-- --------------------------------------- [ Preventing Information Disclosure ]
+language "Preventing Information Disclosure" as preventing-information-discolure
+
+-- Patterns
+
+rbac <- Pattern("Role Based Access Control")
+cms <- Pattern("COnstrainted Managed Security")
+ms <- Pattern("Multilevel Security")
+sd <- Pattern("Subject Descriptor")
+rm <- Pattern("Reference Monitor")
+
+ss <- Pattern("Security Session")
+ds <- Pattern("Directed Session")
+sso <- Pattern("Secure Session Object")
+oto <- Pattern("Obfuscated Transfer Object")
+cds <- Pattern("Client Data Storage")
+es <- Pattern("Encrypted Storage")
+ssf <- Pattern("Secure Service Facade")
+pd <- Pattern("Policy Delegate")
+dsm <- Pattern("Dynamics Service Management")
+la <- Pattern("Limited Access")
+fawe <- Pattern("Full Access with Errors")
+
+-- Relations
+
+rbac linkedTo la : "Constrained UI"
+rbac linkedTo fawe : "UI with Options"
+
+rbac linkedTo ms : "Security Tiers"
+ms linkedTo sd : "Subject Descriptor"
+
+sd linkedTo rm : "Enforcement"
+
+rbac linkedTo cms : "Container Managed Security"
+
+ss linkedTo la : "Constrained UI"
+ss linkedTo fawe : "UI with Options"
+ss linkedTo ds : "Guide User navigation"
+ss linkedTo sso : "Communicate Between Sessions"
+ss linkedTo ssf : "Centralize Component Interactions"
+
+ds linkedTo sso : "Communicate Between Sessions"
+
+sso linkedTo oto : "Hide Communication Data"
+
+oto linkedTo cds : "Protect Client Side Data"
+oto linkedTo es : "Protect Server Side Data"
+
+ssf linkedTo oto : "Hide Data"
+ssf linkedTo pd : "Control Policy"
+ssf linkedTo dsm : "Instrument and Monitor Sessions"
+
+
+-- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
+-- pattern language (for security). In Proceedings of the ACM
+-- international symposium on New ideas, new paradigms, and
+-- reflections on programming and software (Onward! '12). ACM, New
+-- York, NY, USA, 139-158. DOI=10.1145/2384592.2384607

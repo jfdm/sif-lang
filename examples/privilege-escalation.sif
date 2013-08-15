@@ -1,0 +1,31 @@
+-- ---------------------------------------------------- [ Privilege Escalation ]
+
+language "Privilege Escalation" as privilege-escalation
+
+
+-- Patterns
+
+comp <- Pattern("Compartmentalisation")
+distrep <- Pattern("Distributed Responsiblitly")
+exedom <- Pattern("Execution Domain")
+
+cpc <- Pattern("Controlled Process Creation")
+srp <- Pattern("Secure Resource Pooling")
+
+cof <- Pattern("Controlled Object Factory")
+cs <- Pattern("Checkointed System")
+
+cvas <- Pattern("Controlled Virtual Address Space")
+
+-- Relationships
+
+comp linkedTo distrep : "Efficient Partition"
+
+distrep linkedTo comp : "Re-Partition"
+distrep linkedTo exedom : "Restrict Resources"
+
+exedom linkedTo cpc : "Restrict Privilege Inheritance"
+exedom linkedTo cof : "Protect Object Rights"
+exedom linkedTo cvas "Protect Virtual Memory"
+
+cpc linkedTo srp : "Limit Process Lifetime"
