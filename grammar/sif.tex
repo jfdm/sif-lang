@@ -1,20 +1,14 @@
-%% --------------------------------------- [ An eBNF grammar for the Sif-Lang. ]
-\documentclass[pdftex]{article}
 
-\usepackage{geometry}
 \usepackage{syntax}
-
-\title{eBNF for Sif-Lang}
 
 \begin{document}
 \maketitle
     
-
 \begin{grammar}
-<plang> ::= <catalogueDecl> <imports>* <expression>+
+<plang> ::= <plangDecl> <imports>* <expression>+
 
 
-<catalogueDecl> ::= `catalogue' <string> `as' <ident>
+<plangDecl> ::= `language <string> `as' <ident>
 
 
 <imports> ::= `from' <ident> `import' <ident> (`as' <ident>)?
@@ -24,8 +18,8 @@
 <expression> ::= <patternDecl>
 \alt <relation>
 
-<patternDecl> ::= <ident> `<-' <modifier>? `Pattern' `(' <string>? `)'
-\alt <ident> `<-' `Pattern' `(' <string>? `)' `{' <property>+ `}'
+<patternDecl> ::= <ident> $\leftarrow$ <modifier>? `Pattern' `(' <string>? `)'
+\alt <ident> $\leftarrow$ `Pattern' `(' <string>? `)' `{' <property>+ `}'
 
 
 <property> ::= <typeProp>
@@ -44,4 +38,14 @@
 
 \end{grammar}
 
-\end{document}
+\noindent
+Where:
+
+\begin{description}
+\item[ident]
+are standard string identifiers of the form \verb+[a-zA-Z_] [a-zA-Z_0-9]*+
+
+\item[string]
+are \emph{plain-old-strings}.
+\end{description}
+

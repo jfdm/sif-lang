@@ -2,13 +2,13 @@
 grammar sif;
 
 plang
-    : catalogueDecl imports* expr+ EOF
+    : plangDecl imports* expr+ EOF
     ;
 
-// -------------------------------------------------- [ Catalogue Declarations ]
+// -------------------------------------------- [ Pattern Language Declaration ]
 
-catalogueDecl
-    : CATALOGUE STRING AS ID
+plangDecl
+    : PLANG STRING AS ID
     ;
 
 // ----------------------------------------------------------------- [ Imports ]
@@ -78,7 +78,7 @@ REALISATION    : ':implements';
 PATTERN        : 'Pattern';
 ABSTRACT       : 'Abstract';
 INTEGRATION    : 'Integration';
-CATALOGUE      : 'catalogue';
+PLANG          : 'language'
 // Misc
 FROM           : 'from';
 IMPORT         : 'import';
@@ -107,7 +107,7 @@ ID
 // ------------------------------------------------------------- [ White Space ]
 
 COMMENT
-    :   '#' ~[\r\n]* -> skip
+    :   '--' ~[\r\n]* -> skip
     ;
 
 WS
