@@ -1,4 +1,4 @@
-module Parser where
+module Parser (parsePatternLang) where
 
 import Text.Parsec
 import Text.Parsec.String (Parser)
