@@ -2,7 +2,7 @@
 
 language "Tropyc" as tropyc
 
--- Patterns
+patterns
 
 p1 <- Abstract Pattern("Generic OO Crypto Architecture")
 
@@ -28,7 +28,7 @@ sigapp	<- Pattern("Signature with Appendix")
 swi		<- Pattern("Secrecy with Integrity")
 ssa		<- Pattern("Secrecy with Signature with Appendix")
 
--- Relations
+relations
 
 swa		uses [ infosec, senderauth ]
 sws		uses [ infosec, sig ]

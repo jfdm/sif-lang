@@ -3,36 +3,33 @@
 
 \begin{document}
 \maketitle
-    
+
 \begin{grammar}
-<plang> ::= <plangDecl> <imports>* <expression>+
+<plang> ::= <plangDecl> <imports>* <expression>
 
 
 <plangDecl> ::= `language <string> `as' <ident>
 
 
 <imports> ::= `from' <ident> `import' <ident> (`as' <ident>)?
+  \alt `from' <ident> `import' <identlist>
   \alt `import' <ident>
 
 
-<expression> ::= <patternDecl>
-\alt <relation>
+<expression> ::= `pattern' <patternDecl>+ `relation' <relation>*
 
 <patternDecl> ::= <ident> $\leftarrow$ <modifier>? `Pattern' `(' <string>? `)'
 \alt <ident> $\leftarrow$ `Pattern' `(' <string>? `)' `{' <property>+ `}'
 
+<modifier> ::= `Abstract' \alt `Integration'
 
-<property> ::= <typeProp>
-\alt <relationProp>
+<property> ::= <extends>* <implements>*
 
+<extends> ::= `:extends' <identlist>
 
-<typeProp> ::= `:ofType' <modifier>
+<implements> ::= `:implements' <identlist>
 
-<modifier> ::= `abstract' \alt `integration'
-
-<relationProp> ::= ( `:extends' | `:implements' ) ( <ident> | <identlist> )
-
-<relation> ::= <ident> ( `uses' | `linkedTo' ) ( <ident> ( `:' <string>)? | <identlist>)
+<relation> ::= <ident> ( `uses' | `linkedTo' ) ( <ident> ( `:' <string>)? | <identlist> )
 
 <identlist> ::= <ident>  \alt `[' <ident> ( `,' <ident> )* `]'
 

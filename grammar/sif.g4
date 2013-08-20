@@ -14,13 +14,13 @@ plangDecl
 // ----------------------------------------------------------------- [ Imports ]
 imports
     : FROM ID IMPORT ID (AS ID)?
+    | FROM ID IMPORT identlist
     | IMPORT ID
     ;
 
 // ------------------------------------------------------------- [ Expressions ]
 expr
-    : patternDecl
-    | relation
+    : PAT patternDecl+  REL relation+
     ;
 
 // ---------------------------------------------------- [ Pattern Declarations ]
@@ -31,15 +31,7 @@ patternDecl
     ;
 
 property
-    : typeProp | relationProp
-    ;
-
-typeProp
-    : TYPEPROP modifier
-    ;
-
-relationProp
-    : ( SPECIALISATION | REALISATION ) ( ID | identlist)
+    :  ( SPECIALISATION | REALISATION ) ( identlist )
     ;
 
 modifier
@@ -80,6 +72,8 @@ ABSTRACT       : 'Abstract';
 INTEGRATION    : 'Integration';
 PLANG          : 'language'
 // Misc
+PAT            : 'patterns';
+REL            : 'relations';
 FROM           : 'from';
 IMPORT         : 'import';
 AS             : 'as';

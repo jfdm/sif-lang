@@ -1,7 +1,7 @@
 -- --------------------------------------- [ Preventing Information Disclosure ]
 language "Preventing Information Disclosure" as preventing-information-discolure
 
--- Patterns
+patterns
 
 rbac <- Pattern("Role Based Access Control")
 cms <- Pattern("COnstrainted Managed Security")
@@ -21,7 +21,7 @@ dsm <- Pattern("Dynamics Service Management")
 la <- Pattern("Limited Access")
 fawe <- Pattern("Full Access with Errors")
 
--- Relations
+relations
 
 rbac linkedTo la : "Constrained UI"
 rbac linkedTo fawe : "UI with Options"

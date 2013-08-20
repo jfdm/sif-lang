@@ -2,7 +2,7 @@
 
 language "Identity Management" as identmngmt
 
--- Patterns
+patterns
 
 amat	<- Abstract Pattern("Access Matrix")
 
@@ -35,7 +35,7 @@ idfed <- Pattern("Identity Federation"){
   :implements abac
 }
 
--- Relations
+relations
 
 idfed uses [ cot, cred, author ]
 idfed uses idprov

@@ -2,8 +2,7 @@
 
 language "Privilege Escalation" as privilege-escalation
 
-
--- Patterns
+patterns
 
 comp <- Pattern("Compartmentalisation")
 distrep <- Pattern("Distributed Responsiblitly")
@@ -17,7 +16,7 @@ cs <- Pattern("Checkointed System")
 
 cvas <- Pattern("Controlled Virtual Address Space")
 
--- Relationships
+relations
 
 comp linkedTo distrep : "Efficient Partition"
 

@@ -11,7 +11,7 @@ import privilege-escalation
 
 -}
 
--- Patterns
+patterns
 
 tp <- Pattern("Trust Partitioning")
 cs <- Pattern("Checkpointed Syste")
@@ -20,7 +20,7 @@ ss <- Pattern("Server Sandbox")
 cj <- Pattern("Chroot Jail")
 ulewr <- Pattern("Unique Location for Each Write Request")
 
--- Relationships
+relations
 
 distrep linkedTo tp : "Communicate between processes"
 distrep linkedTo ulewr : "Concurrent write race"
