@@ -1,4 +1,4 @@
-module Parser (parsePatternLang) where
+module Parser where
 
 import Text.Parsec
 import Text.Parsec.String (Parser)
@@ -24,46 +24,48 @@ parseIDs = try parseIDList <|> parseID1 <?> "ID Lists"
 
 
 -- ---------------------------------------------- [ Relation Parsing Functions ]
--- @TODO Simplify?
-{-
 
-relationM ::= <id> "uses" <idlist>
-           | <id> "linkedTo" <idlist>}
-           ;
+-- relationMu ::= <id> "uses" <idlist>;
+parseRelationMu :: Parser Relation
+parseRelationMu = do from <- identifier
+                     reserved "uses"
+                     to <- parseIDs
+                     return (Requires from to Nothing)
 
--}
+-- relationM ::= <id> "linkedTo" <idlist>;
+parseRelationMl :: Parser Relation
+parseRelationMl = do from <- identifier
+                     reserved "linkedTo"
+                     to <- parseIDs
+                     return (Links from to Nothing)
+
+-- relationM ::= relationMu | relationMl
 parseRelationM :: Parser Relation
-parseRelationM = do from <- identifier
-                    reserved "uses"
-                    to <- parseIDs
-                    return (Requires from to Nothing)
-             <|> do from <- identifier
-                    reserved "linkedTo"
-                    to <- parseIDs
-                    return (Links from to Nothing)
-             <?> "1-2-Many Relation"
+parseRelationM =  try parseRelationMu <|> parseRelationMl
+                  <?> "1-2-Many Relation"
+ 
+-- relation1u ::= <id> "uses" <id> ":" <desc>;                    
+parseRelation1u :: Parser Relation
+parseRelation1u = do from <- identifier
+                     reserved "uses"
+                     to <- parseID1
+                     reservedOp ":"
+                     desc <- optionMaybe stringLiteral
+                     return (Requires from to desc)
 
-{-
+-- relation1l ::= <id> "linkedTo" <id> ":" <desc>;
+parseRelation1l :: Parser Relation
+parseRelation1l = do from <- identifier
+                     reserved "linkedTo"
+                     to <- parseID1
+                     reservedOp ":"
+                     desc <- optionMaybe stringLiteral
+                     return (Links from to desc)
 
-relationM ::= <id> "uses" <id> ":" <desc>
-           | <id> "linkedTo" <id> ":" <desc>
-           ;
-
--}                         
-parseRelation1 :: Parser Relation
-parseRelation1 = do from <- identifier
-                    reserved "uses"
-                    to <- parseID1
-                    reservedOp ":"
-                    desc <- optionMaybe stringLiteral
-                    return (Requires from to desc)
-             <|> do from <- identifier
-                    reserved "linkedTo"
-                    to <- parseID1
-                    reservedOp ":"
-                    desc <- optionMaybe stringLiteral
-                    return (Links from to desc)
-             <?> "1-2-1 Relation with Description"
+-- parseRelation1 ::= relation1u | relation1l ;
+parseRelation1 :: Parser Relation            
+parseRelation1 = try parseRelation1u <|> parseRelation1l
+                 <?> "1-2-1 Relation with Description"
 
 -- parseRelation ::= relationM | relation1 ;
 parseRelation :: Parser Relation
