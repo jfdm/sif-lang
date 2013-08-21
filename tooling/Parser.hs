@@ -1,8 +1,7 @@
 module Parser (parseSif) where
 
 import Text.Parsec
-import Text.Parsec.String (Parser)
-import Text.Parsec.String (parseFromFile)
+import Text.Parsec.String (Parser, parseFromFile)
 import Lexer
 import Model
 
@@ -15,8 +14,7 @@ parseID1 = do id <- identifier
 
 -- parseIDList ::= [ <id> (<id> ',')* ];
 parseIDList :: Parser IDs
-parseIDList = do ids <- brackets $ sepBy1 identifier comma
-                 return ids
+parseIDList = brackets $ sepBy1 identifier comma
 
 -- parseIDs ::= <id> | <idlist>;
 parseIDs :: Parser IDs
@@ -93,7 +91,7 @@ parsePatternS = do id <- identifier
                    reservedOp "<-"
                    modifier <- optionMaybe parseModifier
                    reserved "Pattern"
-                   name <- parens $ stringLiteral
+                   name <- parens stringLiteral
                    return (Pattern name id Nothing Nothing modifier)
                <?> "Simple Pattern"
 
@@ -102,14 +100,12 @@ parsePatternS = do id <- identifier
 -- parseExtends ::= :extends <idlist>;
 parseExtends :: Parser IDs
 parseExtends = do reserved ":extends"
-                  ids <- parseIDs
-                  return ids
+                  parseIDs
 
 -- parseImplements ::= :implements <idlist>;
 parseImplements :: Parser IDs
 parseImplements = do reserved ":implements"
-                     ids <- parseIDs
-                     return ids
+                     parseIDs
 
 -- parseProperty ::= parseImplements | parseExtends;
 parseProperties :: Parser (Maybe IDs, Maybe IDs)
@@ -124,8 +120,8 @@ parsePatternC = do id <- identifier
                    reservedOp "<-"
                    modifier <- optionMaybe parseModifier
                    reserved "Pattern"
-                   name <- parens $ stringLiteral
-                   (extends, implements) <- braces $ parseProperties
+                   name <- parens stringLiteral
+                   (extends, implements) <- braces parseProperties
                    return (Pattern name id extends implements modifier)
                <?> "Complex Pattern"
 
@@ -145,7 +141,7 @@ parseImportM = do reserved "from"
                   lang <- identifier
                   reserved "import"
                   ps <- sepBy1 identifier comma
-                  return $ (map (\x -> (Import lang (Just x) Nothing)) ps)
+                  return $ map (\x -> Import lang (Just x) Nothing) ps
 
 -- parseImportAlias ::= from <langID> import <id> as <id>;
 
@@ -156,7 +152,7 @@ parseImportAlias = do reserved "from"
                       origiD <- identifier
                       reserved "as"
                       newID <- identifier
-                      return ((Import langID (Just origiD) (Just newID)) : [] )
+                      return (Import langID (Just origiD) (Just newID) : [] )
 
 parseImport :: Parser Imports
 parseImport = try parseImportAlias <|> parseImportM
@@ -166,7 +162,7 @@ parseImport = try parseImportAlias <|> parseImportM
 parseImportGlobal :: Parser Imports
 parseImportGlobal = do reserved "import"
                        langID <- identifier
-                       return ((Import langID Nothing Nothing) : [])
+                       return (Import langID Nothing Nothing : [])
 
 parseImports :: Parser Imports
 parseImports = do is <- many1 $ choice [parseImport,
@@ -208,7 +204,7 @@ parseSif fname =
 -- Test some parseExpression p with a given string s
 testParseStr :: Show a => Parser a -> String -> IO ()
 testParseStr p s =
-    case (parse (runLex p) "" s) of
+    case parse (runLex p) "" s of
       Left err -> error (show err)
       Right x -> print x
 
