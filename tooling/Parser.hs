@@ -1,4 +1,4 @@
-module Parser where
+module Parser (parseSif) where
 
 import Text.Parsec
 import Text.Parsec.String (Parser)
@@ -195,6 +195,13 @@ parsePatternLang = do info <- parseLangDecl
                       relations <- many1 parseRelation
                       return (PatternLang info imports patterns relations)
                    <?> "Language Instance"
+
+parseSif :: String -> PatternLang
+parseSif fname =
+    case parse (runLex parsePatternLang) "" fname of
+      Left err -> error (show err)
+      Right ast -> ast
+
 
 -- ------------------------------------------------- [ Helper Testing Function ]
 
