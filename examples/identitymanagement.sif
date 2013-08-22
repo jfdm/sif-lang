@@ -1,6 +1,6 @@
 -- ------------------------------ [ A Pattern Language for Identity Management ]
 
-language "Identity Management" as identmngmt
+language "Identity Management" as identitymanagement
 
 patterns
 

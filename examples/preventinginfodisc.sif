@@ -1,5 +1,6 @@
 -- --------------------------------------- [ Preventing Information Disclosure ]
-language "Preventing Information Disclosure" as preventing-information-discolure
+
+language "Preventing Information Disclosure" as preventinginfodisc
 
 patterns
 

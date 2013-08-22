@@ -2,8 +2,8 @@
 
 language "Tampering" as tampering
 
-from privilege-escalation import distrep
-from privilege-escalation import exedom
+from privilegeescalation import distrep
+from privilegeescalation import exedom
 
 {- Alternativly
 
@@ -29,6 +29,8 @@ distrep linkedTo ss : "Constrain Environment"
 exedom linkedTo ss : "Constrain Environment"
 exedom linkedTo sds : "Data safety"
 exedom linkedTo cs : "Graceful restart"
+
+ss linkedTo cj : "Sandbox Processes"
 
 
 -- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
