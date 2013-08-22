@@ -160,14 +160,14 @@ parseRelationMu :: Parser Relation
 parseRelationMu = do from <- identifier
                      reserved "uses"
                      to <- parseIDs
-                     return (Requires from to Nothing)
+                     return (Requires from to (Just "uses")) -- Nasty Hack
 
 -- relationMl ::= <id> "linkedTo" <idlist>;
 parseRelationMl :: Parser Relation
 parseRelationMl = do from <- identifier
                      reserved "linkedTo"
                      to <- parseIDs
-                     return (Links from to Nothing)
+                     return (Links from to (Just "linkedTo")) -- Nasty Hack
 
 -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
 
