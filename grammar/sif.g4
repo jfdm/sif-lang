@@ -13,8 +13,7 @@ plangDecl
 
 // ----------------------------------------------------------------- [ Imports ]
 imports
-    : FROM ID IMPORT ID (AS ID)?
-    | FROM ID IMPORT identlist
+    : FROM ID IMPORT (ID | identlist)
     | IMPORT ID
     ;
 

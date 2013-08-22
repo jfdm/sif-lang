@@ -11,8 +11,7 @@
 <plangDecl> ::= `language <string> `as' <ident>
 
 
-<imports> ::= `from' <ident> `import' <ident> (`as' <ident>)?
-  \alt `from' <ident> `import' <identlist>
+<imports> ::= `from' <ident> `import' (<ident> | <identlist> )?
   \alt `import' <ident>
 
 
