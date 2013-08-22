@@ -23,7 +23,7 @@ instRelations2Dot :: Plang -> [String]
 instRelations2Dot plang = concat $ map (\x -> instRelation2Dot x ) (Model.relations plang)
 
 instRelation2Dot :: Relation -> [String]
-instRelation2Dot rel = map (\to -> genDotEdge from to desc)  (Model.to rel)
+instRelation2Dot rel = map (\to -> genDotEdge to from desc)  (Model.to rel)
                        where
                          from = (Model.from rel)
                          desc = (Model.desc rel)
@@ -39,12 +39,12 @@ classRelations2Dot plang = union extends implements
 -- | Get Implements
 implements2Dot :: Pattern -> Maybe [String]
 implements2Dot (Pattern _ _ _ Nothing _) = Nothing
-implements2Dot (Pattern _ i _ (Just xs) _) = Just $ map (\x -> genDotEdge x i (Just "implements")) xs
+implements2Dot (Pattern _ i _ (Just xs) _) = Just $ map (\x -> genDotEdge i x (Just "implements")) xs
 
 -- | Get Extends to Dot
 extends2Dot :: Pattern -> Maybe [String]
 extends2Dot (Pattern _ _ Nothing _ _) = Nothing
-extends2Dot (Pattern _ i (Just xs) _ _) = Just $ map (\x -> genDotEdge i x (Just "extends")) xs
+extends2Dot (Pattern _ i (Just xs) _ _) = Just $ map (\x -> genDotEdge x i (Just "extends")) xs
 
 -- ---------------------------------------------------------- [ Patterns 2 Dot ]
 
