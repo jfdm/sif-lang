@@ -23,7 +23,7 @@ instRelations2Dot :: Plang -> [String]
 instRelations2Dot plang = concat $ map (\x -> instRelation2Dot x ) (Model.relations plang)
 
 instRelation2Dot :: Relation -> [String]
-instRelation2Dot rel = map (\to -> genDotEdge to from desc)  (Model.to rel)
+instRelation2Dot rel = map (\to -> genDotEdge from to desc)  (Model.to rel)
                        where
                          from = (Model.from rel)
                          desc = (Model.desc rel)
