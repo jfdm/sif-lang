@@ -12,7 +12,7 @@ cpc <- Pattern("Controlled Process Creation")
 srp <- Pattern("Secure Resource Pooling")
 
 cof <- Pattern("Controlled Object Factory")
-cs <- Pattern("Checkointed System")
+cs <- Pattern("Checkpointed System")
 
 cvas <- Pattern("Controlled Virtual Address Space")
 
