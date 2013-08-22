@@ -17,6 +17,7 @@ plang2Dot plang = ["digraph G {\n"] ++ patterns ++ classrels ++ instrels ++ ["\n
       patterns = patterns2Dot plang
       classrels = classRelations2Dot plang
       instrels = instRelations2Dot plang
+
 -- ------------------------------------------------- [ General Relations 2 Dot ]
 
 instRelations2Dot :: Plang -> [String]
@@ -35,7 +36,6 @@ classRelations2Dot plang = union extends implements
                              extends = concat $ mapMaybe (extends2Dot) (Model.patterns plang)
                              implements = concat $ mapMaybe (implements2Dot) (Model.patterns plang)
                              
-
 -- | Get Implements
 implements2Dot :: Pattern -> Maybe [String]
 implements2Dot (Pattern _ _ _ Nothing _) = Nothing
