@@ -9,27 +9,26 @@ type Imports = [ Import ]
 type Modifier = String
 
 
-data PatternLang = PatternLang {
-      info :: PLangLabel,
+data Plang = Plang {
+      info :: Metadata,
       imports :: Maybe Imports,
       patterns :: Patterns,
       relations :: Relations
     } deriving (Show)
 
-data PLangLabel = PLangLabel {
+data Metadata = Metadata {
       title :: String,
       label :: ID
     } deriving (Show)
 
 data Import = Import {
-      langID :: ID,
-      patternID :: Maybe ID,
-      alias :: Maybe ID
+      lang :: ID,
+      pattern :: Maybe ID
     } deriving (Show)
 
 data Pattern = Pattern {
       name :: String,
-      id :: ID,
+      ident :: ID,
       extends :: Maybe IDs,
       implements :: Maybe IDs,
       modifier :: Maybe Modifier
