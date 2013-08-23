@@ -1,0 +1,61 @@
+-- ------------------------------ [ Preventing Information Disclosure Exterior ]
+
+language "Info Disclosure Exterior" as infodisclosureext
+
+patterns
+
+dmz <- Pattern("Demilitarized Zone")
+frontDoor <- Pattern("Front Door")
+trustProxy <- Pattern("Trusted Proxy")
+protectionReverseProxy <- Pattern("Protection Reverse Proxy")
+packetFilterFwall <- Pattern("Packet Filter Firewall")
+netAddressBList <- Pattern("Network Address Blacklist")
+integrationReverseProxy <- Pattern("Integration Reverse Proxy")
+msgReplayDetection <- Pattern("Message Replay Detection")
+proxyBasedFwall <- Pattern("Proxy Based Firewall")
+statefulFwall <- Pattern("Stateful Firewall")
+
+infoObscurity <- Pattern("Information Obsurity")
+secureComms <- Pattern("Secure Communication")
+secureServiceProxy <- Pattern("Secure Service Proxy")
+secureAssocation <- Pattern("Security Association")
+secureContext <- Pattern("Security Context")
+msgInterceptingGateway <- Pattern("Message Intercepting Gateway")
+msgInspector <- Pattern("Message Inspector")
+secureMsgRouter <- Pattern("Secure Message Router")
+
+relations
+
+dmz linkedTo frontDoor : "Enforce Policy"
+
+frontDoor linkedTo trustProxy : "Trust a 3rd Party"
+frontDoor linkedTo protectionReverseProxy : "Setup Firewall"
+
+protectionReverseProxy linkedTo packetFilterFwall : "Filter All input"
+protectionReverseProxy linkedTo integrationReverseProxy : "Facade for Internal Services"
+
+packetFilterFwall linkedTo netAddressBList : "Known Offenders"
+
+integrationReverseProxy linkedTo msgReplayDetection : "Prevent Replay Attack"
+integrationReverseProxy linkedTo proxyBasedFwall : "Selectively Expose Service"
+integrationReverseProxy linkedTo msgInterceptingGateway : "Check and Validate Messaging"
+
+proxyBasedFwall linkedTo statefulFwall : "Stateful Check"
+
+msgInterceptingGateway linkedTo msgInspector : "Valiation Component"
+msgInterceptingGateway linkedTo secureMsgRouter : "Multi-Party Messaging"
+
+infoObscurity linkedTo secureComms : "Unobservable Channel"
+
+seccomms linkedTo secureServiceProxy : "Secure Facade"
+seccomms linkedTo secureAssocation : "Store Security Info"
+
+secureServiceProxy linkedTo integrationReverseProxy: "Enforce Policy"
+
+secureAssocation linkedTo secureContext : "Container for Sec Attributes"
+
+-- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
+-- pattern language (for security). In Proceedings of the ACM
+-- international symposium on New ideas, new paradigms, and
+-- reflections on programming and software (Onward! '12). ACM, New
+-- York, NY, USA, 139-158. DOI=10.1145/2384592.2384607

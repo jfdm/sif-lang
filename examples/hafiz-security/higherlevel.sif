@@ -1,0 +1,53 @@
+-- --------------------------------------------------- [ Higher Level Patterns ]
+
+language "Higher Level patterns" as higherlevel
+
+from perimeter import policy
+
+patterns
+
+assetIdentification <- Pattern("Security Needs Identification of Enterprise Asses")
+assetEval <- Pattern("Asset Evaluation")
+vulnAssessment <- Pattern("Vulnerability Assessment")
+riskDetermination <- Pattern("Risk Determination")
+defenseDepth <- Pattern("Defense in Depth")
+enterSecApproach <- Pattern("Enterprise Security Approaches")
+enterSecServices <- Pattern("Enterprise Security Services")
+lowHangingFruit <- Pattern("Low Hanging Fruit")
+protectedSystem <- Pattern("Protected System")
+hideImplementation <- Pattern("Hidden Implementation")
+minefield <- Pattern("Minefield")
+whiteHatsHackThyselves <- Pattern("White Hats Hack Thyselves")
+
+relations
+
+assetIdentification linkedTo assetEval : "Value of Asset"
+assetIdentification linkedTo vulnAssessment : "Identify Threats"
+
+assetEval linkedTo riskDetermination : "Rank Assets"
+
+vulnAssessment linkedTo riskDetermination : "Rank Threats"
+
+riskDetermination linkedTo defenseDepth : "Strong Protection"
+riskDetermination linkedTo enterSecApproach : "Select and Integrate Countermeasure"
+
+defenseDepth linkedTo enterSecApproach : "Choose Defense Mechanism"
+
+enterSecApproaches linkedTo lowHangingFruit : "Where to start"
+enterSecApproaches linkedTo enterSecServices : "Solution to use"
+
+enterSecServices linkedTo protectedSystem : "Protect Resources"
+enterSecServices linkedTo hideImplementation : "Security by Obscurity"
+enterSecServices linkedTo whiteHatsHackThyselves : "Test Adopted Solution"
+
+protectedSystem linkedTo policy : "Rules for Protection"
+hideImplementation linkedTo minefield: "Variation in System"
+
+whiteHatsHackThyselves linkedTo riskDetermination : "Mitigate vulnerability found"
+
+
+-- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
+-- pattern language (for security). In Proceedings of the ACM
+-- international symposium on New ideas, new paradigms, and
+-- reflections on programming and software (Onward! '12). ACM, New
+-- York, NY, USA, 139-158. DOI=10.1145/2384592.2384607

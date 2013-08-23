@@ -1,0 +1,52 @@
+-- ------------------------------ [ Preventing Information Disclosure Exterior ]
+
+language "Info Disclosure Exterior" as infodisclosureext
+
+from infodisclosureext import infoObscurity
+
+patterns
+
+obliviousTransfer <- Pattern("Oblivious Transfer")
+pseudoIdentity <- Pattern("Pseudonymous Identity")
+anonymitySet <- Pattern("Anonymity Set")
+chaining <- Pattern("Chaining")
+randomExit <- Pattern("Random Exit")
+batchRouting <- Pattern("Batched Routing")
+randomWait <- Pattern("Random Wait")
+coverTraffic <- Pattern("Cover Traffic")
+linkPadding <- Pattern("Linked Padding")
+morphedRepr <- Pattern("Morphed Representation")
+layeredEncryption <- Pattern("Layered Encryption")
+constantLengthPadding <- Pattern("Constent Length Padding")
+
+relations
+
+infoObscurity linkedTo obliviousTransfer : "Zero Knowledge Communication"
+infoObscurity linkedTo pseudoIdentity : "Assume Alias"
+
+pseudoIdentity linkedTo anonymitySet : "Mix with probable suspects"
+pseudoIdentity linkedTo chaining : "Deep defense"
+pseudoIdentity linkedTo morphedRepr : "Hide Identifiable Traits"
+
+anonymitySet linkedTo batchRouting : "Mixing Strategy"
+anonymitySet linkedTo randomWait : "Mixing Strategy"
+anonymitySet linkedTo morphedRepr : "Hide Identifiable Traits"
+anonymitySet linkedTo chaining: "Deep Defense"
+
+batchRouting linkedTo coverTraffic : "Create Proable Suspects"
+randomWait linkedTo coverTraffic : "Create Proable Suspects"
+
+coverTraffic linkedTo linkPadding : "Prevent Traffic Shaping"
+
+chaining linkedTo randomExit : "Unpredictable Chaining"
+chaining linkedTo morphedRepr : "Hide Identifiable Traits"
+
+morphedRepr linkedTo layeredEncryption : "Protect Confidentiality"
+
+layeredEncryption linkedTo constantLengthPadding : "Make Indistinguishable"
+
+-- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
+-- pattern language (for security). In Proceedings of the ACM
+-- international symposium on New ideas, new paradigms, and
+-- reflections on programming and software (Onward! '12). ACM, New
+-- York, NY, USA, 139-158. DOI=10.1145/2384592.2384607

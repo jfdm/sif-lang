@@ -1,0 +1,33 @@
+-- ----------------------------------------------- [ Security Pattern Language ]
+
+language "Security" as security
+
+from higherlevel import enterSecServices, protectedSystem, policy
+from infodisclosureext import infoObscurity, dmz, integrationReverseProxy
+from perimeter import brokeredAuth, sap, rbac, authenticationEnforcer
+from privelegeescalation import compartmentalisation
+from privacyattacks import pseudoIdentity
+from spoofing import interceptingWebAgent
+from infodisclosurecore import securitySession, mLevelSecurity
+
+patterns
+
+temp <- Pattern("Ignore Me")
+
+relations
+
+enterSecServices linkedTo [infoObscurity, compartmentalisation]
+protectedSystem linkedTo [dmz, compartmentalisation]
+policy linkedTo [brokeredAuth, sap]
+infoObscurity linkedTo pseudoIdentity
+integrationReverseProxy linkedTo interceptingWebAgent
+authenticationEnforcer linkedTo securitySession
+rbac linkedTo mLevelSecurity
+
+-- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
+-- pattern language (for security). In Proceedings of the ACM
+-- international symposium on New ideas, new paradigms, and
+-- reflections on programming and software (Onward! '12). ACM, New
+-- York, NY, USA, 139-158. DOI=10.1145/2384592.2384607
+
+-- --------------------------------------------------------------------- [ EOF ]

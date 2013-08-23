@@ -1,0 +1,48 @@
+-- ------------------------------------------------------ [ Perimeter Patterns ]
+language "Perimeter Patterns" as perimeter
+
+from infodisclosurecore import rbac
+
+patterns
+
+policy <- Abstract Pattern("Policy")
+brokeredAuth <- Pattern("Brokered Authentication")
+sap <- Pattern("Single Access Point")
+singleThreadedFacade <- Pattern("Single Threaded Facade")
+pep <- Pattern("Policy Enforcement Point")
+authenticationEnforcer <- Pattern("Authentication Enforcer")
+authorisationEnforcer <- Pattern("Authorisation Enforcer")
+accountLockout <- Pattern("Account Lockout")
+interceptvalidator <- Pattern("Intercepting Validator")
+contentDependentProcessing <- Pattern("Content Dependent Processing")
+errorDetectionCorrection <- Pattern("Error Detection and Correction")
+exceptionShield <- Pattern("Exception Shielding")
+
+relations
+
+policy linkedTo brokeredAuth : "External Authentication"
+policy linkedTo sap : "Decision Point"
+
+brokeredAuth linkedTo authenticationEnforcer : "Check Credential"
+
+sap linkedTo pep : "Enforce Policy"
+sap linkedTo singleThreadedFacade : "Simple Perimeter"
+
+pep linkedTo authenticationEnforcer : "Check Identity" 
+pep linkedTo authorisationEnforcer : "Control Access" 
+pep linkedTo interceptvalidator : "Check Input" 
+
+authenticationEnforcer linkedTo accountLockout : "Prevent Brute Force Attacks"
+authorisationEnforcer linkedTo rbac : "Policy for A/C"
+
+interceptvalidtor linkedTo contentDependentProcessing : "Code and Data separation"
+interceptvalidtor linkedTo errorDetectionCorrection : "Integrity Check" 
+
+contentDependentProcessing linkedTo exceptionShield : "Protect with exception and hide exception metadata" 
+errorDetectionCorrection linkedTo exceptionShield : "Protect with exception and hide exception metadata"
+
+-- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
+-- pattern language (for security). In Proceedings of the ACM
+-- international symposium on New ideas, new paradigms, and
+-- reflections on programming and software (Onward! '12). ACM, New
+-- York, NY, USA, 139-158. DOI=10.1145/2384592.2384607

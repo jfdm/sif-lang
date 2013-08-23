@@ -1,0 +1,315 @@
+-- ----------------------------------------------- [ Security Pattern Language ]
+
+language "Security" as security
+
+patterns
+
+-- ---------------------------------------------------- [ Privilege Escalation ]
+
+compartmentalisation <- Pattern("Compartmenaliseationartmentalisation")
+distResponsibility <- Pattern("Distributed Responsiblitly")
+exeDomain <- Pattern("Execution Domain")
+
+controlledProcCreation <- Pattern("Controlled Process Creation")
+secureResourcePooling <- Pattern("Secure Resource Pooling")
+
+controlledObjectFactory <- Pattern("Controlled Object Factory")
+
+controlledVirtualAddressSpace <- Pattern("Controlled Virtual Address Space")
+
+-- --------------------------------------------------------------- [ Tampering ]
+
+trustedPartitioning <- Pattern("Trust Partitioning")
+checkpointedSys <- Pattern("Checkpointed System")
+safeDataStruct <- Pattern("Safe Data Structure")
+serverSandbox <- Pattern("Server Sandbox")
+chroot <- Pattern("Chroot Jail")
+uniqueLocWriteReq <- Pattern("Unique Location for Each Write Request")
+
+-- --------------------------------------------- [ Information Disclosure Core ]
+
+rbac <- Pattern("Role Based Access Control")
+containerManagedSec <- Pattern("Container Managed Security")
+mLevelSecurity <- Pattern("Multilevel Security")
+subjectDesc <- Pattern("Subject Descriptor")
+referenceMonitor <- Pattern("Reference Monitor")
+
+securitySession <- Pattern("Security Session")
+directedSession <- Pattern("Directed Session")
+secureSessionObject <- Pattern("Secure Session Object")
+obfuscatedTranferObject <- Pattern("Obfuscated Transfer Object")
+clientDataStorage <- Pattern("Client Data Storage")
+encryptedStorage <- Pattern("Encrypted Storage")
+secureServiceFacade <- Pattern("Secure Service Facade")
+policyDelegate <- Pattern("Policy Delegate")
+dynamicsServiceMgnt <- Pattern("Dynamics Service Management")
+limitedAccess <- Pattern("Limited Access")
+fullAccessWErrors <- Pattern("Full Access with Errors")
+
+-- --------------------------------------------------------------- [ Perimeter ]
+
+policy <- Abstract Pattern("Policy")
+brokeredAuth <- Pattern("Brokered Authentication")
+sap <- Pattern("Single Access Point")
+singleThreadedFacade <- Pattern("Single Threaded Facade")
+pep <- Pattern("Policy Enforcement Point")
+authenticationEnforcer <- Pattern("Authentication Enforcer")
+authorisationEnforcer <- Pattern("Authorisation Enforcer")
+accountLockout <- Pattern("Account Lockout")
+interceptvalidator <- Pattern("Intercepting Validator")
+contentDependentProcessing <- Pattern("Content Dependent Processing")
+errorDetectionCorrection <- Pattern("Error Detection and Correction")
+exceptionShield <- Pattern("Exception Shielding")
+
+-- ---------------------------------------------------------------- [ Spoofing ]
+
+interceptingWebAgent <- Pattern("Intercepting Web Agent")
+credentialTokeniser <- Pattern("Credential Tokenizer")
+sso <- Pattern("Single Sign On")
+ssoDelegator <- Pattern("SSO Felegator")
+assertBuilder <- Pattern("Assertion Builder")
+passwordSynchroniser <- Pattern("Password Synchronizer")
+
+-- ----------------------------------------- [ Information Disclosure Exterior ]
+
+dmz <- Pattern("Demilitarized Zone")
+frontDoor <- Pattern("Front Door")
+trustProxy <- Pattern("Trusted Proxy")
+protectionReverseProxy <- Pattern("Protection Reverse Proxy")
+packetFilterFwall <- Pattern("Packet Filter Firewall")
+netAddressBList <- Pattern("Network Address Blacklist")
+integrationReverseProxy <- Pattern("Integration Reverse Proxy")
+msgReplayDetection <- Pattern("Message Replay Detection")
+proxyBasedFwall <- Pattern("Proxy Based Firewall")
+statefulFwall <- Pattern("Stateful Firewall")
+
+infoObscurity <- Pattern("Information Obsurity")
+secureComms <- Pattern("Secure Communication")
+secureServiceProxy <- Pattern("Secure Service Proxy")
+secureAssocation <- Pattern("Security Association")
+secureContext <- Pattern("Security Context")
+msgInterceptingGateway <- Pattern("Message Intercepting Gateway")
+msgInspector <- Pattern("Message Inspector")
+secureMsgRouter <- Pattern("Secure Message Router")
+
+-- -------------------------------------------------------- [ Privacy Patterns ]
+
+obliviousTransfer <- Pattern("Oblivious Transfer")
+pseudoIdentity <- Pattern("Pseudonymous Identity")
+anonymitySet <- Pattern("Anonymity Set")
+chaining <- Pattern("Chaining")
+randomExit <- Pattern("Random Exit")
+batchRouting <- Pattern("Batched Routing")
+randomWait <- Pattern("Random Wait")
+coverTraffic <- Pattern("Cover Traffic")
+linkPadding <- Pattern("Linked Padding")
+morphedRepr <- Pattern("Morphed Representation")
+layeredEncryption <- Pattern("Layered Encryption")
+constantLengthPadding <- Pattern("Constent Length Padding")
+
+-- --------------------------------------------------- [ Higher Level Patterns ]
+
+assetIdentification <- Pattern("Security Needs Identification of Enterprise Asses")
+assetEval <- Pattern("Asset Evaluation")
+vulnAssessment <- Pattern("Vulnerability Assessment")
+riskDetermination <- Pattern("Risk Determination")
+defenseDepth <- Pattern("Defense in Depth")
+enterSecApproach <- Pattern("Enterprise Security Approaches")
+enterSecServices <- Pattern("Enterprise Security Services")
+lowHangingFruit <- Pattern("Low Hanging Fruit")
+protectedSystem <- Pattern("Protected System")
+hideImplementation <- Pattern("Hidden Implementation")
+minefield <- Pattern("Minefield")
+whiteHatsHackThyselves <- Pattern("White Hats Hack Thyselves")
+
+relations
+
+-- ---------------------------------------------------- [ Privilege Escalation ]
+
+compartmentalisation linkedTo distResponsibility : "Efficient Partition"
+
+distResponsibility linkedTo compartmenaliseation : "Re-Partition"
+distResponsibility linkedTo exeDomain : "Restrict Resources"
+
+exeDomain linkedTo controlledProcCreation : "Restrict Privilege Inheritance"
+exeDomain linkedTo controlledObjectFactory : "Protect Object Rights"
+exeDomain linkedTo controlledVirtualAddressSpace : "Protect Virtual Memory"
+
+controlledProcCreation linkedTo secureResourcePooling : "Limit Process Lifetime"
+
+-- --------------------------------------------------------------- [ Tampering ]
+
+distResponsibility linkedTo trustedPartitioning : "Communicate between processes"
+distResponsibility linkedTo uniqueLocWriteReq : "Concurrent write race"
+distResponsibility linkedTo serverSandbox : "Constrain Environment"
+
+exeDomain linkedTo serverSandbox : "Constrain Environment"
+exeDomain linkedTo safeDataStruct : "Data safety"
+exeDomain linkedTo checkpointedSys : "Graceful restart"
+
+serverSandbox linkedTo chroot : "Sandbox Processes"
+
+-- --------------------------------------------- [ Information Disclosure Core ]
+
+rbac linkedTo limitedAccess : "Constrained UI"
+rbac linkedTo fullAccessWErrors : "UI with Options"
+rbac linkedTo mLevelSecurity : "Security Tiers"
+rbac linkedTo containerManagedSec : "Container Managed Security"
+rbac linkedTo referenceMonitor : "Enforcement"
+
+mLevelSecurity linkedTo subjectDesc : "Subject Descriptor"
+
+subjectDesc linkedTo referenceMonitor : "Enforcement"
+
+securitySesion linkedTo limitedAccess : "Constrained UI"
+securitySesion linkedTo fullAccessWErrors : "UI with Options"
+securitySesion linkedTo directedSession : "Guide User navigation"
+securitySesion linkedTo secureSessionObject : "Communicate Between Sessions"
+securitySesion linkedTo secureServiceFacade : "Centralize Component Interactions"
+
+directedSession linkedTo secureSessionObject : "Communicate Between Sessions"
+
+secureSessionObject linkedTo obfuscatedTranferObject : "Hide Communication Data"
+
+obfuscatedTranferObject linkedTo clientDataStorage : "Protect Client Side Data"
+obfuscatedTranferObject linkedTo encryptedStorage : "Protect Server Side Data"
+
+secureServiceFacade linkedTo obfuscatedTranferObject : "Hide Data"
+secureServiceFacade linkedTo policyDelegate : "Control Policy"
+secureServiceFacade linkedTo dynamicsServiceMgnt : "Instrument and Monitor Sessions"
+
+-- --------------------------------------------------------------- [ Perimeter ]
+
+policy linkedTo brokeredAuth : "External Authentication"
+policy linkedTo sap : "Decision Point"
+
+brokeredAuth linkedTo authenticationEnforcer : "Check Credential"
+
+sap linkedTo pep : "Enforce Policy"
+sap linkedTo singleThreadedFacade : "Simple Perimeter"
+
+pep linkedTo authenticationEnforcer : "Check Identity" 
+pep linkedTo authorisationEnforcer : "Control Access" 
+pep linkedTo interceptvalidator : "Check Input" 
+
+authenticationEnforcer linkedTo accountLockout : "Prevent Brute Force Attacks"
+authorisationEnforcer linkedTo rbac : "Policy for A/C"
+
+interceptvalidtor linkedTo contentDependentProcessing : "Code and Data separation"
+interceptvalidtor linkedTo errorDetectionCorrection : "Integrity Check" 
+
+contentDependentProcessing linkedTo exceptionShield : "Protect with exception and hide exception metadata" 
+errorDetectionCorrection linkedTo exceptionShield : "Protect with exception and hide exception metadata"
+
+-- ---------------------------------------------------------------- [ Spoofing ]
+
+interceptingWebAgent linkedTo credentialTokeniser: "Reusable Credential" 
+interceptingWebAgent linkedTo sso : "Reuse Authentication" 
+
+sso linkedTo ssoDelegator : "Separate processing component"
+
+sso linkedTo credentialTokeniser : "Manage Credential" 
+sso linkedTo assertBuilder : "SAML Assertions" 
+sso linkedTo passwordSynchroniser  : "Manage Passwords" 
+
+-- ----------------------------------------- [ Information Disclosure Exterior ]
+
+dmz linkedTo frontDoor : "Enforce Policy"
+
+frontDoor linkedTo trustProxy : "Trust a 3rd Party"
+frontDoor linkedTo protectionReverseProxy : "Setup Firewall"
+
+protectionReverseProxy linkedTo packetFilterFwall : "Filter All input"
+protectionReverseProxy linkedTo integrationReverseProxy : "Facade for Internal Services"
+
+packetFilterFwall linkedTo netAddressBList : "Known Offenders"
+
+integrationReverseProxy linkedTo msgReplayDetection : "Prevent Replay Attack"
+integrationReverseProxy linkedTo proxyBasedFwall : "Selectively Expose Service"
+integrationReverseProxy linkedTo msgInterceptingGateway : "Check and Validate Messaging"
+
+proxyBasedFwall linkedTo statefulFwall : "Stateful Check"
+
+msgInterceptingGateway linkedTo msgInspector : "Valiation Component"
+msgInterceptingGateway linkedTo secureMsgRouter : "Multi-Party Messaging"
+
+infoObscurity linkedTo secureComms : "Unobservable Channel"
+
+seccomms linkedTo secureServiceProxy : "Secure Facade"
+seccomms linkedTo secureAssocation : "Store Security Info"
+
+secureServiceProxy linkedTo integrationReverseProxy: "Enforce Policy"
+
+secureAssocation linkedTo secureContext : "Container for Sec Attributes"
+
+-- -------------------------------------------------------- [ Privacy Patterns ]
+
+infoObscurity linkedTo obliviousTransfer : "Zero Knowledge Communication"
+infoObscurity linkedTo pseudoIdentity : "Assume Alias"
+
+pseudoIdentity linkedTo anonymitySet : "Mix with probable suspects"
+pseudoIdentity linkedTo chaining : "Deep defense"
+pseudoIdentity linkedTo morphedRepr : "Hide Identifiable Traits"
+
+anonymitySet linkedTo batchRouting : "Mixing Strategy"
+anonymitySet linkedTo randomWait : "Mixing Strategy"
+anonymitySet linkedTo morphedRepr : "Hide Identifiable Traits"
+anonymitySet linkedTo chaining: "Deep Defense"
+
+batchRouting linkedTo coverTraffic : "Create Proable Suspects"
+randomWait linkedTo coverTraffic : "Create Proable Suspects"
+
+coverTraffic linkedTo linkPadding : "Prevent Traffic Shaping"
+
+chaining linkedTo randomExit : "Unpredictable Chaining"
+chaining linkedTo morphedRepr : "Hide Identifiable Traits"
+
+morphedRepr linkedTo layeredEncryption : "Protect Confidentiality"
+
+layeredEncryption linkedTo constantLengthPadding : "Make Indistinguishable"
+
+-- --------------------------------------------------- [ Higher Level Patterns ]
+
+assetIdentification linkedTo assetEval : "Value of Asset"
+assetIdentification linkedTo vulnAssessment : "Identify Threats"
+
+assetEval linkedTo riskDetermination : "Rank Assets"
+
+vulnAssessment linkedTo riskDetermination : "Rank Threats"
+
+riskDetermination linkedTo defenseDepth : "Strong Protection"
+riskDetermination linkedTo enterSecApproach : "Select and Integrate Countermeasure"
+
+defenseDepth linkedTo enterSecApproach : "Choose Defense Mechanism"
+
+enterSecApproaches linkedTo lowHangingFruit : "Where to start"
+enterSecApproaches linkedTo enterSecServices : "Solution to use"
+
+enterSecServices linkedTo protectedSystem : "Protect Resources"
+enterSecServices linkedTo hideImplementation : "Security by Obscurity"
+enterSecServices linkedTo whiteHatsHackThyselves : "Test Adopted Solution"
+
+protectedSystem linkedTo policy : "Rules for Protection"
+hideImplementation linkedTo minefield: "Variation in System"
+
+whiteHatsHackThyselves linkedTo riskDetermination : "Mitigate vulnerability found"
+
+-- -------------------------------------------------- [ InterPattern Relations ]
+
+enterSecServices linkedTo [infoObscurity, compartmentalisation]
+protectedSystem linkedTo [dmz, compartmentalisation]
+policy linkedTo [brokeredAuth, sap]
+infoObscurity linkedTo pseudoIdentity
+integrationReverseProxy linkedTo interceptingWebAgent
+authenticationEnforcer linkedTo securitySession
+rbac linkedTo mLevelSecurity
+
+-- --------------------------------------------------------------------- [ EOR ]
+
+-- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
+-- pattern language (for security). In Proceedings of the ACM
+-- international symposium on New ideas, new paradigms, and
+-- reflections on programming and software (Onward! '12). ACM, New
+-- York, NY, USA, 139-158. DOI=10.1145/2384592.2384607
+
+-- --------------------------------------------------------------------- [ EOF ]

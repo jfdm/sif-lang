@@ -1,0 +1,59 @@
+-- --------------------------------------- [ Preventing Information Disclosure ]
+
+language "Preventing Information Disclosure Core" as preventinginfodisccore
+
+patterns
+
+rbac <- Pattern("Role Based Access Control")
+containerManagedSec <- Pattern("Container Managed Security")
+mLevelSecurity <- Pattern("Multilevel Security")
+subjectDesc <- Pattern("Subject Descriptor")
+referenceMonitor <- Pattern("Reference Monitor")
+
+securitySession <- Pattern("Security Session")
+directedSession <- Pattern("Directed Session")
+secureSessionObject <- Pattern("Secure Session Object")
+obfuscatedTranferObject <- Pattern("Obfuscated Transfer Object")
+clientDataStorage <- Pattern("Client Data Storage")
+encryptedStorage <- Pattern("Encrypted Storage")
+secureServiceFacade <- Pattern("Secure Service Facade")
+policyDelegate <- Pattern("Policy Delegate")
+dynamicsServiceMgnt <- Pattern("Dynamics Service Management")
+limitedAccess <- Pattern("Limited Access")
+fullAccessWErrors <- Pattern("Full Access with Errors")
+
+relations
+
+rbac linkedTo limitedAccess : "Constrained UI"
+rbac linkedTo fullAccessWErrors : "UI with Options"
+rbac linkedTo mLevelSecurity : "Security Tiers"
+rbac linkedTo containerManagedSec : "Container Managed Security"
+rbac linkedTo referenceMonitor : "Enforcement"
+
+mLevelSecurity linkedTo subjectDesc : "Subject Descriptor"
+
+subjectDesc linkedTo referenceMonitor : "Enforcement"
+
+securitySesion linkedTo limitedAccess : "Constrained UI"
+securitySesion linkedTo fullAccessWErrors : "UI with Options"
+securitySesion linkedTo directedSession : "Guide User navigation"
+securitySesion linkedTo secureSessionObject : "Communicate Between Sessions"
+securitySesion linkedTo secureServiceFacade : "Centralize Component Interactions"
+
+directedSession linkedTo secureSessionObject : "Communicate Between Sessions"
+
+secureSessionObject linkedTo obfuscatedTranferObject : "Hide Communication Data"
+
+obfuscatedTranferObject linkedTo clientDataStorage : "Protect Client Side Data"
+obfuscatedTranferObject linkedTo encryptedStorage : "Protect Server Side Data"
+
+secureServiceFacade linkedTo obfuscatedTranferObject : "Hide Data"
+secureServiceFacade linkedTo policyDelegate : "Control Policy"
+secureServiceFacade linkedTo dynamicsServiceMgnt : "Instrument and Monitor Sessions"
+
+
+-- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
+-- pattern language (for security). In Proceedings of the ACM
+-- international symposium on New ideas, new paradigmLevelSecurity, and
+-- reflections on programming and software (Onward! '12). ACM, New
+-- York, NY, USA, 139-158. DOI=10.1145/2384592.2384607
