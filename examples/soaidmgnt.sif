@@ -1,16 +1,15 @@
--- ------------------------------ [ A Pattern Language for Identity Management ]
+-- ------------------------------------------------- [ SOA Identity Management ]
 
-language "Identity Management" as identitymanagement
+language "SOA Identity Management" as soaidmgnt
 
 patterns
 
--- SOA Security Patterns
 amat	<- Abstract Pattern("Access Matrix")
 refmon	<- Pattern("Reference Monitor")
 abac	<- Pattern("Attribute-Based Access Control")
 cred	<- Pattern("Credential")
 author	<- Pattern("Authenticator")
-authiz  <- Pattern("Authorisation")
+authiz	<- Pattern("Authorization")
 cot		<- Pattern("Circle of Trust")
 idprov	<- Pattern("Identity Provider")
 
@@ -27,30 +26,6 @@ idfed <- Pattern("Identity Federation"){
   :implements abac
 }
 
--- Web Services Federation Patterns
-
-saml <- Pattern("SAML Assertion"){
-  :implements [ cred, abac, cap ]
-}
-
-xacml <- Pattern("XACML Authorization")
-
-appfwall <- Pattern("Application Firewall"){
-  :implements xacml
-}
-
-xmlfwall <- Pattern("XML Firewall"){
-  :extends [ appfwall ]
-}
-
-liaf <- Pattern("Liberty Alliance ID Federation"){
-  :implements idfed
-}
-
-liafs <- Pattern("Liberty Allliance PAOS ID Service")
-
-xacmla <- Pattern("XACML A/C Evaluation")
-
 relations
 
 idfed uses [ cot, cred, author ]
@@ -64,18 +39,6 @@ refmon linkedTo acl : "enforces"
 refmon linkedTo cap : "enforces"
 refmon linkedTo abac : "enforces"
 
-saml linkedTo cap : "typeOf"
-
-appfwall uses saml
-appfwall linkedTo xacmla : "enforces"
-
-xacml linkedTo author : "defines"
-
-xacmla linkedTo xacml : "enforces"
-xacmla linkedTo refmon : "enforces"
-
-liaf uses saml
-liaf linkedTo liafs : "Wireless Systems"
 
 -- Delessy, N.A.; Fernandez, E.B., "A Pattern-Driven Security Process
 -- for SOA Applications," Availability, Reliability and Security,

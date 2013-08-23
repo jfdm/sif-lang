@@ -26,13 +26,13 @@ relations
 
 rbac linkedTo la : "Constrained UI"
 rbac linkedTo fawe : "UI with Options"
-
 rbac linkedTo ms : "Security Tiers"
+rbac linkedTo cms : "Container Managed Security"
+rbac linkedTo rm : "Enforcement"
+
 ms linkedTo sd : "Subject Descriptor"
 
 sd linkedTo rm : "Enforcement"
-
-rbac linkedTo cms : "Container Managed Security"
 
 ss linkedTo la : "Constrained UI"
 ss linkedTo fawe : "UI with Options"
