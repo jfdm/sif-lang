@@ -10,13 +10,50 @@ import Examples
 -- http://ivanmiljenovic.wordpress.com/2011/10/16/graphviz-in-vacuum/
 
 -- ------------------------------------------------- [ Tranformation Functions ]
-
 plang2Dot :: Plang -> [String]
-plang2Dot plang = ["digraph G {\n"] ++ patterns ++ classrels ++ instrels ++ ["\n}\n"]
+plang2Dot plang | isNothing (Model.imports plang) = plang2Dot' plang False
+                | otherwise = plang2Dot' plang True
+
+plang2Dot' :: Plang -> Bool -> [String]
+plang2Dot' plang b | b == False = heed ++ pbody ++ ["\n}\n"]
+                   | otherwise = heed ++ ibody ++ pbody ++ ["\n}\n"]
+                                 where
+                                   heed = ["digraph G {\n"]
+                                   pbody = doTransform plang
+                                   ibody = imports2Dot $ fromJust (Model.imports plang)
+
+doTransform :: Plang -> [String]
+doTransform plang = patterns ++ classrels ++ instrels
+                    where
+                      patterns = patterns2Dot plang
+                      classrels = classRelations2Dot plang
+                      instrels = instRelations2Dot plang
+
+-- ---------------------------------------------------------- [ Imports to Dot ]
+
+imports2Dot :: Imports -> [String]
+imports2Dot imps = map unlines (map (imports2Dot') (groupBy (groupImports) imps))
     where
-      patterns = patterns2Dot plang
-      classrels = classRelations2Dot plang
-      instrels = instRelations2Dot plang
+      groupImports x y = (Model.lang x) == (Model.lang y)
+     
+     
+imports2Dot' :: Imports -> [String]
+imports2Dot' imps = heed ++ body ++ taal
+                    where
+                      heed = ["subgraph cluster_" ++ label ++ " {\n"]
+                      body = map (import2Dot) imps
+                      taal = ["label=\"" ++ label ++ "\ncolor=black;\n}\n"]
+                      label = (Model.lang (head imps))
+
+import2Dot :: Import -> String
+import2Dot (Import id Nothing) = genDotNode id id 
+import2Dot (Import id (Just patID)) = genDotNode patID patID
+
+-- @TODO If full import -> 
+--    1. Get AST for import language.
+--    2. Transform into Plang
+ 
+--      withImports = ["cluster_" ++ (Model.label (Model.info plang)) ++ "{\n"]
 
 -- ------------------------------------------------- [ General Relations 2 Dot ]
 
@@ -44,7 +81,7 @@ implements2Dot (Pattern _ i _ (Just xs) _) = Just $ map (\x -> genDotEdge i x (J
 -- | Get Extends to Dot
 extends2Dot :: Pattern -> Maybe [String]
 extends2Dot (Pattern _ _ Nothing _ _) = Nothing
-extends2Dot (Pattern _ i (Just xs) _ _) = Just $ map (\x -> genDotEdge x i (Just "extends")) xs
+extends2Dot (Pattern _ i (Just xs) _ _) = Just $ map (\x -> genDotEdge i x (Just "extends")) xs
 
 -- ---------------------------------------------------------- [ Patterns 2 Dot ]
 
@@ -64,5 +101,8 @@ genDotNode i l = i ++ " [style=rounded,shape=box,label=\"" ++ l ++ "\"]; "
 -- | Gen Dot Edge
 genDotEdge :: ID -> ID -> Maybe String -> String
 genDotEdge a b Nothing = a ++ " -> " ++ b ++ ";"
-genDotEdge a b (Just l) =  a ++ " -> " ++ b ++ "[label=\"" ++ l ++ "\"]; "
+genDotEdge a b (Just l) =  a ++ " -> " ++ b ++ " [" ++ label l ++ "]; "
+                           where
+                             label l = "label=\"" ++ l ++ "\""
 
+-- --------------------------------------------------------------------- [ EOF ]
