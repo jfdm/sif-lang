@@ -1,2 +1,4 @@
 *~
 tooling/*.sif
+tooling/*.dot
+tooling/*.png
