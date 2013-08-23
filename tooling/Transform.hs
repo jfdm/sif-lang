@@ -42,7 +42,7 @@ imports2Dot' imps = heed ++ body ++ taal
                     where
                       heed = ["subgraph cluster_" ++ label ++ " {\n"]
                       body = map (import2Dot) imps
-                      taal = ["label=\"" ++ label ++ "\ncolor=black;\n}\n"]
+                      taal = ["label=\"" ++ label ++ "\"\ncolor=black;\n}\n"]
                       label = (Model.lang (head imps))
 
 import2Dot :: Import -> String
