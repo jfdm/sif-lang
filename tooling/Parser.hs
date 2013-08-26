@@ -1,9 +1,12 @@
 module Parser (parseSif) where
 
+import Control.Monad.State
 import Text.Parsec
 import Text.Parsec.String (Parser, parseFromFile)
+import Text.Parsec.Prim (parseTest)
 import Lexer
 import Model
+import Utils
 
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 
@@ -22,7 +25,7 @@ parsePlang = do mdata <- parseMetadata
                 reserved "patterns"
                 patterns <- manyTill parsePattern (reserved "relations")
                 relations <- many1 parseRelation
-                return (Plang mdata imports patterns relations)
+                return (Plang mdata imports patterns)
              <?> "Language Instance"
 
 -- ---------------------------------------------------- [ Language Declaration ]
@@ -43,6 +46,7 @@ parseMetadata = do reserved "language"
 -- parseImports ::= parseImport*;
 parseImports :: Parser Imports
 parseImports = do is <- many1 parseImport
+                  map (\x -> modify ((Model.pattern x) :)) is
                   return $ concat is
                <?> "Imports"
 
@@ -58,7 +62,7 @@ parseImportM = do reserved "from"
                   lang <- identifier
                   reserved "import"
                   ps <- sepBy1 identifier comma
-                  return $ map (\x -> Import lang (Just x)) ps
+                  return $ map (\x -> Import lang (Pattern x x Nothing Nothing Nothing Nothing Nothing)) ps
                <?> "Many Imports"
 
 -- | Import a pattern language
@@ -66,7 +70,7 @@ parseImportM = do reserved "from"
 parseImportLang :: Parser Imports
 parseImportLang = do reserved "import"
                      lang <- identifier
-                     return (Import lang Nothing : [])
+                     return (Import lang Nothing)
                   <?> "Language Import"
 
 -- ----------------------------------------------- [ Pattern Parsing Functions ]
@@ -86,7 +90,9 @@ parsePatternC = do id <- identifier
                    reserved "Pattern"
                    name <- parens stringLiteral
                    (extends, implements) <- braces parseProperties
-                   return (Pattern name id extends implements modifier)
+                   p <- (Pattern name id modifier extends implements Nothing Nothing)
+                   modify (p :)
+                   return p
                <?> "Complex Pattern"
 
 -- | Simple patterns.
@@ -97,7 +103,9 @@ parsePatternS = do id <- identifier
                    modifier <- optionMaybe parseModifier
                    reserved "Pattern"
                    name <- parens stringLiteral
-                   return (Pattern name id Nothing Nothing modifier)
+                   p <- (Pattern name id modifier Nothing Nothing Nothing)
+                   modify (p :)
+                   return p
                <?> "Simple Pattern"
 
 -- ---------------------------------------------- [ Pattern Modifier Functions ]
@@ -117,26 +125,31 @@ parseModifierI = do reserved "Integration"
                     return "Integration"
                  <?> "Integration"
 
--- ------------------------------------------------ [ Pattern Modifier Parsing ]
+-- ------------------------------------------------ [ Pattern Property Parsing ]
 
 -- | Parse the properties
 -- parseProperty ::= parseImplements parseExtends;
-parseProperties :: Parser (Maybe IDs, Maybe IDs)
+parseProperties :: Parser (Maybe Extends, Maybe Realises)
 parseProperties = do extends <- optionMaybe parseExtends
                      implements <- optionMaybe parseImplements
                      return (extends, implements)
                  <?> "Properties"
 
 -- parseExtends ::= :extends <idlist>;
-parseExtends :: Parser IDs
+parseExtends :: Parser Extends
 parseExtends = do reserved ":extends"
-                  parseIDs
+                  ids <- parseIDs
+                  st <- get
+                  map (\id -> Relation (getPattern id st) Nothing) ids
                <?> "Specialisation"
 
 -- parseImplements ::= :implements <idlist>;
-parseImplements :: Parser IDs
+parseImplements :: Parser Realises
 parseImplements = do reserved ":implements"
                      parseIDs
+                     ids <- parseIDs
+                     st <- get
+                     map (\id -> Relation (getPattern id st) Nothing) ids
                   <?> "Realisation"
 
 -- ---------------------------------------------- [ Relation Parsing Functions ]
@@ -149,6 +162,8 @@ parseRelation :: Parser Relation
 parseRelation = try parseRelation1 <|> parseRelationM <?> "Relations"
 
 -- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
+
+-- TODO Write code to modify state table updating the `to' patterns with the relations.
 
 -- relationM ::= relationMu | relationMl
 parseRelationM :: Parser Relation
@@ -182,7 +197,11 @@ parseRelation1u = do from <- identifier
                      to <- parseID1
                      reservedOp ":"
                      desc <- optionMaybe stringLiteral
-                     return (Requires from to desc)
+                     st <- get
+                     res <- Relation (getPattern to st) desc
+                     ust <- addLink from res st
+                     put ust
+                     return res
 
 -- relation1l ::= <id> "linkedTo" <id> ":" <desc>;
 parseRelation1l :: Parser Relation
@@ -191,7 +210,8 @@ parseRelation1l = do from <- identifier
                      to <- parseID1
                      reservedOp ":"
                      desc <- optionMaybe stringLiteral
-                     return (Links from to desc)
+                     st <- get
+                     return Relation (getPattern to st) desc
 
 -- -------------------------------------------------- [ Misc Parsing Functions ]
 
@@ -211,11 +231,8 @@ parseIDList = brackets $ sepBy1 identifier comma
 -- ------------------------------------------------- [ Helper Testing Function ]
 
 -- Test some parseExpression p with a given string s
-testParseStr :: Show a => Parser a -> String -> IO ()
-testParseStr p s =
-    case parse (runLex p) "" s of
-      Left err -> error (show err)
-      Right x -> print x
+testParseStr :: Parser -> String -> IO ()
+testParseStr p s = parseTest p s
 
 -- Test some parseExpression p with a given file f
 testParseFile :: Show a => Parser a -> String -> IO ()
