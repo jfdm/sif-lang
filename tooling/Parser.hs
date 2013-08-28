@@ -2,8 +2,8 @@ module Parser (parseSif) where
 
 import Text.Parsec
 import Text.Parsec.String (Parser, parseFromFile)
+import Model.AST
 import Lexer
-import Model
 
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 

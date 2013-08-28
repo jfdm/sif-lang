@@ -3,7 +3,7 @@ module Main (main) where
 import System.Environment (getArgs)
 import System.IO
 import Parser
-import Model
+import Model.AST
 import Transform
 
 main :: IO ()

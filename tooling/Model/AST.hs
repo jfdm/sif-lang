@@ -1,4 +1,6 @@
-module Model where
+module Model.AST where
+
+-- AST for the Pattern Language
 
 type ID = String
 type IDs = [ ID ]

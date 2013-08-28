@@ -1,6 +1,6 @@
-module Examples where
+module Examples.AST where
 
-import Model
+import Model.AST
 
 -- ------------------------------------------------------- [ Testing Languages ]
 

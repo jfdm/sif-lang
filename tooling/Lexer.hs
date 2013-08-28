@@ -4,7 +4,7 @@ import Text.Parsec
 import Text.Parsec.String (Parser)
 import qualified Text.Parsec.Token as Tok
 import Text.Parsec.Language (haskellStyle)
-import Model
+import Model.AST
 
 -- ----------------------------------------------------- [ Define Token Parser ]
 

@@ -4,8 +4,8 @@ import System.IO
 import Data.List
 import Data.Maybe
 import Parser
-import Model
-import Examples
+import Model.AST
+import Examples.AST
 
 -- ------------------------------------------------------ [ Checking Functions ]
 
