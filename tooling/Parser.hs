@@ -9,13 +9,13 @@ import Lexer
 import Model
 import Utils
 
-type Parser a = Parsec String Patterns a
+--type Parser a = Parsec String Patterns a
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 
 -- | Parses a Sif Spec file into the corresponding AST
 parseSif :: String -> Plang
 parseSif fname =
-    case parse (runLex parsePlang) "" fname of
+    case runParser (runLex parsePlang) [] "" fname of
       Left err -> error (show err)
       Right ast -> ast
 
@@ -25,7 +25,7 @@ parsePlang :: Parser Plang
 parsePlang = do (title, label) <- parseMetadata
                 imports <- optionMaybe parseImports
                 reserved "patterns"
---                patterns <- -- manyTill parsePattern (reserved "relations")
+                patterns <- manyTill parsePattern (reserved "relations")
           --      relations <- many1 parseRelation
                 return (Plang title label imports [Pattern label label Nothing Nothing Nothing Nothing Nothing] )
              <?> "Language Instance"
@@ -48,7 +48,7 @@ parseMetadata = do reserved "language"
 -- parseImports ::= parseImport*;
 parseImports :: Parser Imports
 parseImports = do is <- liftM (concat) $ many1 parseImport
-                  putState $ fmap (map (\x -> Model.pattern x)) is
+                  putState $ mapMaybe (\x -> Model.pattern x) is
                   return is
                <?> "Imports"
 
@@ -77,80 +77,80 @@ parseImportLang = do reserved "import"
 
 -- ----------------------------------------------- [ Pattern Parsing Functions ]
 
--- -- | Pattern Definition
--- -- parsePattern := parsePatternSimple | parsePatternC
--- parsePattern :: Parser Pattern
--- parsePattern = try parsePatternC <|> parsePatternS <?> "Patterns"
+-- | Pattern Definition
+-- parsePattern := parsePatternSimple | parsePatternC
+parsePattern :: Parser Pattern
+parsePattern = try parsePatternC <|> parsePatternS <?> "Patterns"
 
 
--- -- | Complex patterns that extend or import other patterns
--- -- parsePatternC ::= parsePatternS { parseProperty* };
--- parsePatternC :: Parser Pattern
--- parsePatternC = do id <- identifier
---                    reservedOp "<-"
---                    modifier <- optionMaybe parseModifier
---                    reserved "Pattern"
---                    name <- parens stringLiteral
---                    (extends, implements) <- braces parseProperties
---                    p <- (Pattern name id modifier extends implements Nothing Nothing)
---                    modify (p :)
---                    return p
---                <?> "Complex Pattern"
+-- | Complex patterns that extend or import other patterns
+-- parsePatternC ::= parsePatternS { parseProperty* };
+parsePatternC :: Parser Pattern
+parsePatternC = do id <- identifier
+                   reservedOp "<-"
+                   modifier <- optionMaybe parseModifier
+                   reserved "Pattern"
+                   name <- parens stringLiteral
+                   (extends, implements) <- braces parseProperties
+                   let p = (Pattern name id modifier extends implements Nothing Nothing)
+                   modifyState (p :)
+                   return p
+               <?> "Complex Pattern"
 
--- -- | Simple patterns.
--- -- parsePatternS ::= <id> <- <modifier> Pattern(<name>) ;
--- parsePatternS :: Parser Pattern
--- parsePatternS = do id <- identifier
---                    reservedOp "<-"
---                    modifier <- optionMaybe parseModifier
---                    reserved "Pattern"
---                    name <- parens stringLiteral
---                    p <- (Pattern name id modifier Nothing Nothing Nothing)
---                    modify (p :)
---                    return p
---                <?> "Simple Pattern"
+-- | Simple patterns.
+-- parsePatternS ::= <id> <- <modifier> Pattern(<name>) ;
+parsePatternS :: Parser Pattern
+parsePatternS = do id <- identifier
+                   reservedOp "<-"
+                   modifier <- optionMaybe parseModifier
+                   reserved "Pattern"
+                   name <- parens stringLiteral
+                   let p = (Pattern name id modifier Nothing Nothing Nothing Nothing)
+                   modifyState (p :)
+                   return p
+               <?> "Simple Pattern"
 
--- -- ---------------------------------------------- [ Pattern Modifier Functions ]
+-- ---------------------------------------------- [ Pattern Modifier Functions ]
 
--- -- | Parse the modifiers
--- -- parseModifier ::= parseModifierA | parseModifierI;
--- parseModifier :: Parser Modifier
--- parseModifier = try parseModifierA <|> parseModifierI <?> "Modifier"
+-- | Parse the modifiers
+-- parseModifier ::= parseModifierA | parseModifierI;
+parseModifier :: Parser Modifier
+parseModifier = try parseModifierA <|> parseModifierI <?> "Modifier"
 
--- parseModifierA :: Parser Modifier
--- parseModifierA = do reserved "Abstract"
---                     return Abstract
---                  <?> "Abstract"
+parseModifierA :: Parser Modifier
+parseModifierA = do reserved "Abstract"
+                    return Abstract
+                 <?> "Abstract"
 
--- parseModifierI :: Parser Modifier
--- parseModifierI = do reserved "Integration"
---                     return Integration
---                  <?> "Integration"
+parseModifierI :: Parser Modifier
+parseModifierI = do reserved "Integration"
+                    return Integration
+                 <?> "Integration"
 
--- -- ------------------------------------------------ [ Pattern Property Parsing ]
+-- ------------------------------------------------ [ Pattern Property Parsing ]
 
--- -- | Parse the properties
--- -- parseProperty ::= parseImplements parseExtends;
--- parseProperties :: Parser (Maybe Extends, Maybe Realises)
--- parseProperties = do extends <- optionMaybe parseExtends
---                      implements <- optionMaybe parseImplements
---                      return (extends, implements)
---                  <?> "Properties"
+-- | Parse the properties
+-- parseProperty ::= parseImplements parseExtends;
+parseProperties :: Parser (Maybe Extends, Maybe Realises)
+parseProperties = do extends <- optionMaybe parseExtends
+                     let implements = Nothing -- optionMaybe parseImplements
+                     return (extends, implements)
+                 <?> "Properties"
 
--- -- parseExtends ::= :extends <idlist>;
--- parseExtends :: Parser Extends
--- parseExtends = do reserved ":extends"
---                   ids <- parseIDs
---                   st <- get
---                   map (\id -> Relation (getPattern id st) Nothing) ids
---                <?> "Specialisation"
+-- parseExtends ::= :extends <idlist>;
+parseExtends :: Parser Extends
+parseExtends = do reserved ":extends"
+                  ids <- parseIDs
+                  st <- getState
+                  map (\id -> Relation (getPattern id st) Nothing) ids
+               <?> "Specialisation"
 
--- -- parseImplements ::= :implements <idlist>;
+-- parseImplements ::= :implements <idlist>;
 -- parseImplements :: Parser Realises
 -- parseImplements = do reserved ":implements"
 --                      parseIDs
 --                      ids <- parseIDs
---                      st <- get
+--                      st <- getState
 --                      map (\id -> Relation (getPattern id st) Nothing) ids
 --                   <?> "Realisation"
 
@@ -223,18 +223,18 @@ parseImportLang = do reserved "import"
 
 -- -- -------------------------------------------------- [ Misc Parsing Functions ]
 
--- -- parseIDs ::= <id> | <idlist>;
--- parseIDs :: Parser IDs
--- parseIDs = try parseIDList <|> parseID1 <?> "ID Lists"
+-- parseIDs ::= <id> | <idlist>;
+parseIDs :: Parser IDs
+parseIDs = try parseIDList <|> parseID1 <?> "ID Lists"
 
--- -- parseID1 ::= <id>;
--- parseID1 :: Parser IDs
--- parseID1 = do id <- identifier
---               return (id : [])
+-- parseID1 ::= <id>;
+parseID1 :: Parser IDs
+parseID1 = do id <- identifier
+              return (id : [])
 
--- -- parseIDList ::= [ <id> (<id> ',')* ];
--- parseIDList :: Parser IDs
--- parseIDList = brackets $ sepBy1 identifier comma
+-- parseIDList ::= [ <id> (<id> ',')* ];
+parseIDList :: Parser IDs
+parseIDList = brackets $ sepBy1 identifier comma
 
 -- -- ------------------------------------------------- [ Helper Testing Function ]
 

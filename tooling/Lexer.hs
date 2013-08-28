@@ -1,14 +1,17 @@
 module Lexer where
 
 import Text.Parsec
-import Text.Parsec.String (Parser)
+import Text.Parsec.String (GenParser)
 import qualified Text.Parsec.Token as Tok
+-- import Control.Monad.Identity
+
 import Text.Parsec.Language (haskellStyle)
 import Model
 
+type Parser a = GenParser Char [Pattern] a
 -- ----------------------------------------------------- [ Define Token Parser ]
 
-lexer :: Tok.TokenParser ()
+--lexer :: Tok.TokenParser [Pattern]
 lexer = Tok.makeTokenParser style
     where ops = ["<-", ":"]
           names = ["linkedTo", "uses",                               -- Relations
