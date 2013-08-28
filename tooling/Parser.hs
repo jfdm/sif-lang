@@ -1,9 +1,10 @@
 module Parser (parseSif) where
 
-import Control.Monad.State
+import Data.Maybe
+import Data.List
+import Control.Monad
 import Text.Parsec
 import Text.Parsec.String (Parser, parseFromFile)
-import Text.Parsec.Prim (parseTest)
 import Lexer
 import Model
 import Utils
@@ -20,24 +21,24 @@ parseSif fname =
 -- | Definition for a pattern language
 -- parsePlang ::= parseMetadata parseImports parsePattern+ parseRelation*;
 parsePlang :: Parser Plang
-parsePlang = do mdata <- parseMetadata
+parsePlang = do (title, label) <- parseMetadata
                 imports <- optionMaybe parseImports
                 reserved "patterns"
-                patterns <- manyTill parsePattern (reserved "relations")
-                relations <- many1 parseRelation
-                return (Plang mdata imports patterns)
+--                patterns <- -- manyTill parsePattern (reserved "relations")
+          --      relations <- many1 parseRelation
+                return (Plang title label imports [Pattern label label Nothing Nothing Nothing Nothing Nothing] )
              <?> "Language Instance"
 
 -- ---------------------------------------------------- [ Language Declaration ]
 
 -- | Definition for a pattern language metadata.
 -- parseLangDecl ::= language <title> as <id>
-parseMetadata :: Parser Metadata
+parseMetadata :: Parser (String, ID)
 parseMetadata = do reserved "language"
                    title <- stringLiteral
                    reserved "as"
-                   id <- identifier
-                   return (Metadata title id)
+                   label <- identifier
+                   return (title, label)
                 <?> "Language Declaration"
 
 -- ------------------------------------------------- [ Import Parsing Function ]
@@ -45,9 +46,9 @@ parseMetadata = do reserved "language"
 -- | Definition of language imports
 -- parseImports ::= parseImport*;
 parseImports :: Parser Imports
-parseImports = do is <- many1 parseImport
-                  map (\x -> modify ((Model.pattern x) :)) is
-                  return $ concat is
+parseImports = do is <- liftM (concat) $ many1 parseImport
+                  putState $ fmap (map (\x -> Model.pattern x)) is
+                  return is
                <?> "Imports"
 
 -- | Parse a single import
@@ -61,8 +62,8 @@ parseImportM :: Parser Imports
 parseImportM = do reserved "from"
                   lang <- identifier
                   reserved "import"
-                  ps <- sepBy1 identifier comma
-                  return $ map (\x -> Import lang (Pattern x x Nothing Nothing Nothing Nothing Nothing)) ps
+                  pIDs <- sepBy1 identifier comma
+                  return $ map (\i -> Import lang (Just $ Pattern i i Nothing Nothing Nothing Nothing Nothing)) pIDs
                <?> "Many Imports"
 
 -- | Import a pattern language
@@ -70,177 +71,179 @@ parseImportM = do reserved "from"
 parseImportLang :: Parser Imports
 parseImportLang = do reserved "import"
                      lang <- identifier
-                     return (Import lang Nothing)
+                     return [Import lang Nothing]
                   <?> "Language Import"
 
 -- ----------------------------------------------- [ Pattern Parsing Functions ]
 
--- | Pattern Definition
--- parsePattern := parsePatternSimple | parsePatternC
-parsePattern :: Parser Pattern
-parsePattern = try parsePatternC <|> parsePatternS <?> "Patterns"
+-- -- | Pattern Definition
+-- -- parsePattern := parsePatternSimple | parsePatternC
+-- parsePattern :: Parser Pattern
+-- parsePattern = try parsePatternC <|> parsePatternS <?> "Patterns"
 
 
--- | Complex patterns that extend or import other patterns
--- parsePatternC ::= parsePatternS { parseProperty* };
-parsePatternC :: Parser Pattern
-parsePatternC = do id <- identifier
-                   reservedOp "<-"
-                   modifier <- optionMaybe parseModifier
-                   reserved "Pattern"
-                   name <- parens stringLiteral
-                   (extends, implements) <- braces parseProperties
-                   p <- (Pattern name id modifier extends implements Nothing Nothing)
-                   modify (p :)
-                   return p
-               <?> "Complex Pattern"
+-- -- | Complex patterns that extend or import other patterns
+-- -- parsePatternC ::= parsePatternS { parseProperty* };
+-- parsePatternC :: Parser Pattern
+-- parsePatternC = do id <- identifier
+--                    reservedOp "<-"
+--                    modifier <- optionMaybe parseModifier
+--                    reserved "Pattern"
+--                    name <- parens stringLiteral
+--                    (extends, implements) <- braces parseProperties
+--                    p <- (Pattern name id modifier extends implements Nothing Nothing)
+--                    modify (p :)
+--                    return p
+--                <?> "Complex Pattern"
 
--- | Simple patterns.
--- parsePatternS ::= <id> <- <modifier> Pattern(<name>) ;
-parsePatternS :: Parser Pattern
-parsePatternS = do id <- identifier
-                   reservedOp "<-"
-                   modifier <- optionMaybe parseModifier
-                   reserved "Pattern"
-                   name <- parens stringLiteral
-                   p <- (Pattern name id modifier Nothing Nothing Nothing)
-                   modify (p :)
-                   return p
-               <?> "Simple Pattern"
+-- -- | Simple patterns.
+-- -- parsePatternS ::= <id> <- <modifier> Pattern(<name>) ;
+-- parsePatternS :: Parser Pattern
+-- parsePatternS = do id <- identifier
+--                    reservedOp "<-"
+--                    modifier <- optionMaybe parseModifier
+--                    reserved "Pattern"
+--                    name <- parens stringLiteral
+--                    p <- (Pattern name id modifier Nothing Nothing Nothing)
+--                    modify (p :)
+--                    return p
+--                <?> "Simple Pattern"
 
--- ---------------------------------------------- [ Pattern Modifier Functions ]
+-- -- ---------------------------------------------- [ Pattern Modifier Functions ]
 
--- | Parse the modifiers
--- parseModifier ::= parseModifierA | parseModifierI;
-parseModifier :: Parser Modifier
-parseModifier = try parseModifierA <|> parseModifierI <?> "Modifier"
+-- -- | Parse the modifiers
+-- -- parseModifier ::= parseModifierA | parseModifierI;
+-- parseModifier :: Parser Modifier
+-- parseModifier = try parseModifierA <|> parseModifierI <?> "Modifier"
 
-parseModifierA :: Parser Modifier
-parseModifierA = do reserved "Abstract"
-                    return "Abstract"
-                 <?> "Abstract"
+-- parseModifierA :: Parser Modifier
+-- parseModifierA = do reserved "Abstract"
+--                     return Abstract
+--                  <?> "Abstract"
 
-parseModifierI :: Parser Modifier
-parseModifierI = do reserved "Integration"
-                    return "Integration"
-                 <?> "Integration"
+-- parseModifierI :: Parser Modifier
+-- parseModifierI = do reserved "Integration"
+--                     return Integration
+--                  <?> "Integration"
 
--- ------------------------------------------------ [ Pattern Property Parsing ]
+-- -- ------------------------------------------------ [ Pattern Property Parsing ]
 
--- | Parse the properties
--- parseProperty ::= parseImplements parseExtends;
-parseProperties :: Parser (Maybe Extends, Maybe Realises)
-parseProperties = do extends <- optionMaybe parseExtends
-                     implements <- optionMaybe parseImplements
-                     return (extends, implements)
-                 <?> "Properties"
+-- -- | Parse the properties
+-- -- parseProperty ::= parseImplements parseExtends;
+-- parseProperties :: Parser (Maybe Extends, Maybe Realises)
+-- parseProperties = do extends <- optionMaybe parseExtends
+--                      implements <- optionMaybe parseImplements
+--                      return (extends, implements)
+--                  <?> "Properties"
 
--- parseExtends ::= :extends <idlist>;
-parseExtends :: Parser Extends
-parseExtends = do reserved ":extends"
-                  ids <- parseIDs
-                  st <- get
-                  map (\id -> Relation (getPattern id st) Nothing) ids
-               <?> "Specialisation"
+-- -- parseExtends ::= :extends <idlist>;
+-- parseExtends :: Parser Extends
+-- parseExtends = do reserved ":extends"
+--                   ids <- parseIDs
+--                   st <- get
+--                   map (\id -> Relation (getPattern id st) Nothing) ids
+--                <?> "Specialisation"
 
--- parseImplements ::= :implements <idlist>;
-parseImplements :: Parser Realises
-parseImplements = do reserved ":implements"
-                     parseIDs
-                     ids <- parseIDs
-                     st <- get
-                     map (\id -> Relation (getPattern id st) Nothing) ids
-                  <?> "Realisation"
+-- -- parseImplements ::= :implements <idlist>;
+-- parseImplements :: Parser Realises
+-- parseImplements = do reserved ":implements"
+--                      parseIDs
+--                      ids <- parseIDs
+--                      st <- get
+--                      map (\id -> Relation (getPattern id st) Nothing) ids
+--                   <?> "Realisation"
 
--- ---------------------------------------------- [ Relation Parsing Functions ]
+-- -- ---------------------------------------------- [ Relation Parsing Functions ]
 
--- @TODO Make better!
+-- -- @TODO Make better!
 
--- | Parse a relation
--- parseRelation ::= relationM | relation1 ;
-parseRelation :: Parser Relation
-parseRelation = try parseRelation1 <|> parseRelationM <?> "Relations"
+-- -- | Parse a relation
+-- -- parseRelation ::= relationM | relation1 ;
+-- parseRelation :: Parser Relation
+-- parseRelation = try parseRelation1 <|> parseRelationM <?> "Relations"
 
--- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
+-- -- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
 
--- TODO Write code to modify state table updating the `to' patterns with the relations.
+-- -- TODO Write code to modify state table updating the `to' patterns with the relations.
 
--- relationM ::= relationMu | relationMl
-parseRelationM :: Parser Relation
-parseRelationM =  try parseRelationMu <|> parseRelationMl
-                  <?> "1-2-Many Relation"
+-- -- relationM ::= relationMu | relationMl
+-- parseRelationM :: Parser Relation
+-- parseRelationM =  try parseRelationMu <|> parseRelationMl
+--                   <?> "1-2-Many Relation"
 
--- relationMu ::= <id> "uses" <idlist>;
-parseRelationMu :: Parser Relation
-parseRelationMu = do from <- identifier
-                     reserved "uses"
-                     to <- parseIDs
-                     return (Requires from to (Just "uses")) -- Nasty Hack
+-- -- relationMu ::= <id> "uses" <idlist>;
+-- parseRelationMu :: Parser Relation
+-- parseRelationMu = do from <- identifier
+--                      reserved "uses"
+--                      to <- parseIDs
+--                      return (Relation from to (Just "uses")) -- Nasty Hack
 
--- relationMl ::= <id> "linkedTo" <idlist>;
-parseRelationMl :: Parser Relation
-parseRelationMl = do from <- identifier
-                     reserved "linkedTo"
-                     to <- parseIDs
-                     return (Links from to (Just "linkedTo")) -- Nasty Hack
+-- -- relationMl ::= <id> "linkedTo" <idlist>;
+-- parseRelationMl :: Parser Relation
+-- parseRelationMl = do from <- identifier
+--                      reserved "linkedTo"
+--                      to <- parseIDs
+--                      return (Relation from to (Just "linkedTo")) -- Nasty Hack
 
--- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
+-- -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
 
--- parseRelation1 ::= relation1u | relation1l ;
-parseRelation1 :: Parser Relation            
-parseRelation1 = try parseRelation1u <|> parseRelation1l <?> "1-2-1 Relation with Description"
+-- -- parseRelation1 ::= relation1u | relation1l ;
+-- parseRelation1 :: Parser Relation            
+-- parseRelation1 = try parseRelation1u <|> parseRelation1l <?> "1-2-1 Relation with Description"
  
--- relation1u ::= <id> "uses" <id> ":" <desc>;                    
-parseRelation1u :: Parser Relation
-parseRelation1u = do from <- identifier
-                     reserved "uses"
-                     to <- parseID1
-                     reservedOp ":"
-                     desc <- optionMaybe stringLiteral
-                     st <- get
-                     res <- Relation (getPattern to st) desc
-                     ust <- addLink from res st
-                     put ust
-                     return res
+-- -- relation1u ::= <id> "uses" <id> ":" <desc>;                    
+-- parseRelation1u :: Parser Relation
+-- parseRelation1u = do from <- identifier
+--                      reserved "uses"
+--                      to <- parseID1
+--                      reservedOp ":"
+--                      desc <- optionMaybe stringLiteral
+--                      st <- get
+--                      res <- (Relation (getPattern to st) desc)
+--                      ust <- addLink from res st
+--                      put ust
+--                      return res
 
--- relation1l ::= <id> "linkedTo" <id> ":" <desc>;
-parseRelation1l :: Parser Relation
-parseRelation1l = do from <- identifier
-                     reserved "linkedTo"
-                     to <- parseID1
-                     reservedOp ":"
-                     desc <- optionMaybe stringLiteral
-                     st <- get
-                     return Relation (getPattern to st) desc
+-- -- relation1l ::= <id> "linkedTo" <id> ":" <desc>;
+-- parseRelation1l :: Parser Relation
+-- parseRelation1l = do from <- identifier
+--                      reserved "linkedTo"
+--                      to' <- parseID1
+--                      reservedOp ":"
+--                      desc <- optionMaybe stringLiteral
+--                      st <- get
+                     
+--                      return (Relation (patt to st) desc)
+--                             where
+--                               patt' = getPattern (head to) st
+--                               patt to st = case isNothing $ patt' to st of
+--                                              True -> error "Pattern Not Found"
+--                                              otherwise -> patt' to st
 
--- -------------------------------------------------- [ Misc Parsing Functions ]
+-- -- -------------------------------------------------- [ Misc Parsing Functions ]
 
--- parseIDs ::= <id> | <idlist>;
-parseIDs :: Parser IDs
-parseIDs = try parseIDList <|> parseID1 <?> "ID Lists"
+-- -- parseIDs ::= <id> | <idlist>;
+-- parseIDs :: Parser IDs
+-- parseIDs = try parseIDList <|> parseID1 <?> "ID Lists"
 
--- parseID1 ::= <id>;
-parseID1 :: Parser IDs
-parseID1 = do id <- identifier
-              return (id : [])
+-- -- parseID1 ::= <id>;
+-- parseID1 :: Parser IDs
+-- parseID1 = do id <- identifier
+--               return (id : [])
 
--- parseIDList ::= [ <id> (<id> ',')* ];
-parseIDList :: Parser IDs
-parseIDList = brackets $ sepBy1 identifier comma
+-- -- parseIDList ::= [ <id> (<id> ',')* ];
+-- parseIDList :: Parser IDs
+-- parseIDList = brackets $ sepBy1 identifier comma
 
--- ------------------------------------------------- [ Helper Testing Function ]
+-- -- ------------------------------------------------- [ Helper Testing Function ]
 
--- Test some parseExpression p with a given string s
-testParseStr :: Parser -> String -> IO ()
-testParseStr p s = parseTest p s
-
--- Test some parseExpression p with a given file f
-testParseFile :: Show a => Parser a -> String -> IO ()
-testParseFile p f = do { res <- parseFromFile (runLex p) f
-                       ; case res of
-                           Left err -> error (show err)
-                           Right x -> print x
-                       }
+-- -- Test some parseExpression p with a given file f
+-- testParseFile :: Show a => Parser a -> String -> IO ()
+-- testParseFile p f = do { res <- parseFromFile (runLex p) f
+--                        ; case res of
+--                            Left err -> error (show err)
+--                            Right x -> print x
+--                        }
 
 
--- --------------------------------------------------------------------- [ EOF ]
+-- -- --------------------------------------------------------------------- [ EOF ]

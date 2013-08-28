@@ -4,13 +4,14 @@ import System.Environment (getArgs)
 import System.IO
 import Parser
 import Model
-import Transform
+-- import Transform
 
 main :: IO ()
 main = do args <- getArgs 
           content <- readFile $ head args
           let ast = parseSif content
-          putStr $ unlines (plang2Dot ast)
+          print ast
+--          putStr $ unlines (plang2Dot ast)
 
 
 -- --------------------------------------------------------------------- [ EOF ]

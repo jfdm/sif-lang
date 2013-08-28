@@ -14,7 +14,7 @@ lexer = Tok.makeTokenParser style
           names = ["linkedTo", "uses",                               -- Relations
                    ":ofType", ":extends", ":implements",             -- Properties
                    "Pattern", "Abstract", "Integration", "language", -- 'Types'
-                   "from", "import", "as", "relations", "patterns"]  -- Keywords
+                   "from", "import", "relations", "patterns"]  -- Keywords
           style = haskellStyle {Tok.reservedOpNames = ops,
                                 Tok.reservedNames = names,
                                 Tok.commentLine = "--"}
