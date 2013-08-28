@@ -4,11 +4,12 @@ import Data.Maybe
 import Data.List
 import Control.Monad
 import Text.Parsec
-import Text.Parsec.String (Parser, parseFromFile)
+-- import Text.Parsec.String (Parser, parseFromFile)
 import Lexer
 import Model
 import Utils
 
+type Parser a = Parsec String Patterns a
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 
 -- | Parses a Sif Spec file into the corresponding AST
