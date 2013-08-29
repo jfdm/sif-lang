@@ -181,7 +181,7 @@ parseRelation = try parseRelationM <|> parseRelation1 <?> "Relations"
 
 -- relationM ::= relationMu | relationMl
 parseRelationM :: Parser ()
-parseRelationM =  parseRelationMu <|> try parseRelationMl <?> "1-2-Many Relation" 
+parseRelationM =  try parseRelationMu <|> parseRelationMl <?> "1-2-Many Relation" 
 
 -- relationMu ::= <id> "uses" <idlist>;
 parseRelationMu :: Parser ()
@@ -213,7 +213,7 @@ parseRelationMl = do from <- identifier
 
 -- parseRelation1 ::= relation1u | relation1l ;
 parseRelation1 :: Parser ()            
-parseRelation1 = parseRelation1u <|> try parseRelation1l <?> "1-2-1 Relation with Description"
+parseRelation1 = try parseRelation1u <|> parseRelation1l <?> "1-2-1 Relation with Description"
 
 -- relation1u ::= <id> "uses" <id> parseRelDesc?                    
 parseRelation1u :: Parser ()
