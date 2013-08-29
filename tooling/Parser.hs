@@ -1,15 +1,22 @@
 module Parser (parseSif) where
 
-import Data.Maybe
-import Data.List
+import Control.Applicative hiding ((<|>))
 import Control.Monad
 import Text.Parsec
--- import Text.Parsec.String (Parser, parseFromFile)
+
+import Data.Maybe
+import Data.List
+
 import Lexer
 import Model
 import Utils
 
---type Parser a = Parsec String Patterns a
+--  Need to added proper checks when making the relations!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+--  It is the whole goddam point of a stateful parser!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+--  Need to added proper checks when making the relations!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+--  It is the whole goddam point of a stateful parser!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+--  mkRelation (from Utils) is a nasty hack. Try and improve using parser errors, otherwise what is the point of using state.
+
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 
 -- | Parses a Sif Spec file into the corresponding AST
@@ -25,9 +32,11 @@ parsePlang :: Parser Plang
 parsePlang = do (title, label) <- parseMetadata
                 imports <- optionMaybe parseImports
                 reserved "patterns"
-                patterns <- manyTill parsePattern (reserved "relations")
-          --      relations <- many1 parseRelation
-                return (Plang title label imports [Pattern label label Nothing Nothing Nothing Nothing Nothing] )
+                manyTill parsePattern (reserved "relations")          
+                many1 parseRelation
+                pState <- getState
+                let ps = filter (\p -> Model.ident p /= Model.name p) pState
+                return (Plang title label imports ps)
              <?> "Language Instance"
 
 -- ---------------------------------------------------- [ Language Declaration ]
@@ -79,13 +88,13 @@ parseImportLang = do reserved "import"
 
 -- | Pattern Definition
 -- parsePattern := parsePatternSimple | parsePatternC
-parsePattern :: Parser Pattern
+parsePattern :: Parser ()
 parsePattern = try parsePatternC <|> parsePatternS <?> "Patterns"
 
 
 -- | Complex patterns that extend or import other patterns
 -- parsePatternC ::= parsePatternS { parseProperty* };
-parsePatternC :: Parser Pattern
+parsePatternC :: Parser ()
 parsePatternC = do id <- identifier
                    reservedOp "<-"
                    modifier <- optionMaybe parseModifier
@@ -94,12 +103,11 @@ parsePatternC = do id <- identifier
                    (extends, implements) <- braces parseProperties
                    let p = (Pattern name id modifier extends implements Nothing Nothing)
                    modifyState (p :)
-                   return p
                <?> "Complex Pattern"
 
 -- | Simple patterns.
 -- parsePatternS ::= <id> <- <modifier> Pattern(<name>) ;
-parsePatternS :: Parser Pattern
+parsePatternS :: Parser ()
 parsePatternS = do id <- identifier
                    reservedOp "<-"
                    modifier <- optionMaybe parseModifier
@@ -107,7 +115,6 @@ parsePatternS = do id <- identifier
                    name <- parens stringLiteral
                    let p = (Pattern name id modifier Nothing Nothing Nothing Nothing)
                    modifyState (p :)
-                   return p
                <?> "Simple Pattern"
 
 -- ---------------------------------------------- [ Pattern Modifier Functions ]
@@ -133,7 +140,7 @@ parseModifierI = do reserved "Integration"
 -- parseProperty ::= parseImplements parseExtends;
 parseProperties :: Parser (Maybe Extends, Maybe Realises)
 parseProperties = do extends <- optionMaybe parseExtends
-                     let implements = Nothing -- optionMaybe parseImplements
+                     implements <- optionMaybe parseImplements
                      return (extends, implements)
                  <?> "Properties"
 
@@ -141,87 +148,94 @@ parseProperties = do extends <- optionMaybe parseExtends
 parseExtends :: Parser Extends
 parseExtends = do reserved ":extends"
                   ids <- parseIDs
-                  st <- getState
-                  map (\id -> Relation (getPattern id st) Nothing) ids
+                  ps <- getState
+                  let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
+                  return $ catMaybes exs  -- Nasty Hack need to add check
                <?> "Specialisation"
 
+
 -- parseImplements ::= :implements <idlist>;
--- parseImplements :: Parser Realises
--- parseImplements = do reserved ":implements"
---                      parseIDs
---                      ids <- parseIDs
---                      st <- getState
---                      map (\id -> Relation (getPattern id st) Nothing) ids
---                   <?> "Realisation"
+parseImplements :: Parser Realises
+parseImplements = do reserved ":implements"                     
+                     ids <- parseIDs
+                     ps <- getState
+                     let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
+                     return $ catMaybes exs
+                  <?> "Realisation"
 
--- -- ---------------------------------------------- [ Relation Parsing Functions ]
+-- ---------------------------------------------- [ Relation Parsing Functions ]
 
--- -- @TODO Make better!
+-- @TODO Make better!
 
--- -- | Parse a relation
--- -- parseRelation ::= relationM | relation1 ;
--- parseRelation :: Parser Relation
--- parseRelation = try parseRelation1 <|> parseRelationM <?> "Relations"
+-- | Parse a relation
+-- parseRelation ::= relationM | relation1 ;
+parseRelation :: Parser ()
+parseRelation = try parseRelation1 <|> parseRelationM <?> "Relations"
 
--- -- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
+-- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
 
--- -- TODO Write code to modify state table updating the `to' patterns with the relations.
+-- relationM ::= relationMu | relationMl
+parseRelationM :: Parser ()
+parseRelationM =  try parseRelationMu <|> parseRelationMl <?> "1-2-Many Relation" 
 
--- -- relationM ::= relationMu | relationMl
--- parseRelationM :: Parser Relation
--- parseRelationM =  try parseRelationMu <|> parseRelationMl
---                   <?> "1-2-Many Relation"
+-- relationMu ::= <id> "uses" <idlist>;
+parseRelationMu :: Parser ()
+parseRelationMu = do from <- identifier
+                     reserved "uses"
+                     tos <- parseIDs
+                     state <- getState
+                     let rels = catMaybes $ map (\to -> tryMkRelation to state Nothing) tos
+                     let newState = last $ map (\r -> addRequire from r state) rels                 -- Nasty Hack
+                     putState newState
 
--- -- relationMu ::= <id> "uses" <idlist>;
--- parseRelationMu :: Parser Relation
--- parseRelationMu = do from <- identifier
---                      reserved "uses"
---                      to <- parseIDs
---                      return (Relation from to (Just "uses")) -- Nasty Hack
+-- relationMl ::= <id> "linkedTo" <idlist>;
+parseRelationMl :: Parser ()
+parseRelationMl = do from <- identifier
+                     reserved "linkedTo"
+                     tos <- parseIDs
+                     state <- getState
+                     let rels = catMaybes $ map (\to -> tryMkRelation to state Nothing) tos         -- Nasty Hack
+                     let newState = last $ map (\r -> addLink from r state) rels
+                     putState newState
 
--- -- relationMl ::= <id> "linkedTo" <idlist>;
--- parseRelationMl :: Parser Relation
--- parseRelationMl = do from <- identifier
---                      reserved "linkedTo"
---                      to <- parseIDs
---                      return (Relation from to (Just "linkedTo")) -- Nasty Hack
+-- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
 
--- -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
+-- parseRelation1 ::= relation1u | relation1l ;
+parseRelation1 :: Parser ()            
+parseRelation1 = try parseRelation1l <|> parseRelation1u <?> "1-2-1 Relation with Description"
 
--- -- parseRelation1 ::= relation1u | relation1l ;
--- parseRelation1 :: Parser Relation            
--- parseRelation1 = try parseRelation1u <|> parseRelation1l <?> "1-2-1 Relation with Description"
- 
--- -- relation1u ::= <id> "uses" <id> ":" <desc>;                    
--- parseRelation1u :: Parser Relation
--- parseRelation1u = do from <- identifier
---                      reserved "uses"
---                      to <- parseID1
---                      reservedOp ":"
---                      desc <- optionMaybe stringLiteral
---                      st <- get
---                      res <- (Relation (getPattern to st) desc)
---                      ust <- addLink from res st
---                      put ust
---                      return res
+-- relation1u ::= <id> "uses" <id> parseRelDesc?                    
+parseRelation1u :: Parser ()
+parseRelation1u = do from <- identifier
+                     reserved "uses"
+                     to <- identifier
+                     desc <- optionMaybe parseRelDesc
+                     ps <- getState
+                     let res = tryMkRelation to ps desc                                             -- Nasty Hack
+                     case isNothing res of 
+                       True -> fail "uh oh"
+                       otherwise -> putState (addRequire from (fromJust res) ps)
 
--- -- relation1l ::= <id> "linkedTo" <id> ":" <desc>;
--- parseRelation1l :: Parser Relation
--- parseRelation1l = do from <- identifier
---                      reserved "linkedTo"
---                      to' <- parseID1
---                      reservedOp ":"
---                      desc <- optionMaybe stringLiteral
---                      st <- get
-                     
---                      return (Relation (patt to st) desc)
---                             where
---                               patt' = getPattern (head to) st
---                               patt to st = case isNothing $ patt' to st of
---                                              True -> error "Pattern Not Found"
---                                              otherwise -> patt' to st
+
+-- relation1l ::= <id> "linkedTo" <id> parseRelDesc?
+parseRelation1l :: Parser ()
+parseRelation1l = do from <- identifier
+                     reserved "linkedTo"
+                     to <- identifier
+                     desc <- optionMaybe parseRelDesc
+                     ps <- getState
+                     let res = tryMkRelation to ps desc                                             -- Nasty Hack
+                     case isNothing res of 
+                       True -> fail "uh oh"
+                       otherwise -> putState (addLink from (fromJust res) ps)
 
 -- -- -------------------------------------------------- [ Misc Parsing Functions ]
+
+-- parseRelDesc ::= ":" <desc>
+parseRelDesc :: Parser String
+parseRelDesc = do reservedOp ":"
+                  stringLiteral
+               <?> "Relation Description"
 
 -- parseIDs ::= <id> | <idlist>;
 parseIDs :: Parser IDs
