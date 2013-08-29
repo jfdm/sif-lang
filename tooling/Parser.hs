@@ -1,6 +1,6 @@
 module Parser (parseSif) where
 
-import Control.Applicative hiding ((<|>))
+import Control.Applicative hiding ((<|>), many)
 import Control.Monad
 import Text.Parsec
 
@@ -32,8 +32,9 @@ parsePlang :: Parser Plang
 parsePlang = do (title, label) <- parseMetadata
                 imports <- optionMaybe parseImports
                 reserved "patterns"
-                manyTill parsePattern (reserved "relations")          
-                many1 parseRelation
+                many1 parsePattern
+                reserved "relations"
+                many parseRelation
                 pState <- getState
                 let ps = filter (\p -> Model.ident p /= Model.name p) pState
                 return (Plang title label imports ps)
@@ -56,8 +57,8 @@ parseMetadata = do reserved "language"
 -- | Definition of language imports
 -- parseImports ::= parseImport*;
 parseImports :: Parser Imports
-parseImports = do is <- liftM (concat) $ many1 parseImport
-                  putState $ mapMaybe (\x -> Model.pattern x) is
+parseImports = do is <- liftM concat $ many1 parseImport
+                  putState $ mapMaybe Model.pattern is
                   return is
                <?> "Imports"
 
@@ -101,7 +102,7 @@ parsePatternC = do id <- identifier
                    reserved "Pattern"
                    name <- parens stringLiteral
                    (extends, implements) <- braces parseProperties
-                   let p = (Pattern name id modifier extends implements Nothing Nothing)
+                   let p = Pattern name id modifier extends implements Nothing Nothing
                    modifyState (p :)
                <?> "Complex Pattern"
 
@@ -113,7 +114,7 @@ parsePatternS = do id <- identifier
                    modifier <- optionMaybe parseModifier
                    reserved "Pattern"
                    name <- parens stringLiteral
-                   let p = (Pattern name id modifier Nothing Nothing Nothing Nothing)
+                   let p = Pattern name id modifier Nothing Nothing Nothing Nothing
                    modifyState (p :)
                <?> "Simple Pattern"
 
@@ -150,7 +151,9 @@ parseExtends = do reserved ":extends"
                   ids <- parseIDs
                   ps <- getState
                   let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
-                  return $ catMaybes exs  -- Nasty Hack need to add check
+                  if Nothing `elem` exs
+                     then unexpected "Unknown identity used"
+                     else return $ catMaybes exs
                <?> "Specialisation"
 
 
@@ -160,7 +163,9 @@ parseImplements = do reserved ":implements"
                      ids <- parseIDs
                      ps <- getState
                      let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
-                     return $ catMaybes exs
+                     if Nothing `elem` exs
+                        then unexpected "Unknown identity used"
+                        else return $ catMaybes exs
                   <?> "Realisation"
 
 -- ---------------------------------------------- [ Relation Parsing Functions ]
@@ -170,7 +175,7 @@ parseImplements = do reserved ":implements"
 -- | Parse a relation
 -- parseRelation ::= relationM | relation1 ;
 parseRelation :: Parser ()
-parseRelation = try parseRelation1 <|> parseRelationM <?> "Relations"
+parseRelation = try parseRelationM <|> parseRelation1 <?> "Relations"
 
 -- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
 
@@ -182,27 +187,29 @@ parseRelationM =  try parseRelationMu <|> parseRelationMl <?> "1-2-Many Relation
 parseRelationMu :: Parser ()
 parseRelationMu = do from <- identifier
                      reserved "uses"
-                     tos <- parseIDs
+                     tos <- parseIDList
                      state <- getState
-                     let rels = catMaybes $ map (\to -> tryMkRelation to state Nothing) tos
-                     let newState = last $ map (\r -> addRequire from r state) rels                 -- Nasty Hack
-                     putState newState
+                     let rels = map (\to -> tryMkRelation to state Nothing) tos
+                     if Nothing `elem` rels
+                        then unexpected "Unknown Identity used"
+                        else putState $ last $ map (\r -> addRequire from r state) (catMaybes rels) -- Nasty Hack
 
 -- relationMl ::= <id> "linkedTo" <idlist>;
 parseRelationMl :: Parser ()
 parseRelationMl = do from <- identifier
                      reserved "linkedTo"
-                     tos <- parseIDs
+                     tos <- parseIDList
                      state <- getState
-                     let rels = catMaybes $ map (\to -> tryMkRelation to state Nothing) tos         -- Nasty Hack
-                     let newState = last $ map (\r -> addLink from r state) rels
-                     putState newState
+                     let rels = map (\to -> tryMkRelation to state Nothing) tos                     -- Nasty Hack
+                     if Nothing `elem` rels
+                        then unexpected "Unknown Identity used"
+                        else putState $ last $ map (\r -> addLink from r state) (catMaybes rels)
 
 -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
 
 -- parseRelation1 ::= relation1u | relation1l ;
 parseRelation1 :: Parser ()            
-parseRelation1 = try parseRelation1l <|> parseRelation1u <?> "1-2-1 Relation with Description"
+parseRelation1 = try parseRelation1u <|> parseRelation1l <?> "1-2-1 Relation with Description"
 
 -- relation1u ::= <id> "uses" <id> parseRelDesc?                    
 parseRelation1u :: Parser ()
@@ -211,10 +218,11 @@ parseRelation1u = do from <- identifier
                      to <- identifier
                      desc <- optionMaybe parseRelDesc
                      ps <- getState
-                     let res = tryMkRelation to ps desc                                             -- Nasty Hack
-                     case isNothing res of 
-                       True -> fail "uh oh"
-                       otherwise -> putState (addRequire from (fromJust res) ps)
+                     let res = tryMkRelation to ps desc
+                     if isNothing res
+                        then unexpected "Unknown Identity used in uses relation"
+                        else putState (addRequire from (fromJust res) ps)
+                  <?> "1-2- Uses Relation with Description"
 
 
 -- relation1l ::= <id> "linkedTo" <id> parseRelDesc?
@@ -224,10 +232,11 @@ parseRelation1l = do from <- identifier
                      to <- identifier
                      desc <- optionMaybe parseRelDesc
                      ps <- getState
-                     let res = tryMkRelation to ps desc                                             -- Nasty Hack
-                     case isNothing res of 
-                       True -> fail "uh oh"
-                       otherwise -> putState (addLink from (fromJust res) ps)
+                     let res = tryMkRelation to ps desc
+                     if isNothing res
+                        then unexpected "Unknown Identity Used in links relation"
+                        else putState (addLink from (fromJust res) ps)
+                  <?> "1-2-1 LinkedTo Relation with Description"
 
 -- -- -------------------------------------------------- [ Misc Parsing Functions ]
 
@@ -244,7 +253,7 @@ parseIDs = try parseIDList <|> parseID1 <?> "ID Lists"
 -- parseID1 ::= <id>;
 parseID1 :: Parser IDs
 parseID1 = do id <- identifier
-              return (id : [])
+              return [id]
 
 -- parseIDList ::= [ <id> (<id> ',')* ];
 parseIDList :: Parser IDs

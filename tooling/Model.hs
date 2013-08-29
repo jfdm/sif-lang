@@ -23,13 +23,13 @@ data Pattern = Pattern {
       implements :: Maybe Realises,
       requires   :: Maybe Requires,
       links      :: Maybe Links
-    } deriving (Show)
+    } deriving (Show, Eq)
     
 -- --------------------------------------------------------------- [ Relations ]
 data Relation = Relation {
       to   :: Pattern,
       desc :: Maybe String }
-    deriving (Show)
+    deriving (Show, Eq)
 
 data Modifier = Abstract | Integration
                 deriving (Show, Eq, Read, Enum, Ord)

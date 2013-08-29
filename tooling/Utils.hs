@@ -31,8 +31,10 @@ addRequire id l ps = map (\p -> if Model.ident p == id then update p l else p) p
                              
 
 tryMkRelation :: ID -> Patterns -> Maybe String -> Maybe Relation
-tryMkRelation id ps desc = do let p = getPattern id ps
-                              case p of
-                                Nothing -> Nothing
-                                otherwise -> Just $ Relation (fromJust p) desc
+tryMkRelation id ps desc = res
+                           where
+                             p = getPattern id ps
+                             res = case isNothing p of
+                                     True -> Nothing
+                                     otherwise -> Just $ Relation (fromJust p) desc
 
