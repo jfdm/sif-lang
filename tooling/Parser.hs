@@ -152,7 +152,7 @@ parseExtends = do reserved ":extends"
                   ps <- getState
                   let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
                   if Nothing `elem` exs
-                     then unexpected "Unknown identity used"
+                     then error "Unknown identity used"
                      else return $ catMaybes exs
                <?> "Specialisation"
 
@@ -164,7 +164,7 @@ parseImplements = do reserved ":implements"
                      ps <- getState
                      let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
                      if Nothing `elem` exs
-                        then unexpected "Unknown identity used"
+                        then error "Unknown identity used"
                         else return $ catMaybes exs
                   <?> "Realisation"
 
@@ -181,35 +181,39 @@ parseRelation = try parseRelationM <|> parseRelation1 <?> "Relations"
 
 -- relationM ::= relationMu | relationMl
 parseRelationM :: Parser ()
-parseRelationM =  try parseRelationMu <|> parseRelationMl <?> "1-2-Many Relation" 
+parseRelationM =  parseRelationMu <|> try parseRelationMl <?> "1-2-Many Relation" 
 
 -- relationMu ::= <id> "uses" <idlist>;
 parseRelationMu :: Parser ()
 parseRelationMu = do from <- identifier
                      reserved "uses"
                      tos <- parseIDList
-                     state <- getState
-                     let rels = map (\to -> tryMkRelation to state Nothing) tos
-                     if Nothing `elem` rels
-                        then unexpected "Unknown Identity used"
-                        else putState $ last $ map (\r -> addRequire from r state) (catMaybes rels) -- Nasty Hack
+                     ps <- getState
+                     if isNothing $ getPattern from ps
+                        then error $ "From Pattern in linked relation doesn't exist: " ++ from
+                        else do let rels = map (\to -> tryMkRelation to ps Nothing) tos                     -- Nasty Hack
+                                if Nothing `elem` rels
+                                   then error "Unknown Identity used in To relation of uses"
+                                   else putState $ last $ map (\r -> addRequire from r ps) (catMaybes rels) -- Nasty Hack
 
 -- relationMl ::= <id> "linkedTo" <idlist>;
 parseRelationMl :: Parser ()
 parseRelationMl = do from <- identifier
                      reserved "linkedTo"
                      tos <- parseIDList
-                     state <- getState
-                     let rels = map (\to -> tryMkRelation to state Nothing) tos                     -- Nasty Hack
-                     if Nothing `elem` rels
-                        then unexpected "Unknown Identity used"
-                        else putState $ last $ map (\r -> addLink from r state) (catMaybes rels)
+                     ps <- getState
+                     if isNothing $ getPattern from ps
+                        then error $ "From Pattern in linked relation doesn't exist: " ++ from
+                        else do let rels = map (\to -> tryMkRelation to ps Nothing) tos                     -- Nasty Hack
+                                if Nothing `elem` rels
+                                   then error "Unknown Identity used in To relation of linkedTo"
+                                   else putState $ last $ map (\r -> addLink from r ps) (catMaybes rels)
 
 -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
 
 -- parseRelation1 ::= relation1u | relation1l ;
 parseRelation1 :: Parser ()            
-parseRelation1 = try parseRelation1u <|> parseRelation1l <?> "1-2-1 Relation with Description"
+parseRelation1 = parseRelation1u <|> try parseRelation1l <?> "1-2-1 Relation with Description"
 
 -- relation1u ::= <id> "uses" <id> parseRelDesc?                    
 parseRelation1u :: Parser ()
@@ -218,10 +222,12 @@ parseRelation1u = do from <- identifier
                      to <- identifier
                      desc <- optionMaybe parseRelDesc
                      ps <- getState
-                     let res = tryMkRelation to ps desc
-                     if isNothing res
-                        then unexpected "Unknown Identity used in uses relation"
-                        else putState (addRequire from (fromJust res) ps)
+                     if isNothing $ getPattern from ps
+                        then error $ "From Pattern in used relation doesn't exist: " ++ from
+                        else do let res = tryMkRelation to ps desc
+                                if isNothing res
+                                   then error $ "To Pattern in used relation doesn't exist: " ++ to
+                                   else putState (addRequire from (fromJust res) ps)
                   <?> "1-2- Uses Relation with Description"
 
 
@@ -232,10 +238,12 @@ parseRelation1l = do from <- identifier
                      to <- identifier
                      desc <- optionMaybe parseRelDesc
                      ps <- getState
-                     let res = tryMkRelation to ps desc
-                     if isNothing res
-                        then unexpected "Unknown Identity Used in links relation"
-                        else putState (addLink from (fromJust res) ps)
+                     if isNothing $ getPattern from ps
+                        then error $ "From Pattern in linkedTO relation doesn't exist:  " ++ from
+                        else do let res = tryMkRelation to ps desc
+                                if isNothing res
+                                   then error $ "To Pattern in linkedTo relation doesn't exist: " ++ to
+                                   else putState (addLink from (fromJust res) ps)
                   <?> "1-2-1 LinkedTo Relation with Description"
 
 -- -- -------------------------------------------------- [ Misc Parsing Functions ]
