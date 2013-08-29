@@ -18,7 +18,7 @@ addLink :: ID -> Relation -> Patterns -> Patterns
 addLink id l ps = map (\p -> if Model.ident p == id then update p l else p) ps
     where
       update p l = case isNothing (Model.links p) of
-                     True -> p {links = Just [l] }
+                     True -> p { links = Just [l] }
                      otherwise -> p { links = Just (l : fromJust (Model.links p))}
 
 -- | Add Require to Pattern
@@ -26,8 +26,8 @@ addRequire :: ID -> Relation -> Patterns -> Patterns
 addRequire id l ps = map (\p -> if Model.ident p == id then update p l else p) ps
     where
       update p l = case isNothing (Model.requires p) of
-                     True -> p {requires = Just [l]}
-                     otherwise -> p { links = Just (l : fromJust (Model.requires p))}
+                     True -> p { requires = Just [l]}
+                     otherwise -> p { requires = Just (l : fromJust (Model.requires p))}
                              
 
 tryMkRelation :: ID -> Patterns -> Maybe String -> Maybe Relation
