@@ -2,6 +2,7 @@ module Examples.Tropyc where
 
 import Model
 
+-- Crypto Pattern
 
 tropyc = Plang "Tropyc" "tropyc" Nothing tropycPatt
 
@@ -17,14 +18,16 @@ tropycPatternSigApp    = Pattern "Signature with Appendix"              "sigapp"
 tropycPatternSWI       = Pattern "Secrecy with Integrity"               "swi"        Nothing          Nothing               Nothing  (Just [tropycRelInfoSec, tropycRelMSG])     Nothing
 tropycPatternSSA       = Pattern "Secrecy with Signature with Appendix" "ssa"        Nothing          Nothing               Nothing  (Just [tropycRelSWS,     tropycRelSigApp])  Nothing
 
-tropycRelGen     = Relation tropycPatternGen      Nothing
-tropycRelInfoSec = Relation tropycPatternInfoSec  Nothing
-tropycRelSA      = Relation tropycPatternSendAuth Nothing
-tropycRelSIG     = Relation tropycPatternSIG      Nothing  
-tropycRelMSG     = Relation tropycPatternMsgInt   Nothing  
-tropycRelSWS     = Relation tropycPatternSWS      Nothing
-tropycRelSigApp  = Relation tropycPatternSigApp   Nothing
+-- The Relations
+tropycRelGen     = Relation "p1"         Nothing
+tropycRelInfoSec = Relation "infosec"    Nothing
+tropycRelSA      = Relation "senderauth" Nothing
+tropycRelSIG     = Relation "sig"        Nothing  
+tropycRelMSG     = Relation "msgint"     Nothing  
+tropycRelSWS     = Relation "sws"        Nothing
+tropycRelSigApp  = Relation "sigapp"     Nothing
 
+-- Group the Patterns
 tropycPatt = [tropycPatternGen     , 
               tropycPatternInfoSec , 
               tropycPatternSendAuth, 
@@ -35,3 +38,4 @@ tropycPatt = [tropycPatternGen     ,
               tropycPatternSigApp  , 
               tropycPatternSWI     , 
               tropycPatternSSA      ]
+-- --------------------------------------------------------------------- [ EOF ]

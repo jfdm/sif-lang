@@ -4,24 +4,33 @@ import Model
 
 -- Tampering
 
--- tamper = Plang tamperInfo tamperImps tamperPatts tamperRels
+tamper = Plang "Tampering" "tampering" tamperImps tamperPatts
 
--- tamperInfo = Metadata "Tampering" "tampering"
+-- ----------------------------------------------------------------- [ Imports ]
+tamperImps = Just [ Import "privilegeescalation" (Pattern "distrep" "distrep" Nothing Nothing Nothing Nothing tamperRelDistRep),
+                    Import "privilegeescalation" (Pattern "exedom" "exedom" Nothing Nothing Nothing Nothing tamperRelExeDom)]
 
--- tamperImps = Just [ Import "privilegeescalation" (Just "distrep"),
---                     Import "privilegeescalation" (Just "exedom")]
+-- ---------------------------------------------------------------- [ Patterns ]
+tamperPatternTP  = Pattern "Trust Partitioning"                     "tp"    Nothing Nothing Nothing Nothing Nothing 
+tamperPatternCS  = Pattern "Checkpointed System"                    "cs"    Nothing Nothing Nothing Nothing Nothing 
+tamperPatternSDS = Pattern "Safe Data Structure"                    "sds"   Nothing Nothing Nothing Nothing Nothing 
+tamperPatternSS  = Pattern "Server Sandbox"                         "ss"    Nothing Nothing Nothing Nothing tamperRelSS 
+tamperPatternCJ  = Pattern "Chroot Jail"                            "cj"    Nothing Nothing Nothing Nothing Nothing 
+tamperPatternUL  = Pattern "Unique Location for Each Write Request" "ulewr" Nothing Nothing Nothing Nothing Nothing 
 
--- tamperPatts = [ Pattern "Trust Partitioning"                     "tp"    Nothing Nothing Nothing,
---                 Pattern "Checkpointed System"                    "cs"    Nothing Nothing Nothing,
---                 Pattern "Safe Data Structure"                    "sds"   Nothing Nothing Nothing,
---                 Pattern "Server Sandbox"                         "ss"    Nothing Nothing Nothing,
---                 Pattern "Chroot Jail"                            "cj"    Nothing Nothing Nothing,
---                 Pattern "Unique Location for Each Write Request" "ulewr" Nothing Nothing Nothing]
+tamperPatterns = [tamperPatternTP ,
+                  tamperPatternCS ,
+                  tamperPatternSDS, 
+                  tamperPatternSS ,
+                  tamperPatternCJ ,
+                  tamperPatternUL ]
 
--- tamperRels = [ Links "distrep" ["tp"]    (Just "Communicate between processes"),
---                Links "distrep" ["ulewr"] (Just "Concurrent write race"),
---                Links "distrep" ["ss"]    (Just "Constrain Environment"),
---                Links "exedom"  ["ss"]    (Just "Constrain Environment"),
---                Links "exedom"  ["sds"]   (Just "Data safety"),
---                Links "exedom"  ["cs"]    (Just "Graceful restart"),
---                Links "ss"      ["cj"]    (Just "Sandbox Processes")]
+-- --------------------------------------------------------------- [ Relations ]
+
+tamperRelDistRep = Just [ Relation "tp"    (Just "Communicate between processes"),
+                          Relation "ulewr" (Just "Concurrent write race"),
+                          Relation "ss"    (Just "Constrain Environment")]
+
+tamperRelExeDom = Just [ Relation "exedom"  ["ss"]    (Just "Constrain Environment"),
+                         Relation "exedom"  ["sds"]   (Just "Data safety"),
+                         Relation "exedom"  ["cs"]    (Just "Graceful restart")]
