@@ -24,14 +24,13 @@ parseSif fname =
 -- parsePlang ::= parseMetadata parseImports parsePattern+ parseRelation*;
 parsePlang :: Parser Plang
 parsePlang = do (title, label) <- parseMetadata
-                imports <- optionMaybe parseImports
+                optionMaybe parseImports
                 reserved "patterns"
                 many parsePattern
                 reserved "relations"
                 many parseRelation
                 pState <- getState
-                let ps = filter (\p -> Model.ident p /= Model.name p) pState
-                return (Plang title label imports ps)
+                return (Plang title label pState)
              <?> "Language Instance"
 
 -- ---------------------------------------------------- [ Language Declaration ]
@@ -50,33 +49,32 @@ parseMetadata = do reserved "language"
 
 -- | Definition of language imports
 -- parseImports ::= parseImport*;
-parseImports :: Parser Imports
+parseImports :: Parser ()
 parseImports = do is <- liftM concat $ many1 parseImport
-                  putState $ mapMaybe Model.pattern is
-                  return is
+                  putState is
                <?> "Imports"
 
 -- | Parse a single import
 -- parseImport ::= parseImportM | parseImportLang
-parseImport :: Parser Imports
+parseImport :: Parser Patterns
 parseImport = try parseImportM <|> parseImportLang <?> "Import"
 
 -- | Import select patterns from a language
 -- parseImportM ::= from <lang> import <idlist>;
-parseImportM :: Parser Imports
+parseImportM :: Parser Patterns
 parseImportM = do reserved "from"
                   lang <- identifier
                   reserved "import"
                   pIDs <- sepBy1 identifier comma
-                  return $ map (\i -> Import lang (Just $ Pattern i i Nothing Nothing Nothing Nothing Nothing)) pIDs
+                  return $ map (\i -> mkImportPattern i lang) pIDs
                <?> "Many Imports"
 
 -- | Import a pattern language
 -- parseImportLang ::= import <lang>;
-parseImportLang :: Parser Imports
+parseImportLang :: Parser Patterns
 parseImportLang = do reserved "import"
                      lang <- identifier
-                     return [Import lang Nothing]
+                     return [mkImportPattern lang lang]
                   <?> "Language Import"
 
 -- ----------------------------------------------- [ Pattern Parsing Functions ]
@@ -92,7 +90,7 @@ parsePattern = try parsePatternC <|> parsePatternS <?> "Patterns"
 parsePatternC :: Parser ()
 parsePatternC = do (id, modifier, name) <- parsePatternHead
                    (extends, implements) <- braces parseProperties
-                   let p = Pattern name id modifier extends implements Nothing Nothing
+                   let p = mkComplexPattern name id modifier extends implements
                    modifyState (p :)
                <?> "Complex Pattern"
 
@@ -100,7 +98,7 @@ parsePatternC = do (id, modifier, name) <- parsePatternHead
 -- parsePatternS ::= parsePatternHead ;
 parsePatternS :: Parser ()
 parsePatternS = do (id, modifier, name) <- parsePatternHead
-                   let p = Pattern name id modifier Nothing Nothing Nothing Nothing
+                   let p = mkSimplePattern name id modifier
                    modifyState (p :)
                <?> "Simple Pattern"
 

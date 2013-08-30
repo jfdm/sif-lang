@@ -4,20 +4,14 @@ module Model where
 data Plang = Plang {
       title    :: String,
       label    :: ID,
-      imports  :: Maybe Imports,
       patterns :: Patterns
-    } deriving (Show)
-
--- ----------------------------------------------------------------- [ Imports ]
-data Import = Import {
-      lang    :: ID,
-      pattern :: Maybe Pattern
     } deriving (Show)
 
 -- ----------------------------------------------------------------- [ Pattern ]
 data Pattern = Pattern {
       name       :: String,
       ident      :: ID,
+      origin     :: Maybe String,
       modifier   :: Maybe Modifier,
       extends    :: Maybe Extends,
       implements :: Maybe Realises,
@@ -36,7 +30,6 @@ data Modifier = Abstract | Integration
 
 -- ------------------------------------------------------------ [ Type Aliases ]
 -- PLang
-type Imports  = [ Import ]
 type Patterns = [ Pattern ]
 -- Relations
 type Extends  = [ Relation ]
