@@ -6,7 +6,7 @@ patterns
 
 -- ---------------------------------------------------- [ Privilege Escalation ]
 
-compartmentalisation <- Pattern("Compartmenaliseationartmentalisation")
+compartmentalisation <- Pattern("Compartmentalisation")
 distResponsibility <- Pattern("Distributed Responsiblitly")
 exeDomain <- Pattern("Execution Domain")
 
@@ -83,10 +83,10 @@ msgReplayDetection <- Pattern("Message Replay Detection")
 proxyBasedFwall <- Pattern("Proxy Based Firewall")
 statefulFwall <- Pattern("Stateful Firewall")
 
-infoObscurity <- Pattern("Information Obsurity")
+infoObscurity <- Pattern("Information Obscurity")
 secureComms <- Pattern("Secure Communication")
 secureServiceProxy <- Pattern("Secure Service Proxy")
-secureAssocation <- Pattern("Security Association")
+secureAssociation <- Pattern("Security Association")
 secureContext <- Pattern("Security Context")
 msgInterceptingGateway <- Pattern("Message Intercepting Gateway")
 msgInspector <- Pattern("Message Inspector")
@@ -114,7 +114,7 @@ assetEval <- Pattern("Asset Evaluation")
 vulnAssessment <- Pattern("Vulnerability Assessment")
 riskDetermination <- Pattern("Risk Determination")
 defenseDepth <- Pattern("Defense in Depth")
-enterSecApproach <- Pattern("Enterprise Security Approaches")
+enterSecApproaches <- Pattern("Enterprise Security Approaches")
 enterSecServices <- Pattern("Enterprise Security Services")
 lowHangingFruit <- Pattern("Low Hanging Fruit")
 protectedSystem <- Pattern("Protected System")
@@ -128,7 +128,7 @@ relations
 
 compartmentalisation linkedTo distResponsibility : "Efficient Partition"
 
-distResponsibility linkedTo compartmenaliseation : "Re-Partition"
+distResponsibility linkedTo compartmentalisation : "Re-Partition"
 distResponsibility linkedTo exeDomain : "Restrict Resources"
 
 exeDomain linkedTo controlledProcCreation : "Restrict Privilege Inheritance"
@@ -161,11 +161,11 @@ mLevelSecurity linkedTo subjectDesc : "Subject Descriptor"
 
 subjectDesc linkedTo referenceMonitor : "Enforcement"
 
-securitySesion linkedTo limitedAccess : "Constrained UI"
-securitySesion linkedTo fullAccessWErrors : "UI with Options"
-securitySesion linkedTo directedSession : "Guide User navigation"
-securitySesion linkedTo secureSessionObject : "Communicate Between Sessions"
-securitySesion linkedTo secureServiceFacade : "Centralize Component Interactions"
+securitySession linkedTo limitedAccess : "Constrained UI"
+securitySession linkedTo fullAccessWErrors : "UI with Options"
+securitySession linkedTo directedSession : "Guide User navigation"
+securitySession linkedTo secureSessionObject : "Communicate Between Sessions"
+securitySession linkedTo secureServiceFacade : "Centralize Component Interactions"
 
 directedSession linkedTo secureSessionObject : "Communicate Between Sessions"
 
@@ -195,8 +195,8 @@ pep linkedTo interceptvalidator : "Check Input"
 authenticationEnforcer linkedTo accountLockout : "Prevent Brute Force Attacks"
 authorisationEnforcer linkedTo rbac : "Policy for A/C"
 
-interceptvalidtor linkedTo contentDependentProcessing : "Code and Data separation"
-interceptvalidtor linkedTo errorDetectionCorrection : "Integrity Check" 
+interceptvalidator linkedTo contentDependentProcessing : "Code and Data separation"
+interceptvalidator linkedTo errorDetectionCorrection : "Integrity Check" 
 
 contentDependentProcessing linkedTo exceptionShield : "Protect with exception and hide exception metadata" 
 errorDetectionCorrection linkedTo exceptionShield : "Protect with exception and hide exception metadata"
@@ -235,12 +235,12 @@ msgInterceptingGateway linkedTo secureMsgRouter : "Multi-Party Messaging"
 
 infoObscurity linkedTo secureComms : "Unobservable Channel"
 
-seccomms linkedTo secureServiceProxy : "Secure Facade"
-seccomms linkedTo secureAssocation : "Store Security Info"
+secureComms linkedTo secureServiceProxy : "Secure Facade"
+secureComms linkedTo secureAssociation : "Store Security Info"
 
 secureServiceProxy linkedTo integrationReverseProxy: "Enforce Policy"
 
-secureAssocation linkedTo secureContext : "Container for Sec Attributes"
+secureAssociation linkedTo secureContext : "Container for Sec Attributes"
 
 -- -------------------------------------------------------- [ Privacy Patterns ]
 
@@ -278,9 +278,9 @@ assetEval linkedTo riskDetermination : "Rank Assets"
 vulnAssessment linkedTo riskDetermination : "Rank Threats"
 
 riskDetermination linkedTo defenseDepth : "Strong Protection"
-riskDetermination linkedTo enterSecApproach : "Select and Integrate Countermeasure"
+riskDetermination linkedTo enterSecApproaches : "Select and Integrate Countermeasure"
 
-defenseDepth linkedTo enterSecApproach : "Choose Defense Mechanism"
+defenseDepth linkedTo enterSecApproaches : "Choose Defense Mechanism"
 
 enterSecApproaches linkedTo lowHangingFruit : "Where to start"
 enterSecApproaches linkedTo enterSecServices : "Solution to use"
@@ -299,7 +299,6 @@ whiteHatsHackThyselves linkedTo riskDetermination : "Mitigate vulnerability foun
 enterSecServices linkedTo [infoObscurity, compartmentalisation]
 protectedSystem linkedTo [dmz, compartmentalisation]
 policy linkedTo [brokeredAuth, sap]
-infoObscurity linkedTo pseudoIdentity
 integrationReverseProxy linkedTo interceptingWebAgent
 authenticationEnforcer linkedTo securitySession
 rbac linkedTo mLevelSecurity
