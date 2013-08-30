@@ -3,7 +3,6 @@ module Utils where
 import Data.List
 import Data.Maybe
 import Model
-import Examples
 
 -- | Get Pattern
 getPattern :: ID -> Patterns -> Maybe Pattern

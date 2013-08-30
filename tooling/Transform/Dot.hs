@@ -1,11 +1,10 @@
-module Transform (plang2Dot) where
+module Transform.Dot (plang2Dot) where
 
 -- import Data.Graph.Inductive.Graph
 -- import Text.Dot
 import Data.Maybe
 import Data.List
 import Model
-import Examples 
 
 -- http://ivanmiljenovic.wordpress.com/2011/10/16/graphviz-in-vacuum/
 

@@ -4,8 +4,7 @@ import System.Environment (getArgs)
 import System.IO
 import Parser
 import Model
-import Examples
--- import Transform
+-- import Transform.Dot
 
 main :: IO ()
 main = do args <- getArgs 
