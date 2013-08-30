@@ -88,7 +88,7 @@ parseImportLang = do reserved "import"
 -- ----------------------------------------------- [ Pattern Parsing Functions ]
 
 -- | Pattern Definition
--- parsePattern := parsePatternSimple | parsePatternC
+-- parsePattern ::= parsePatternC | parsePatternS ;
 parsePattern :: Parser ()
 parsePattern = try parsePatternC <|> parsePatternS <?> "Patterns"
 
@@ -96,27 +96,31 @@ parsePattern = try parsePatternC <|> parsePatternS <?> "Patterns"
 -- | Complex patterns that extend or import other patterns
 -- parsePatternC ::= parsePatternS { parseProperty* };
 parsePatternC :: Parser ()
-parsePatternC = do id <- identifier
-                   reservedOp "<-"
-                   modifier <- optionMaybe parseModifier
-                   reserved "Pattern"
-                   name <- parens stringLiteral
+parsePatternC = do (id, modifier, name) <- parsePatternHead
                    (extends, implements) <- braces parseProperties
                    let p = Pattern name id modifier extends implements Nothing Nothing
                    modifyState (p :)
                <?> "Complex Pattern"
 
 -- | Simple patterns.
--- parsePatternS ::= <id> <- <modifier> Pattern(<name>) ;
+-- parsePatternS ::= parsePatternHead ;
 parsePatternS :: Parser ()
-parsePatternS = do id <- identifier
-                   reservedOp "<-"
-                   modifier <- optionMaybe parseModifier
-                   reserved "Pattern"
-                   name <- parens stringLiteral
+parsePatternS = do (id, modifier, name) <- parsePatternHead
                    let p = Pattern name id modifier Nothing Nothing Nothing Nothing
                    modifyState (p :)
                <?> "Simple Pattern"
+
+
+-- | Common Head of a Pattern
+-- parsePatternHead ::= <id> '<-' parseModifier? Pattern(<name>);
+parsePatternHead :: Parser (ID, Maybe Modifier, String)
+parsePatternHead = do id <- identifier
+                      reservedOp "<-"
+                      modifier <- optionMaybe parseModifier
+                      reserved "Pattern"
+                      name <- parens stringLiteral                    
+                      return (id, modifier, name)
+                <?> "Pattern Head"
 
 -- ---------------------------------------------- [ Pattern Modifier Functions ]
 
@@ -140,33 +144,21 @@ parseModifierI = do reserved "Integration"
 -- | Parse the properties
 -- parseProperty ::= parseImplements parseExtends;
 parseProperties :: Parser (Maybe Extends, Maybe Realises)
-parseProperties = do extends <- optionMaybe parseExtends
-                     implements <- optionMaybe parseImplements
+parseProperties = do extends <- optionMaybe parseProperty
+                     implements <- optionMaybe parseProperty
                      return (extends, implements)
                  <?> "Properties"
 
--- parseExtends ::= :extends <idlist>;
-parseExtends :: Parser Extends
-parseExtends = do reserved ":extends"
-                  ids <- parseIDs
-                  ps <- getState
-                  let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
-                  if Nothing `elem` exs
-                     then error "Unknown identity used"
-                     else return $ catMaybes exs
-               <?> "Specialisation"
-
-
--- parseImplements ::= :implements <idlist>;
-parseImplements :: Parser Realises
-parseImplements = do reserved ":implements"                     
-                     ids <- parseIDs
-                     ps <- getState
-                     let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
-                     if Nothing `elem` exs
-                        then error "Unknown identity used"
-                        else return $ catMaybes exs
-                  <?> "Realisation"
+-- parseProperty ::= parsePropKWord <idlist>;
+parseProperty :: Parser Relations
+parseProperty = do parsePropKWord
+                   ids <- parseIDs
+                   ps <- getState
+                   let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
+                   if Nothing `elem` exs
+                   then unexpected "Unknown identity used"
+                   else return $ catMaybes exs
+               <?> "Properties Parsing"
 
 -- ---------------------------------------------- [ Relation Parsing Functions ]
 
@@ -179,74 +171,60 @@ parseRelation = try parseRelationM <|> parseRelation1 <?> "Relations"
 
 -- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
 
--- relationM ::= relationMu | relationMl
+-- relationM ::= <id> parseRelKWord <idlist>;
 parseRelationM :: Parser ()
-parseRelationM =  try parseRelationMu <|> parseRelationMl <?> "1-2-Many Relation" 
-
--- relationMu ::= <id> "uses" <idlist>;
-parseRelationMu :: Parser ()
-parseRelationMu = do from <- identifier
-                     reserved "uses"
-                     tos <- parseIDList
-                     ps <- getState
-                     if isNothing $ getPattern from ps
-                        then error $ "From Pattern in linked relation doesn't exist: " ++ from
-                        else do let rels = map (\to -> tryMkRelation to ps Nothing) tos                     -- Nasty Hack
-                                if Nothing `elem` rels
-                                   then error "Unknown Identity used in To relation of uses"
-                                   else putState $ last $ map (\r -> addRequire from r ps) (catMaybes rels) -- Nasty Hack
-
--- relationMl ::= <id> "linkedTo" <idlist>;
-parseRelationMl :: Parser ()
-parseRelationMl = do from <- identifier
-                     reserved "linkedTo"
-                     tos <- parseIDList
-                     ps <- getState
-                     if isNothing $ getPattern from ps
-                        then error $ "From Pattern in linked relation doesn't exist: " ++ from
-                        else do let rels = map (\to -> tryMkRelation to ps Nothing) tos                     -- Nasty Hack
-                                if Nothing `elem` rels
-                                   then error "Unknown Identity used in To relation of linkedTo"
-                                   else putState $ last $ map (\r -> addLink from r ps) (catMaybes rels)
+parseRelationM = do from <- identifier
+                    kword <- parseRelKWord
+                    tos <- parseIDList
+                    ps <- getState
+                    if isNothing $ getPattern from ps
+                    then fail $ "From Pattern in relation doesn't exist: " ++ from
+                    else do let rels = map (\to -> tryMkRelation to ps Nothing) tos
+                            if Nothing `elem` rels
+                            then fail "Unknown Identity used in To relation"
+                            else putState (last 
+                                           (if kword -- below is a nasty hack need to sort
+                                            then map (\r -> addRequire from r ps) (catMaybes rels)
+                                            else map (\r -> addLink from r ps) (catMaybes rels)))
+                  <?> "1-2-Many Relation"
 
 -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
 
--- parseRelation1 ::= relation1u | relation1l ;
+-- parseRelation1 ::= <id> parseRelKWord <id> parseRelDesc?                    
 parseRelation1 :: Parser ()            
-parseRelation1 = try parseRelation1u <|> parseRelation1l <?> "1-2-1 Relation with Description"
-
--- relation1u ::= <id> "uses" <id> parseRelDesc?                    
-parseRelation1u :: Parser ()
-parseRelation1u = do from <- identifier
-                     reserved "uses"
-                     to <- identifier
-                     desc <- optionMaybe parseRelDesc
-                     ps <- getState
-                     if isNothing $ getPattern from ps
-                        then error $ "From Pattern in used relation doesn't exist: " ++ from
-                        else do let res = tryMkRelation to ps desc
-                                if isNothing res
-                                   then error $ "To Pattern in used relation doesn't exist: " ++ to
-                                   else putState (addRequire from (fromJust res) ps)
-                  <?> "1-2- Uses Relation with Description"
-
-
--- relation1l ::= <id> "linkedTo" <id> parseRelDesc?
-parseRelation1l :: Parser ()
-parseRelation1l = do from <- identifier
-                     reserved "linkedTo"
-                     to <- identifier
-                     desc <- optionMaybe parseRelDesc
-                     ps <- getState
-                     if isNothing $ getPattern from ps
-                        then error $ "From Pattern in linkedTO relation doesn't exist:  " ++ from
-                        else do let res = tryMkRelation to ps desc
-                                if isNothing res
-                                   then error $ "To Pattern in linkedTo relation doesn't exist: " ++ to
-                                   else putState (addLink from (fromJust res) ps)
-                  <?> "1-2-1 LinkedTo Relation with Description"
+parseRelation1 = do from <- identifier
+                    kword <- parseRelKWord
+                    to <- identifier
+                    desc <- optionMaybe parseRelDesc
+                    ps <- getState
+                    if isNothing $ getPattern from ps
+                    then fail $ "From Pattern in relation doesn't exist: " ++ from
+                    else do let res = tryMkRelation to ps desc
+                            if isNothing res
+                            then fail $ "To Pattern in relation doesn't exist: " ++ to
+                            else putState
+                                     (if kword
+                                      then addRequire from (fromJust res) ps
+                                      else addLink from (fromJust res) ps)
+                  <?> "1-2-1 Relation with Description"
 
 -- -- -------------------------------------------------- [ Misc Parsing Functions ]
+
+-- parsePropKWord :: = (":extends" | ":implements");
+parsePropKWord :: Parser Bool
+parsePropKWord = do try $ reserved ":extends"
+                    return True
+             <|> do reserved ":implements"
+                    return False
+             <?> "Property Keyword"
+
+-- parseRelKWord ::= ("uses" | "linkedTo" );
+parseRelKWord :: Parser Bool
+parseRelKWord = do try $ reserved "uses"
+                   return True
+            <|> do reserved "linkedTo"
+                   return False
+            <?> "Relation Keyword"
 
 -- parseRelDesc ::= ":" <desc>
 parseRelDesc :: Parser String

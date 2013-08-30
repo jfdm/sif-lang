@@ -43,6 +43,7 @@ type Extends  = [ Relation ]
 type Realises = [ Relation ]
 type Requires = [ Relation ]
 type Links    = [ Relation ]
+type Relations = [Relation]
 -- Misc
 type ID       = String
 type IDs      = [ ID ]
