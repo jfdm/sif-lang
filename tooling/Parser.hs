@@ -11,12 +11,6 @@ import Lexer
 import Model
 import Utils
 
---  Need to added proper checks when making the relations!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
---  It is the whole goddam point of a stateful parser!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
---  Need to added proper checks when making the relations!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
---  It is the whole goddam point of a stateful parser!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
---  mkRelation (from Utils) is a nasty hack. Try and improve using parser errors, otherwise what is the point of using state.
-
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 
 -- | Parses a Sif Spec file into the corresponding AST
@@ -32,7 +26,7 @@ parsePlang :: Parser Plang
 parsePlang = do (title, label) <- parseMetadata
                 imports <- optionMaybe parseImports
                 reserved "patterns"
-                many1 parsePattern
+                many parsePattern
                 reserved "relations"
                 many parseRelation
                 pState <- getState
@@ -125,19 +119,13 @@ parsePatternHead = do id <- identifier
 -- ---------------------------------------------- [ Pattern Modifier Functions ]
 
 -- | Parse the modifiers
--- parseModifier ::= parseModifierA | parseModifierI;
+-- parseModifier ::= ("Integration" | "Abstract");
 parseModifier :: Parser Modifier
-parseModifier = try parseModifierA <|> parseModifierI <?> "Modifier"
-
-parseModifierA :: Parser Modifier
-parseModifierA = do reserved "Abstract"
-                    return Abstract
-                 <?> "Abstract"
-
-parseModifierI :: Parser Modifier
-parseModifierI = do reserved "Integration"
-                    return Integration
-                 <?> "Integration"
+parseModifier = do try $ reserved "Abstract"
+                   return Abstract
+            <|> do reserved "Integration"
+                   return Integration
+            <?> "Modifier"
 
 -- ------------------------------------------------ [ Pattern Property Parsing ]
 
@@ -167,7 +155,7 @@ parseProperty = do parsePropKWord
 -- | Parse a relation
 -- parseRelation ::= relationM | relation1 ;
 parseRelation :: Parser ()
-parseRelation = try parseRelationM <|> parseRelation1 <?> "Relations"
+parseRelation = try parseRelation1 <|> parseRelationM <?> "Relations"
 
 -- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
 
@@ -181,7 +169,7 @@ parseRelationM = do from <- identifier
                     then fail $ "From Pattern in relation doesn't exist: " ++ from
                     else do let rels = map (\to -> tryMkRelation to ps Nothing) tos
                             if Nothing `elem` rels
-                            then fail "Unknown Identity used in To relation"
+                            then unexpected "Unknown Identity used in To relation"
                             else putState (last 
                                            (if kword -- below is a nasty hack need to sort
                                             then map (\r -> addRequire from r ps) (catMaybes rels)
