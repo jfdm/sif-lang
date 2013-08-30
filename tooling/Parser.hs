@@ -66,7 +66,7 @@ parseImportM = do reserved "from"
                   lang <- identifier
                   reserved "import"
                   pIDs <- sepBy1 identifier comma
-                  return $ map (\i -> mkImportPattern i lang) pIDs
+                  return $ map (`mkImportPattern` lang) pIDs
                <?> "Many Imports"
 
 -- | Import a pattern language
@@ -153,7 +153,7 @@ parseProperty = do parsePropKWord
 -- | Parse a relation
 -- parseRelation ::= relationM | relation1 ;
 parseRelation :: Parser ()
-parseRelation = try parseRelation1 <|> parseRelationM <?> "Relations"
+parseRelation = try parseRelationM <|> parseRelation1 <?> "Relations"
 
 -- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
 
@@ -168,10 +168,11 @@ parseRelationM = do from <- identifier
                     else do let rels = map (\to -> tryMkRelation to ps Nothing) tos
                             if Nothing `elem` rels
                             then unexpected "Unknown Identity used in To relation"
-                            else putState (last 
-                                           (if kword -- below is a nasty hack need to sort
-                                            then map (\r -> addRequire from r ps) (catMaybes rels)
-                                            else map (\r -> addLink from r ps) (catMaybes rels)))
+                            else do let rel' = catMaybes rels
+                                    putState $ nub -- Dirty Hack! Need to use modify state.
+                                       (if kword
+                                           then concatMap (\r -> addRequire from r ps) rel'
+                                           else concatMap (\r -> addLink from r ps) rel')
                   <?> "1-2-Many Relation"
 
 -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]

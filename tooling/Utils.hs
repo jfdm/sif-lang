@@ -44,3 +44,7 @@ mkSimplePattern n id mod = Pattern n id Nothing mod Nothing Nothing Nothing Noth
 
 mkComplexPattern :: String -> ID -> Maybe Modifier -> Maybe Extends -> Maybe Realises -> Pattern
 mkComplexPattern n id mod exs imps = Pattern n id Nothing mod exs imps Nothing Nothing
+
+
+getImportOrigin :: Pattern -> String
+getImportOrigin p  = fromJust $ Model.origin p

@@ -1,96 +1,78 @@
 module Transform.Dot (plang2Dot) where
 
--- import Data.Graph.Inductive.Graph
--- import Text.Dot
 import Data.Maybe
 import Data.List
 import Model
-
--- http://ivanmiljenovic.wordpress.com/2011/10/16/graphviz-in-vacuum/
+import Examples.Tampering
+import Examples.Tropyc
 
 -- ------------------------------------------------- [ Tranformation Functions ]
+-- | Transform a Pattern Language into it's Dot equivalent
 plang2Dot :: Plang -> [String]
-plang2Dot plang | isNothing (Model.imports plang) = plang2Dot' plang False
-                | otherwise = plang2Dot' plang True
+plang2Dot plang = heed ++ pbody ++ rbody ++ foot
+                  where
+                    heed = ["digraph G {\n"]
+                    foot = ["\n}\n"]
+                    pbody = doPatterns $ break (isJust . Model.origin) ps
+                    rbody = doRelations ps
+                    ps = (Model.patterns plang)
 
-plang2Dot' :: Plang -> Bool -> [String]
-plang2Dot' plang b | b == False = heed ++ pbody ++ ["\n}\n"]
-                   | otherwise = heed ++ ibody ++ pbody ++ ["\n}\n"]
-                                 where
-                                   heed = ["digraph G {\n"]
-                                   pbody = doTransform plang
-                                   ibody = imports2Dot $ fromJust (Model.imports plang)
+-- | Do the transformation of a (Local Patterns, Imports Patterns) tuple into Dot Form
+doPatterns :: (Patterns, Patterns) -> [String]
+doPatterns (pats, imps) = nub $ imports2Dot imps ++ patterns2Dot pats
+                          
+-- -- ---------------------------------------------------------- [ Imports to Dot ]
 
-doTransform :: Plang -> [String]
-doTransform plang = patterns ++ classrels ++ instrels
-                    where
-                      patterns = patterns2Dot plang
-                      classrels = classRelations2Dot plang
-                      instrels = instRelations2Dot plang
+-- | Transform a list of Imported Patterns into Dot Form.
+imports2Dot :: Patterns -> [String]
+imports2Dot [] = [""]
+imports2Dot imps = map unlines (map imports2Dot' getGroups)
+                   where
+                     getGroups = groupBy groupImports imps
+                     groupImports x y = (Model.origin x) == (Model.origin y)
 
--- ---------------------------------------------------------- [ Imports to Dot ]
-
-imports2Dot :: Imports -> [String]
-imports2Dot imps = map unlines (map (imports2Dot') (groupBy (groupImports) imps))
-    where
-      groupImports x y = (Model.lang x) == (Model.lang y)
-     
-     
-imports2Dot' :: Imports -> [String]
-imports2Dot' imps = heed ++ body ++ taal
+-- | Do the transformation of Imports
+imports2Dot' :: Patterns -> [String]
+imports2Dot' imps = heed ++ body ++ foot
                     where
                       heed = ["subgraph cluster_" ++ label ++ " {\n"]
-                      body = map (import2Dot) imps
-                      taal = ["label=\"" ++ label ++ "\"\ncolor=black;\n}\n"]
-                      label = (Model.lang (head imps))
+                      foot = ["label=\"" ++ label ++ "\"\ncolor=black;\n}\n"]
+                      label = fromJust (Model.origin (head imps))
+                      body = patterns2Dot imps
 
-import2Dot :: Import -> String
-import2Dot (Import id Nothing) = genDotNode id id 
-import2Dot (Import id (Just patID)) = genDotNode patID patID
+-- ---------------------------------------------------------- [ Pattern To Dot ]
 
--- @TODO If full import -> 
---    1. Get AST for import language.
---    2. Transform into Plang
- 
---      withImports = ["cluster_" ++ (Model.label (Model.info plang)) ++ "{\n"]
+-- | Transform a List of Patterns to Dot Form.
 
--- ------------------------------------------------- [ General Relations 2 Dot ]
+patterns2Dot :: Patterns -> [String]
+patterns2Dot ps = map pattern2Dot ps
 
-instRelations2Dot :: Plang -> [String]
-instRelations2Dot plang = concat $ map (\x -> instRelation2Dot x ) (Model.relations plang)
-
-instRelation2Dot :: Relation -> [String]
-instRelation2Dot rel = map (\to -> genDotEdge from to desc)  (Model.to rel)
-                       where
-                         from = (Model.from rel)
-                         desc = (Model.desc rel)
-
--- --------------------------------------------------- [ Class Relations 2 Dot ]
-classRelations2Dot :: Plang -> [String]
-classRelations2Dot plang = union extends implements
-                           where
-                             extends = concat $ mapMaybe (extends2Dot) (Model.patterns plang)
-                             implements = concat $ mapMaybe (implements2Dot) (Model.patterns plang)
-                             
--- | Get Implements
-implements2Dot :: Pattern -> Maybe [String]
-implements2Dot (Pattern _ _ _ Nothing _) = Nothing
-implements2Dot (Pattern _ i _ (Just xs) _) = Just $ map (\x -> genDotEdge i x (Just "implements")) xs
-
--- | Get Extends to Dot
-extends2Dot :: Pattern -> Maybe [String]
-extends2Dot (Pattern _ _ Nothing _ _) = Nothing
-extends2Dot (Pattern _ i (Just xs) _ _) = Just $ map (\x -> genDotEdge i x (Just "extends")) xs
-
--- ---------------------------------------------------------- [ Patterns 2 Dot ]
-
--- | Patterns to Dot
-patterns2Dot :: Plang -> [String]
-patterns2Dot plang = map pattern2Dot (Model.patterns plang)
-
--- | Pattern to Dot
+-- | Transform a Pattern into Dot Form
 pattern2Dot :: Pattern -> String
 pattern2Dot p = genDotNode (Model.ident p) (Model.name p)
+
+-- -------------------------------------------------------- [ Relations to Dot ]
+
+-- | Transform the relations in the pattern language to Dot Form
+doRelations :: Patterns -> [String]
+doRelations ps = concatMap patternRels2Dot ps
+
+                   
+patternRels2Dot :: Pattern -> [String]
+patternRels2Dot p = nub $ extends2Dot ++ implements2Dot ++ requires2Dot ++ generals2Dot
+                    where 
+                      extends2Dot    = relations2Dot p (Model.extends p)    "extends"
+                      implements2Dot = relations2Dot p (Model.implements p) "implements"
+                      requires2Dot   = relations2Dot p (Model.requires p)   "uses"
+                      generals2Dot   = relations2Dot p (Model.links p)      "links"
+
+-- | Generic Transform of Relation to Dot Form
+relations2Dot :: Pattern -> Maybe Relations -> String -> [String]
+relations2Dot _ Nothing _ = [""]
+relations2Dot p (Just rs) desc = map (\r -> genDotEdge (Model.ident p) (Model.to r) (chkDesc r)) rs
+  where
+    chkDesc r = case isNothing $ Model.desc r of True -> Just desc
+                                                 otherwise -> Model.desc r
 
 -- -------------------------------------------------- [ Generate Dot Functions ]
 -- | Gen Dot Node
