@@ -158,41 +158,45 @@ parseRelation = try parseRelationM <|> parseRelation1 <?> "Relations"
 -- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
 
 -- relationM ::= <id> parseRelKWord <idlist>;
+-- Nasty Code!
 parseRelationM :: Parser ()
 parseRelationM = do from <- identifier
                     kword <- parseRelKWord
                     tos <- parseIDList
                     ps <- getState
-                    if isNothing $ getPattern from ps
+                    let p = getPattern from ps
+                    if isNothing p
                     then fail $ "From Pattern in relation doesn't exist: " ++ from
-                    else do let rels = map (\to -> tryMkRelation to ps Nothing) tos
-                            if Nothing `elem` rels
+                    else do let rs = map (\to -> tryMkRelation to ps Nothing) tos
+                            if Nothing `elem` rs
                             then unexpected "Unknown Identity used in To relation"
-                            else do let rel' = catMaybes rels
-                                    putState $ nub -- Dirty Hack! Need to use modify state.
-                                       (if kword
-                                           then concatMap (\r -> addRequire from r ps) rel'
-                                           else concatMap (\r -> addLink from r ps) rel')
-                  <?> "1-2-Many Relation"
+                            else do let rs' = catMaybes rs
+                                    let p' = if kword
+                                             then addRequires rs' (fromJust p) 
+                                             else addLinks rs' (fromJust p)
+                                    modifyState (\ps -> updatePatts p' ps)
+              <?> "1-2-Many Relation"
 
 -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
 
--- parseRelation1 ::= <id> parseRelKWord <id> parseRelDesc?                    
+-- parseRelation1 ::= <id> parseRelKWord <id> parseRelDesc?
+-- Nasty Code!
 parseRelation1 :: Parser ()            
 parseRelation1 = do from <- identifier
                     kword <- parseRelKWord
                     to <- identifier
                     desc <- optionMaybe parseRelDesc
                     ps <- getState
-                    if isNothing $ getPattern from ps
+                    let p = getPattern from ps
+                    if isNothing p
                     then fail $ "From Pattern in relation doesn't exist: " ++ from
-                    else do let res = tryMkRelation to ps desc
-                            if isNothing res
+                    else do let r = tryMkRelation to ps desc
+                            if isNothing r
                             then fail $ "To Pattern in relation doesn't exist: " ++ to
-                            else putState
-                                     (if kword
-                                      then addRequire from (fromJust res) ps
-                                      else addLink from (fromJust res) ps)
+                            else do let p' = if kword
+                                             then addRequire (fromJust r) (fromJust p)
+                                             else addLink (fromJust r) (fromJust p)
+                                    modifyState (\ps -> updatePatts p' ps)
                   <?> "1-2-1 Relation with Description"
 
 -- -- -------------------------------------------------- [ Misc Parsing Functions ]
