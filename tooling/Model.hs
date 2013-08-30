@@ -27,7 +27,7 @@ data Pattern = Pattern {
     
 -- --------------------------------------------------------------- [ Relations ]
 data Relation = Relation {
-      to   :: Pattern,
+      to   :: ID,
       desc :: Maybe String }
     deriving (Show, Eq)
 

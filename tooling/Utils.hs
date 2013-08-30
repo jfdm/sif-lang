@@ -35,5 +35,5 @@ tryMkRelation id ps desc = res
                              p = getPattern id ps
                              res = case isNothing p of
                                      True -> Nothing
-                                     otherwise -> Just $ Relation (fromJust p) desc
+                                     otherwise -> Just $ Relation (Model.ident (fromJust p)) desc
 
