@@ -6,7 +6,7 @@ import qualified Text.Parsec.Token as Tok
 -- import Control.Monad.Identity
 
 import Text.Parsec.Language (haskellStyle)
-import Model.AST
+import Model
 
 type Parser a = GenParser Char [Pattern] a
 -- ----------------------------------------------------- [ Define Token Parser ]

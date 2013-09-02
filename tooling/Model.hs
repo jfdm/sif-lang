@@ -1,4 +1,4 @@
-module Model.AST where
+module Model where
 
 -- AST for the Pattern Language
 
