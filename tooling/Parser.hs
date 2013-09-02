@@ -236,22 +236,4 @@ parseID1 = do id <- identifier
 parseIDList :: Parser IDs
 parseIDList = brackets $ sepBy1 identifier comma
 
--- -- ------------------------------------------------- [ Helper Testing Function ]
-
--- -- Test some parseExpression p with a given file f
--- testParseFile :: Show a => Parser a -> String -> IO ()
--- testParseFile p f = do { res <- parseFromFile (runLex p) f
---                        ; case res of
---                            Left err -> error (show err)
---                            Right x -> print x
---                        }
-
--- Test some parseExpression p with a given file f
-testParseFile :: Show a => Parser a -> String -> IO ()
-testParseFile p f = do { res <- parseFromFile (runLex p) f
-                       ; case res of
-                           Left err -> error (show err)
-                           Right x -> print x
-                       }
-
 -- -- --------------------------------------------------------------------- [ EOF ]
