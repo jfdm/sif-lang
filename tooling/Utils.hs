@@ -1,11 +1,17 @@
 module Utils where
 
 import Data.List
+import Data.Bool
 import Data.Maybe
 import Model
 
 -- ------------------------------------------------------- [ Pattern Functions ]
 
+-- | Does the pattern have properties.
+hasProperties :: Pattern -> Bool
+hasProperties p = (isJust (Model.extends p)) || (isJust (Model.implements p))
+
+-- | In a list of patterns update the given pattern.
 updatePatts :: Pattern -> Patterns -> Patterns
 updatePatts p ps = map (\x -> if Model.ident x == Model.ident p then p else x) ps
   
