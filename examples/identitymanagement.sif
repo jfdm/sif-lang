@@ -69,7 +69,7 @@ saml linkedTo cap : "typeOf"
 appfwall uses saml
 appfwall linkedTo xacmla : "enforces"
 
-xacml linkedTo author : "defines"
+xacml linkedTo authiz : "defines"
 
 xacmla linkedTo xacml : "enforces"
 xacmla linkedTo refmon : "enforces"

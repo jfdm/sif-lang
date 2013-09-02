@@ -2,49 +2,44 @@ module Model.AST where
 
 -- AST for the Pattern Language
 
-type ID = String
-type IDs = [ ID ]
-
-type Patterns = [ Pattern ]
-type Relations = [ Relation ]
-type Imports = [ Import ]
-type Modifier = String
-
-
+-- -------------------------------------------------------- [ Pattern Language ]
 data Plang = Plang {
-      info :: Metadata,
-      imports :: Maybe Imports,
-      patterns :: Patterns,
-      relations :: Relations
+      title    :: String,
+      label    :: ID,
+      patterns :: Patterns
     } deriving (Show)
 
-data Metadata = Metadata {
-      title :: String,
-      label :: ID
-    } deriving (Show)
-
-data Import = Import {
-      lang :: ID,
-      pattern :: Maybe ID
-    } deriving (Show)
-
+-- ----------------------------------------------------------------- [ Pattern ]
 data Pattern = Pattern {
-      name :: String,
-      ident :: ID,
-      extends :: Maybe IDs,
-      implements :: Maybe IDs,
-      modifier :: Maybe Modifier
-    } deriving (Show)
+      name       :: String,
+      ident      :: ID,
+      origin     :: Maybe String,
+      modifier   :: Maybe Modifier,
+      extends    :: Maybe Extends,
+      implements :: Maybe Realises,
+      requires   :: Maybe Requires,
+      links      :: Maybe Links
+    } deriving (Show, Eq)
+    
+-- --------------------------------------------------------------- [ Relations ]
+data Relation = Relation {
+      to   :: ID,
+      desc :: Maybe String }
+    deriving (Show, Eq)
 
+data Modifier = Abstract | Integration
+                deriving (Show, Eq, Read, Enum, Ord)
 
-data Relation =
-    Requires { from :: ID,
-               to :: IDs,
-               desc :: Maybe String }
-  | Links { from :: ID,
-              to :: IDs,
-              desc :: Maybe String }
-    deriving (Show)
-
-
+-- ------------------------------------------------------------ [ Type Aliases ]
+-- PLang
+type Patterns = [ Pattern ]
+-- Relations
+type Extends  = [ Relation ]
+type Realises = [ Relation ]
+type Requires = [ Relation ]
+type Links    = [ Relation ]
+type Relations = [Relation]
+-- Misc
+type ID       = String
+type IDs      = [ ID ]
 -- --------------------------------------------------------------------- [ EOF ]

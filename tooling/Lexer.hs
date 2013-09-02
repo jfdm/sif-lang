@@ -1,20 +1,23 @@
 module Lexer where
 
 import Text.Parsec
-import Text.Parsec.String (Parser)
+import Text.Parsec.String (GenParser)
 import qualified Text.Parsec.Token as Tok
+-- import Control.Monad.Identity
+
 import Text.Parsec.Language (haskellStyle)
 import Model.AST
 
+type Parser a = GenParser Char [Pattern] a
 -- ----------------------------------------------------- [ Define Token Parser ]
 
-lexer :: Tok.TokenParser ()
+--lexer :: Tok.TokenParser [Pattern]
 lexer = Tok.makeTokenParser style
     where ops = ["<-", ":"]
           names = ["linkedTo", "uses",                               -- Relations
                    ":ofType", ":extends", ":implements",             -- Properties
                    "Pattern", "Abstract", "Integration", "language", -- 'Types'
-                   "from", "import", "as", "relations", "patterns"]  -- Keywords
+                   "from", "import", "relations", "patterns"]  -- Keywords
           style = haskellStyle {Tok.reservedOpNames = ops,
                                 Tok.reservedNames = names,
                                 Tok.commentLine = "--"}
