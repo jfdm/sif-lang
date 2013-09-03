@@ -49,7 +49,7 @@ patterns2Dot = map pattern2Dot
 
 -- | Transform a Pattern into Dot Form
 pattern2Dot :: Pattern -> String
-pattern2Dot p = genDotNode (Model.ident p) (Model.name p)
+pattern2Dot p = genDotNode (Model.ident p) (Model.name p) (Model.modifier p)
 
 -- -------------------------------------------------------- [ Relations to Dot ]
 
@@ -69,21 +69,44 @@ patternRels2Dot p = nub $ extends2Dot ++ implements2Dot ++ requires2Dot ++ gener
 -- | Generic Transform of Relation to Dot Form
 relations2Dot :: Pattern -> Maybe Relations -> String -> [String]
 relations2Dot _ Nothing _ = [""]
-relations2Dot p (Just rs) desc = map (\r -> genDotEdge (Model.ident p) (Model.to r) (chkDesc r)) rs
-  where
-    chkDesc r = case isNothing $ Model.desc r of True -> Just desc
-                                                 otherwise -> Model.desc r
+relations2Dot p (Just rs) t = map (\r -> genDotEdge (Model.ident p) (Model.to r) (Model.desc r) t) rs
 
 -- -------------------------------------------------- [ Generate Dot Functions ]
 -- | Gen Dot Node
-genDotNode :: ID -> String -> String
-genDotNode i l = i ++ " [style=rounded,shape=box,label=\"" ++ l ++ "\"]; "
+genDotNode :: ID -> String -> Maybe Modifier -> String
+genDotNode id label m = id ++ genDotNodeStyling label m
 
 -- | Gen Dot Edge
-genDotEdge :: ID -> ID -> Maybe String -> String
-genDotEdge a b Nothing = a ++ " -> " ++ b ++ ";"
-genDotEdge a b (Just l) =  a ++ " -> " ++ b ++ " [" ++ label l ++ "]; "
-                           where
-                             label l = "label=\"" ++ l ++ "\""
+genDotEdge :: ID -> ID -> Maybe String -> String -> String
+genDotEdge a b l t =  a ++ " -> " ++ b ++ genDotEdgeStyling l t
 
+-- | Generate Dot Edge Styling
+genDotEdgeStyling :: Maybe String -> String -> String
+genDotEdgeStyling desc t = " [" ++ styling ++ label ++ "];"
+                           where
+                             styling = case t of
+                                         "implements" -> implements
+                                         "extends" -> extends
+                                         "uses" -> uses
+                                         otherwise -> links
+
+                             implements = "style=\"dotted\", dir=\"back\", arrowtail=\"empty\", "
+                             extends = "style=\"solid\", dir=\"forward\", arrowhead=\"empty\", "
+                             uses = "style=\"solid\", dir=\"back\", arrowtail=\"diamond\", "
+                             links = "style=\"solid\", dir=\"forward\", arrowhead=\"normal\", "
+                             label = if isNothing desc
+                                     then ""
+                                     else ", label=\"" ++ fromJust desc ++ "\""
+
+-- | Generate Dot Node Styling
+genDotNodeStyling :: String -> Maybe Modifier -> String
+genDotNodeStyling l m = " [" ++ style ++ shape ++ label ++ "];"
+                        where
+                          shape = "shape=box, "
+                          label = "label=\"" ++ l ++ "\""
+                          style = if isNothing m
+                                  then "style=rounded, " 
+                                  else case fromJust m of
+                                         Abstract -> "style=\"rounded,dashed\", "
+                                         Integration -> "style=\"rounded,diagonals\", "
 -- --------------------------------------------------------------------- [ EOF ]
