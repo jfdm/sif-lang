@@ -128,23 +128,22 @@ parseModifier = do try $ reserved "Abstract"
 -- ------------------------------------------------ [ Pattern Property Parsing ]
 
 -- | Parse the properties
--- parseProperty ::= parseImplements parseExtends;
+-- parseProperty ::= parseExtends parseImplements;
 parseProperties :: Parser (Maybe Extends, Maybe Realises)
-parseProperties = do extends <- optionMaybe parseProperty
-                     implements <- optionMaybe parseProperty
+parseProperties = do extends <- optionMaybe parseExtends
+                     implements <- optionMaybe parseImplements
                      return (extends, implements)
-                 <?> "Properties"
+                  <?> "Properties"
 
--- parseProperty ::= parsePropKWord <idlist>;
-parseProperty :: Parser Relations
-parseProperty = do parsePropKWord
-                   ids <- parseIDs
-                   ps <- getState
-                   let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
-                   if Nothing `elem` exs
-                   then unexpected "Unknown identity used"
-                   else return $ catMaybes exs
-               <?> "Properties Parsing"
+-- parseImplements ::= ":implments" parseRelationIDs;
+parseImplements :: Parser Relations
+parseImplements = do reserved ":implements"
+                     parseRelationIDs
+
+-- parseExtends ::= ":extends" parseRelationIDss
+parseExtends :: Parser Relations
+parseExtends = do reserved ":extends"
+                  parseRelationIDs
 
 -- ---------------------------------------------- [ Relation Parsing Functions ]
 
@@ -201,13 +200,15 @@ parseRelation1 = do from <- identifier
 
 -- -- -------------------------------------------------- [ Misc Parsing Functions ]
 
--- parsePropKWord :: = (":extends" | ":implements");
-parsePropKWord :: Parser Bool
-parsePropKWord = do try $ reserved ":extends"
-                    return True
-             <|> do reserved ":implements"
-                    return False
-             <?> "Property Keyword"
+-- parseRelationIDs ::= <idlist>;
+parseRelationIDs :: Parser Relations
+parseRelationIDs = do ids <- parseIDs
+                      ps <- getState
+                      let exs = fmap (\id -> tryMkRelation id ps Nothing) ids
+                      if Nothing `elem` exs
+                      then unexpected "Unknown identity used"
+                      else return $ catMaybes exs
+               <?> "Relation ID List Parsing"
 
 -- parseRelKWord ::= ("uses" | "linkedTo" );
 parseRelKWord :: Parser Bool
