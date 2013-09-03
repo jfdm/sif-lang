@@ -3,8 +3,11 @@ module Prettifier (prettyPlang) where
 import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
 import Data.List
+import Data.Function
 import Model
 import Utils
+
+import Examples.Tampering
 
 -- | A Pretty Printer of our plang AST.
 prettyPlang :: Plang -> Doc
@@ -35,13 +38,13 @@ prettyImports :: Patterns -> Doc
 prettyImports [] = empty
 prettyImports is = vsep $ map prettyImport domains
                    where 
-                     domains = groupBy (\x y -> Model.origin x == Model.origin y) is
+                     domains = groupBy ((==) `on` Model.origin) is
 
 -- | Prettify a single import domain
 prettyImport :: Patterns -> Doc
-prettyImport ps = (prettyImportM imps) <$> (prettyLangImport langImps)
+prettyImport ps = prettyImportM imps <$> prettyLangImport langImps
                   where
-                    (langImps, imps) = break (\x -> Model.ident x /= (fromJust (Model.origin x))) ps
+                    (langImps, imps) = break (\x -> Model.ident x /= fromJust (Model.origin x)) ps
 
 -- | Prettify individual pattern imports
 prettyImportM :: Patterns -> Doc
@@ -75,12 +78,12 @@ prettyPattern p = text (Model.ident p)
                   <> parens (dquotes (string (Model.name p)))
                   <> properties
                   where
-                    mod = case isNothing (Model.modifier p) of
-                            True -> empty
-                            False -> string (show (Model.modifier p))
-                    properties = case hasProperties p of
-                                   False -> empty
-                                   True -> vcat [lbrace, (prettyProperties p), rbrace]
+                    mod = if isNothing (Model.modifier p)
+                          then empty
+                          else string (show (Model.modifier p))
+                    properties = if hasProperties p
+                                 then vcat [lbrace, prettyProperties p, rbrace]
+                                 else empty
 
 
 -- | Prettify a patterns properties
@@ -121,13 +124,13 @@ prettyRelation from s (Just rs) = pretty121Relations from s r121
 -- | Prettify 1-2-Many Relations
 pretty12ManyRelations :: String -> String -> Relations -> Doc
 pretty12ManyRelations _ _ [] = empty
-pretty12ManyRelations from s rs = (string from) <+> prettyIDList s (Just rs)
+pretty12ManyRelations from s rs = string from <+> prettyIDList s (Just rs)
 
 
 -- | Prettify 1-2-1 Relations
 pretty121Relations :: String -> String -> Relations -> Doc
 pretty121Relations from s [] = empty
-pretty121Relations from s rs = vsep $ map (\r -> pretty121Relation from s r) rs
+pretty121Relations from s rs = vsep $ map (pretty121Relation from s) rs
 
 -- | Prettify a 1-2-1 Relation
 pretty121Relation :: String -> String -> Relation -> Doc
@@ -136,10 +139,10 @@ pretty121Relation from s r = string from
                              <+> string to
                              <+> desc
                              where
-                               to = (Model.to r)
-                               desc = case isNothing (Model.desc r) of
-                                        True -> empty
-                                        False -> colon <+> string (fromJust (Model.desc r))
+                               to = Model.to r
+                               desc = if isNothing (Model.desc r)
+                                      then empty
+                                      else colon <+> string (fromJust (Model.desc r))
 
 -- -------------------------------------------------------------------- [ Misc ]
 -- | Prettify a list if IDs
@@ -149,6 +152,6 @@ prettyIDList s (Just rs) = string s
                            <+> list (prettyIDs ids)
                            where
                              ids = map Model.to rs
-                             prettyIDs is = map string is
+                             prettyIDs = map string
 
 -- --------------------------------------------------------------------- [ EOF ]

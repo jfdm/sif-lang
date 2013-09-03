@@ -1,5 +1,6 @@
 module Lexer where
 
+import Control.Monad (void)
 import Text.Parsec
 import Text.Parsec.String (GenParser)
 import qualified Text.Parsec.Token as Tok
@@ -30,7 +31,7 @@ lexeme :: Parser a -> Parser a
 lexeme = Tok.lexeme lexer
 
 comma :: Parser ()
-comma = Tok.comma lexer >> return ()
+comma = void (Tok.comma lexer)
 
 -- [ <- These bad boys
 brackets :: Parser a -> Parser a

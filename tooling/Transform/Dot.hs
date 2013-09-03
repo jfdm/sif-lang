@@ -15,7 +15,7 @@ plang2Dot plang = heed ++ pbody ++ rbody ++ foot
                     foot = ["\n}\n"]
                     pbody = doPatterns $ break (isJust . Model.origin) ps
                     rbody = doRelations ps
-                    ps = (Model.patterns plang)
+                    ps = Model.patterns plang
 
 -- | Do the transformation of a (Local Patterns, Imports Patterns) tuple into Dot Form
 doPatterns :: (Patterns, Patterns) -> [String]
@@ -26,10 +26,10 @@ doPatterns (pats, imps) = nub $ imports2Dot imps ++ patterns2Dot pats
 -- | Transform a list of Imported Patterns into Dot Form.
 imports2Dot :: Patterns -> [String]
 imports2Dot [] = [""]
-imports2Dot imps = map unlines (map imports2Dot' getGroups)
+imports2Dot imps = map (unlines . imports2Dot') getGroups
                    where
                      getGroups = groupBy groupImports imps
-                     groupImports x y = (Model.origin x) == (Model.origin y)
+                     groupImports x y = Model.origin x == Model.origin y
 
 -- | Do the transformation of Imports
 imports2Dot' :: Patterns -> [String]
@@ -45,7 +45,7 @@ imports2Dot' imps = heed ++ body ++ foot
 -- | Transform a List of Patterns to Dot Form.
 
 patterns2Dot :: Patterns -> [String]
-patterns2Dot ps = map pattern2Dot ps
+patterns2Dot = map pattern2Dot
 
 -- | Transform a Pattern into Dot Form
 pattern2Dot :: Pattern -> String
@@ -55,7 +55,7 @@ pattern2Dot p = genDotNode (Model.ident p) (Model.name p)
 
 -- | Transform the relations in the pattern language to Dot Form
 doRelations :: Patterns -> [String]
-doRelations ps = concatMap patternRels2Dot ps
+doRelations = concatMap patternRels2Dot
 
                    
 patternRels2Dot :: Pattern -> [String]

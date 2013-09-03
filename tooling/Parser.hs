@@ -174,7 +174,7 @@ parseRelationM = do from <- identifier
                                     let p' = if kword
                                              then addRequires rs' (fromJust p) 
                                              else addLinks rs' (fromJust p)
-                                    modifyState (\ps -> updatePatts p' ps)
+                                    modifyState (updatePatts p')
               <?> "1-2-Many Relation"
 
 -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
@@ -196,7 +196,7 @@ parseRelation1 = do from <- identifier
                             else do let p' = if kword
                                              then addRequire (fromJust r) (fromJust p)
                                              else addLink (fromJust r) (fromJust p)
-                                    modifyState (\ps -> updatePatts p' ps)
+                                    modifyState (updatePatts p')
                   <?> "1-2-1 Relation with Description"
 
 -- -- -------------------------------------------------- [ Misc Parsing Functions ]

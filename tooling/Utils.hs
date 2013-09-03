@@ -9,11 +9,11 @@ import Model
 
 -- | Does the pattern have properties.
 hasProperties :: Pattern -> Bool
-hasProperties p = (isJust (Model.extends p)) || (isJust (Model.implements p))
+hasProperties p = isJust (Model.extends p) || isJust (Model.implements p)
 
 -- | In a list of patterns update the given pattern.
 updatePatts :: Pattern -> Patterns -> Patterns
-updatePatts p ps = map (\x -> if Model.ident x == Model.ident p then p else x) ps
+updatePatts p = map (\x -> if Model.ident x == Model.ident p then p else x)
   
 -- ------------------------------------------------------------------- [ Links ]
 
@@ -61,16 +61,18 @@ tryMkRelation id ps desc = res
                                      True -> Nothing
                                      otherwise -> Just $ Relation (Model.ident (fromJust p)) desc
 
-
+-- | Make an import pattern
 mkImportPattern :: ID -> String -> Pattern
 mkImportPattern id origin = Pattern id id (Just origin) Nothing Nothing Nothing Nothing Nothing
 
+-- | Make a simple pattern with no properties
 mkSimplePattern :: String -> ID -> Maybe Modifier -> Pattern
 mkSimplePattern n id mod = Pattern n id Nothing mod Nothing Nothing Nothing Nothing
 
+-- | Make a pattern with properties
 mkComplexPattern :: String -> ID -> Maybe Modifier -> Maybe Extends -> Maybe Realises -> Pattern
 mkComplexPattern n id mod exs imps = Pattern n id Nothing mod exs imps Nothing Nothing
 
-
+-- | Get the origin on the pattern.
 getImportOrigin :: Pattern -> String
 getImportOrigin p  = fromJust $ Model.origin p
