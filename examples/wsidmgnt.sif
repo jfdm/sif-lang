@@ -7,7 +7,7 @@ from soaidmgnt import abac, cred, cap, authiz, refmon, idfed
 patterns
 
 saml <- Pattern("SAML Assertion"){
-  :implements [ cred, abac, cap ]
+  :implements [ cred, abac]
 }
 
 xacml <- Pattern("XACML Authorization")
