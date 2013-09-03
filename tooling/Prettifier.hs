@@ -67,7 +67,7 @@ prettyLangImport ps = vsep $ map f ps
 -- | Prettify declared local patterns
 prettyPatterns :: Patterns -> Doc
 prettyPatterns [] = empty
-prettyPatterns ps = vsep $ map prettyPattern ps
+prettyPatterns ps = vsep $ map prettyPattern (reverse ps)
 
 -- | Prettify a Pattern
 prettyPattern :: Pattern -> Doc
@@ -100,8 +100,9 @@ prettyRelations :: Patterns -> Doc
 prettyRelations [] = empty
 prettyRelations ps = vsep [requires, links]
                      where
-                       requires = vsep $ map prettyRequires ps
-                       links = vsep $ map prettyLinks ps
+                       requires = vsep $ map prettyRequires ps'
+                       links = vsep $ map prettyLinks ps'
+                       ps' = reverse ps
 
 -- | Prettify a list of requires relations
 prettyRequires :: Pattern -> Doc
