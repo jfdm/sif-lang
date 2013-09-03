@@ -69,7 +69,9 @@ patternRels2Dot p = nub $ extends2Dot ++ implements2Dot ++ requires2Dot ++ gener
 -- | Generic Transform of Relation to Dot Form
 relations2Dot :: Pattern -> Maybe Relations -> String -> [String]
 relations2Dot _ Nothing _ = [""]
-relations2Dot p (Just rs) t = map (\r -> genDotEdge (Model.ident p) (Model.to r) (Model.desc r) t) rs
+relations2Dot p (Just rs) t = map (\r -> genDotEdge from (Model.to r) (Model.desc r) t) rs
+                              where
+                                from = Model.ident p
 
 -- -------------------------------------------------- [ Generate Dot Functions ]
 -- | Gen Dot Node
@@ -90,10 +92,10 @@ genDotEdgeStyling desc t = " [" ++ styling ++ label ++ "];"
                                          "uses" -> uses
                                          otherwise -> links
 
-                             implements = "style=\"dotted\", dir=\"back\", arrowtail=\"empty\", "
-                             extends = "style=\"solid\", dir=\"forward\", arrowhead=\"empty\", "
-                             uses = "style=\"solid\", dir=\"back\", arrowtail=\"diamond\", "
-                             links = "style=\"solid\", dir=\"forward\", arrowhead=\"normal\", "
+                             implements = "style=\"dashed\", dir=\"back\", arrowtail=\"empty\""
+                             extends = "style=\"solid\", dir=\"forward\", arrowhead=\"empty\""
+                             uses = "style=\"solid\", dir=\"back\", arrowtail=\"diamond\""
+                             links = "style=\"solid\", dir=\"forward\", arrowhead=\"normal\""
                              label = if isNothing desc
                                      then ""
                                      else ", label=\"" ++ fromJust desc ++ "\""
