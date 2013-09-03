@@ -13,7 +13,7 @@ pep <- Pattern("Policy Enforcement Point")
 authenticationEnforcer <- Pattern("Authentication Enforcer")
 authorisationEnforcer <- Pattern("Authorisation Enforcer")
 accountLockout <- Pattern("Account Lockout")
-interceptvalidator <- Pattern("Intercepting Validator")
+interceptValidator <- Pattern("Intercepting Validator")
 contentDependentProcessing <- Pattern("Content Dependent Processing")
 errorDetectionCorrection <- Pattern("Error Detection and Correction")
 exceptionShield <- Pattern("Exception Shielding")
@@ -30,13 +30,13 @@ sap linkedTo singleThreadedFacade : "Simple Perimeter"
 
 pep linkedTo authenticationEnforcer : "Check Identity" 
 pep linkedTo authorisationEnforcer : "Control Access" 
-pep linkedTo interceptvalidator : "Check Input" 
+pep linkedTo interceptValidator : "Check Input" 
 
 authenticationEnforcer linkedTo accountLockout : "Prevent Brute Force Attacks"
 authorisationEnforcer linkedTo rbac : "Policy for A/C"
 
-interceptvalidtor linkedTo contentDependentProcessing : "Code and Data separation"
-interceptvalidtor linkedTo errorDetectionCorrection : "Integrity Check" 
+interceptValidator linkedTo contentDependentProcessing : "Code and Data separation"
+interceptValidator linkedTo errorDetectionCorrection : "Integrity Check" 
 
 contentDependentProcessing linkedTo exceptionShield : "Protect with exception and hide exception metadata" 
 errorDetectionCorrection linkedTo exceptionShield : "Protect with exception and hide exception metadata"

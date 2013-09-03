@@ -11,7 +11,7 @@ assetEval <- Pattern("Asset Evaluation")
 vulnAssessment <- Pattern("Vulnerability Assessment")
 riskDetermination <- Pattern("Risk Determination")
 defenseDepth <- Pattern("Defense in Depth")
-enterSecApproach <- Pattern("Enterprise Security Approaches")
+enterSecApproaches <- Pattern("Enterprise Security Approaches")
 enterSecServices <- Pattern("Enterprise Security Services")
 lowHangingFruit <- Pattern("Low Hanging Fruit")
 protectedSystem <- Pattern("Protected System")
@@ -29,9 +29,9 @@ assetEval linkedTo riskDetermination : "Rank Assets"
 vulnAssessment linkedTo riskDetermination : "Rank Threats"
 
 riskDetermination linkedTo defenseDepth : "Strong Protection"
-riskDetermination linkedTo enterSecApproach : "Select and Integrate Countermeasure"
+riskDetermination linkedTo enterSecApproaches : "Select and Integrate Countermeasure"
 
-defenseDepth linkedTo enterSecApproach : "Choose Defense Mechanism"
+defenseDepth linkedTo enterSecApproaches : "Choose Defense Mechanism"
 
 enterSecApproaches linkedTo lowHangingFruit : "Where to start"
 enterSecApproaches linkedTo enterSecServices : "Solution to use"

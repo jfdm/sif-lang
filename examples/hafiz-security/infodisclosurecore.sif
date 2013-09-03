@@ -34,11 +34,11 @@ mLevelSecurity linkedTo subjectDesc : "Subject Descriptor"
 
 subjectDesc linkedTo referenceMonitor : "Enforcement"
 
-securitySesion linkedTo limitedAccess : "Constrained UI"
-securitySesion linkedTo fullAccessWErrors : "UI with Options"
-securitySesion linkedTo directedSession : "Guide User navigation"
-securitySesion linkedTo secureSessionObject : "Communicate Between Sessions"
-securitySesion linkedTo secureServiceFacade : "Centralize Component Interactions"
+securitySession linkedTo limitedAccess : "Constrained UI"
+securitySession linkedTo fullAccessWErrors : "UI with Options"
+securitySession linkedTo directedSession : "Guide User navigation"
+securitySession linkedTo secureSessionObject : "Communicate Between Sessions"
+securitySession linkedTo secureServiceFacade : "Centralize Component Interactions"
 
 directedSession linkedTo secureSessionObject : "Communicate Between Sessions"
 

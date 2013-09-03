@@ -4,7 +4,7 @@ language "Privilege Escalation" as privilegeescalation
 
 patterns
 
-compartmentalisation <- Pattern("Compartmenaliseationartmentalisation")
+compartmentalisation <- Pattern("Compartmentalisation")
 distResponsibility <- Pattern("Distributed Responsiblitly")
 exeDomain <- Pattern("Execution Domain")
 
@@ -19,7 +19,7 @@ relations
 
 compartmentalisation linkedTo distResponsibility : "Efficient Partition"
 
-distResponsibility linkedTo compartmenaliseation : "Re-Partition"
+distResponsibility linkedTo compartmentalisation : "Re-Partition"
 distResponsibility linkedTo exeDomain : "Restrict Resources"
 
 exeDomain linkedTo controlledProcCreation : "Restrict Privilege Inheritance"

@@ -47,8 +47,8 @@ msgInterceptingGateway linkedTo secureMsgRouter : "Multi-Party Messaging"
 
 infoObscurity linkedTo secureComms : "Unobservable Channel"
 
-seccomms linkedTo secureServiceProxy : "Secure Facade"
-seccomms linkedTo secureAssocation : "Store Security Info"
+secureComms linkedTo secureServiceProxy : "Secure Facade"
+secureComms linkedTo secureAssocation : "Store Security Info"
 
 secureServiceProxy linkedTo integrationReverseProxy: "Enforce Policy"
 
