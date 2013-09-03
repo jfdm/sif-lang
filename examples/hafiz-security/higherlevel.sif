@@ -36,6 +36,8 @@ defenseDepth linkedTo enterSecApproaches : "Choose Defense Mechanism"
 enterSecApproaches linkedTo lowHangingFruit : "Where to start"
 enterSecApproaches linkedTo enterSecServices : "Solution to use"
 
+lowHangingFruit linkedTo enterSecServices : "Solution to use"
+
 enterSecServices linkedTo protectedSystem : "Protect Resources"
 enterSecServices linkedTo hideImplementation : "Security by Obscurity"
 enterSecServices linkedTo whiteHatsHackThyselves : "Test Adopted Solution"
