@@ -1,3 +1,4 @@
+-- | A pretty printing function.
 module Prettifier (prettyPlang) where
 
 import Text.PrettyPrint.Leijen as PP

@@ -1,12 +1,11 @@
--- ------------------------------------------------------------------ [ Tropyc ]
-module Examples.Tropyc where
-
 -- | Pattern Language for Cryptography
 --
 -- Braga, A., Rubira, C., and Dahab, R. 1998. Tropyc: A pattern
 -- language for cryptographic object-oriented software. Chapter 16 in
 -- Pattern Languages of Program Design 4 (N. Harrison, B. Foote, and
 -- H. Rohnert, Eds.). Also in Procs. of PLoP'98, 
+
+module Examples.Tropyc where
 
 import Model
 

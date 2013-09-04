@@ -1,6 +1,3 @@
--- --------------------------------------------------------------- [ Tampering ]
-module Examples.Tampering where
-
 -- | Tampering Pattern Language
 --
 -- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
@@ -8,6 +5,8 @@ module Examples.Tampering where
 -- international symposium on New ideas, new paradigms, and
 -- reflections on programming and software (Onward!  '12). ACM, New
 -- York, NY, USA, 139-158. DOI=10.1145/2384592.2384607
+
+module Examples.Tampering where
 
 import Model
 

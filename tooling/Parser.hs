@@ -1,3 +1,4 @@
+-- | The parser.
 module Parser (parseSif) where
 
 import Control.Applicative hiding ((<|>), many)

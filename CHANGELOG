@@ -1,0 +1,25 @@
+# _*_ mode: org _*_
+#+TITLE: ChangeLog	
+
+* v2013.08.20a to v2013.09.04
+
+** User Visible Changes
++ Resulting graph has pretty formatting.
+
+** Internal Changes
++ New Stateful parser to provide basic semantic checks
++ Pretty Printer.
+
+** Misc Changes
++ Addition of proper software project build tooling.
+  + Changelog
+  + cabal build script.
++ Addition of BSD3 License
++ Improved README
+
+* Copyright Notice
+
+Copyright (c) 2013 Jan de Muijnck-Hughes
+
+Copying and distribution of this file, with or without modification, are
+permitted provided the copyright notice and this notice are preserved.

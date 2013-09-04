@@ -1,3 +1,4 @@
+-- | Utility functions.
 module Utils where
 
 import Data.List

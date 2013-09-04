@@ -1,6 +1,5 @@
+-- | The ADT describing the Pattern language
 module Model where
-
--- AST for the Pattern Language
 
 -- -------------------------------------------------------- [ Pattern Language ]
 data Plang = Plang {

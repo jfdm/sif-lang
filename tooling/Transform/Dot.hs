@@ -1,3 +1,4 @@
+-- | Transform the Pattern Language into a Dot representation.
 module Transform.Dot (plang2Dot) where
 
 import Data.Maybe
