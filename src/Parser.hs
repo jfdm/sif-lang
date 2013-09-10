@@ -10,7 +10,6 @@ import Data.List
 
 import Lexer
 import Model.AST
--- import Utils
 
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 
@@ -89,42 +88,62 @@ parsePattern = try parsePatternC <|> parsePatternS <?> "Patterns"
 -- | Complex patterns that extend or import other patterns
 -- parsePatternC ::= parsePatternS { parseProperty* };
 parsePatternC :: Parser ()
-parsePatternC = do (id, modifier, name) <- parsePatternHead
+parsePatternC = do (id, typ, name) <- parsePatternHead
                    (extends, implements) <- braces parseProperties
-                   let p = mkComplexPattern name id modifier extends implements
+                   let p = mkComplexPattern name id typ extends implements
                    modifyState (p :)
                <?> "Complex Pattern"
 
 -- | Simple patterns.
 -- parsePatternS ::= parsePatternHead ;
 parsePatternS :: Parser ()
-parsePatternS = do (id, modifier, name) <- parsePatternHead
-                   let p = mkSimplePattern name id modifier
+parsePatternS = do (id, typ, name) <- parsePatternHead
+                   let p = mkSimplePattern name id typ
                    modifyState (p :)
                <?> "Simple Pattern"
 
 
 -- | Common Head of a Pattern
--- parsePatternHead ::= <id> '<-' parseModifier? Pattern(<name>);
-parsePatternHead :: Parser (ID, Maybe ModifierExpr, String)
+-- parsePatternHead ::= <id> '<-' parseType? Pattern(<name>);
+parsePatternHead :: Parser (ID, TyPattern, String)
 parsePatternHead = do id <- identifier
                       reservedOp "<-"
-                      modifier <- optionMaybe parseModifier
+                      typ <- optionMaybe parseType
+                      let typ' = if isNothing typ
+                                 then TyPattern
+                                 else fromJust typ
                       reserved "Pattern"
                       name <- parens stringLiteral                    
-                      return (id, modifier, name)
+                      return (id, typ', name)
                 <?> "Pattern Head"
 
 -- ---------------------------------------------- [ Pattern Modifier Functions ]
 
--- | Parse the modifiers
--- parseModifier ::= ("Integration" | "Abstract");
-parseModifier :: Parser ModifierExpr
-parseModifier = do try $ reserved "Abstract"
-                   return Abstract
-            <|> do reserved "Integration"
-                   return Integration
-            <?> "Modifier"
+-- -- | Parse the modifiers
+-- -- parseModifier ::= ("Integration" | "Abstract");
+-- parseModifier :: Parser ModifierExpr
+-- parseModifier = do try $ reserved "Abstract"
+--                    return Abstract
+--             <|> do reserved "Integration"
+--                    return Integration
+--             <?> "Modifier"
+
+-- ---------------------------------------------------- [ Pattern Type Parsing ]
+-- | Parse the type information
+-- parseType ::= ("Component" | "System" | "Deployment"
+--                 | "Admin" | "Implementation")
+parseType :: Parser TyPattern
+parseType = do try $ reserved "Component"
+               return TyComponent
+            <|> do reserved "System"
+                   return TySystem
+            <|> do reserved "Deployment"
+                   return TyDeployment
+            <|> do reserved "Admin"
+                   return TyAdmin
+            <|> do reserved "Implementation"
+                   return TyImplementation
+            <?> "Type"
 
 -- ------------------------------------------------ [ Pattern Property Parsing ]
 

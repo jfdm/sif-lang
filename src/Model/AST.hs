@@ -10,12 +10,29 @@ data PlangExpr = PlangExpr {
       patterns :: PatternsExpr
     } deriving (Show)
 
+-- ----------------------------------------------------------- [ Pattern Types ]
+data TyPattern = TyPattern
+               | TyComponent
+               | TySystem
+               | TyDeployment
+               | TyAdmin 
+               | TyImplementation
+               | TyImport -- ^ Nasty Hack 
+               deriving (Show, Eq, Enum, Ord)
+
+data TyModifier = TyAbstract
+                | TyConcrete
+                | TySimple
+                | TyComplex
+                deriving (Show, Eq, Read, Enum, Ord)
+
 -- ----------------------------------------------------------------- [ Pattern ]
 data PatternExpr = PatternExpr {
       name       :: String,
-      ident      :: ID,
+      ident      :: ID,      
       origin     :: Maybe String,
-      modifier   :: Maybe ModifierExpr,
+      typ        :: TyPattern,
+--      modifier   :: Maybe ModifierExpr,
       extends    :: Maybe RelationsExpr,
       implements :: Maybe RelationsExpr,
       requires   :: Maybe RelationsExpr,
@@ -27,9 +44,6 @@ data RelationExpr = RelationExpr {
       to   :: ID,
       desc :: Maybe String
     } deriving (Show, Eq)
-
-data ModifierExpr = Abstract | Integration
-                    deriving (Show, Eq, Read, Enum, Ord)
 
 -- ------------------------------------------------------------ [ Type Aliases ]
 
@@ -54,19 +68,19 @@ tryMkRelation id ps desc = res
 
 -- | Make an import pattern
 mkImportPattern :: ID -> String -> PatternExpr
-mkImportPattern id origin = PatternExpr id id (Just origin) Nothing Nothing Nothing Nothing Nothing
+mkImportPattern id origin = PatternExpr id id (Just origin) TyPattern Nothing Nothing Nothing Nothing
 
 -- | Make a simple pattern with no properties
-mkSimplePattern :: String -> ID -> Maybe ModifierExpr -> PatternExpr
-mkSimplePattern n id mod = PatternExpr n id Nothing mod Nothing Nothing Nothing Nothing
+mkSimplePattern :: String -> ID -> TyPattern -> PatternExpr
+mkSimplePattern n id typ = PatternExpr n id Nothing typ Nothing Nothing Nothing Nothing
 
 -- | Make a pattern with properties
 mkComplexPattern :: String -> ID
-                 -> Maybe ModifierExpr -- ^ Modifier
+                 -> TyPattern           -- ^ Type
                  -> Maybe RelationsExpr -- ^ Extends
                  -> Maybe RelationsExpr -- ^ Realises
                  -> PatternExpr
-mkComplexPattern n id mod exs imps = PatternExpr n id Nothing mod exs imps Nothing Nothing
+mkComplexPattern n id typ exs imps = PatternExpr n id Nothing typ exs imps Nothing Nothing
 
 -- -------------------------------------------------------- [ Accessor Methods ]
 -- | Get Pattern
@@ -103,9 +117,5 @@ addLink :: RelationExpr -> PatternExpr -> PatternExpr
 addLink r p = case isNothing (links p) of
                 True -> p { links = Just [r] }
                 otherwise -> p { links = Just (r : fromJust (links p))}
-
-
-
-
   
 -- --------------------------------------------------------------------- [ EOF ]

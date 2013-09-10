@@ -18,7 +18,8 @@ lexer = Tok.makeTokenParser style
           names = ["linkedTo", "uses"]                                        -- instance relations
                   ++ [":extends", ":implements"]                              -- class relations
                   ++ ["Abstract", "Integration"]                              -- modifiers
-                  ++ [ "Pattern"]                                             -- types 
+                  ++ [ "Pattern", "Component", "System", "Deployment",
+                       "Admin", "Implementation"]                             -- types 
                   ++ ["from", "import", "relations", "patterns", "language" ] -- kwords
           style = haskellStyle {Tok.reservedOpNames = ops,
                                 Tok.reservedNames = names,
