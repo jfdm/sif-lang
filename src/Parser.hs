@@ -9,13 +9,13 @@ import Data.Maybe
 import Data.List
 
 import Lexer
-import Model
-import Utils
+import Model.AST
+-- import Utils
 
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 
 -- | Parses a Sif Spec file into the corresponding AST
-parseSif :: String -> Plang
+parseSif :: String -> PlangExpr
 parseSif fname =
     case runParser (runLex parsePlang) [] "" fname of
       Left err -> error (show err)
@@ -23,7 +23,7 @@ parseSif fname =
 
 -- | Definition for a pattern language
 -- parsePlang ::= parseMetadata parseImports parsePattern+ parseRelation*;
-parsePlang :: Parser Plang
+parsePlang :: Parser PlangExpr
 parsePlang = do (title, label) <- parseMetadata
                 optionMaybe parseImports
                 reserved "patterns"
@@ -31,7 +31,7 @@ parsePlang = do (title, label) <- parseMetadata
                 reserved "relations"
                 many parseRelation
                 pState <- getState
-                return (Plang title label pState)
+                return (PlangExpr title label pState)
              <?> "Language Instance"
 
 -- ---------------------------------------------------- [ Language Declaration ]
@@ -57,12 +57,12 @@ parseImports = do is <- liftM concat $ many1 parseImport
 
 -- | Parse a single import
 -- parseImport ::= parseImportM | parseImportLang
-parseImport :: Parser Patterns
+parseImport :: Parser PatternsExpr
 parseImport = try parseImportM <|> parseImportLang <?> "Import"
 
 -- | Import select patterns from a language
 -- parseImportM ::= from <lang> import <idlist>;
-parseImportM :: Parser Patterns
+parseImportM :: Parser PatternsExpr
 parseImportM = do reserved "from"
                   lang <- identifier
                   reserved "import"
@@ -72,7 +72,7 @@ parseImportM = do reserved "from"
 
 -- | Import a pattern language
 -- parseImportLang ::= import <lang>;
-parseImportLang :: Parser Patterns
+parseImportLang :: Parser PatternsExpr
 parseImportLang = do reserved "import"
                      lang <- identifier
                      return [mkImportPattern lang lang]
@@ -106,7 +106,7 @@ parsePatternS = do (id, modifier, name) <- parsePatternHead
 
 -- | Common Head of a Pattern
 -- parsePatternHead ::= <id> '<-' parseModifier? Pattern(<name>);
-parsePatternHead :: Parser (ID, Maybe Modifier, String)
+parsePatternHead :: Parser (ID, Maybe ModifierExpr, String)
 parsePatternHead = do id <- identifier
                       reservedOp "<-"
                       modifier <- optionMaybe parseModifier
@@ -119,7 +119,7 @@ parsePatternHead = do id <- identifier
 
 -- | Parse the modifiers
 -- parseModifier ::= ("Integration" | "Abstract");
-parseModifier :: Parser Modifier
+parseModifier :: Parser ModifierExpr
 parseModifier = do try $ reserved "Abstract"
                    return Abstract
             <|> do reserved "Integration"
@@ -130,19 +130,19 @@ parseModifier = do try $ reserved "Abstract"
 
 -- | Parse the properties
 -- parseProperty ::= parseExtends parseImplements;
-parseProperties :: Parser (Maybe Extends, Maybe Realises)
+parseProperties :: Parser (Maybe RelationsExpr, Maybe RelationsExpr)
 parseProperties = do extends <- optionMaybe parseExtends
                      implements <- optionMaybe parseImplements
                      return (extends, implements)
                   <?> "Properties"
 
 -- parseImplements ::= ":implments" parseRelationIDs;
-parseImplements :: Parser Relations
+parseImplements :: Parser RelationsExpr
 parseImplements = do reserved ":implements"
                      parseRelationIDs
 
 -- parseExtends ::= ":extends" parseRelationIDss
-parseExtends :: Parser Relations
+parseExtends :: Parser RelationsExpr
 parseExtends = do reserved ":extends"
                   parseRelationIDs
 
@@ -202,7 +202,7 @@ parseRelation1 = do from <- identifier
 -- -- -------------------------------------------------- [ Misc Parsing Functions ]
 
 -- parseRelationIDs ::= <idlist>;
-parseRelationIDs :: Parser Relations
+parseRelationIDs :: Parser RelationsExpr
 parseRelationIDs = do ids <- parseIDs
                       ps <- getState
                       let exs = fmap (\id -> tryMkRelation id ps Nothing) ids

@@ -7,9 +7,9 @@ import Text.Parsec.String (GenParser)
 import qualified Text.Parsec.Token as Tok
 
 import Text.Parsec.Language (haskellStyle)
-import Model
+import Model.AST
 
-type Parser a = GenParser Char [Pattern] a
+type Parser a = GenParser Char PatternsExpr a
 -- ----------------------------------------------------- [ Define Token Parser ]
 
 --lexer :: Tok.TokenParser [Pattern]

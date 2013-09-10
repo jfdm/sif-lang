@@ -5,10 +5,8 @@ import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
 import Data.List
 import Data.Function
-import Model
-import Utils
-
-import Examples.Tampering
+-- import Model
+-- import Utils
 
 -- | A Pretty Printer of our plang AST.
 prettyPlang :: Plang -> Doc
