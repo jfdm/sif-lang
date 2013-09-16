@@ -9,8 +9,8 @@ import Data.Maybe
 import Data.List
 
 import Lexer
-import Model.Keywords
-import Model.AST
+import Keywords
+import AST
 
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 

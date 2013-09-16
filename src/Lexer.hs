@@ -5,10 +5,10 @@ import Control.Monad (void)
 import Text.Parsec
 import Text.Parsec.String (GenParser)
 import qualified Text.Parsec.Token as Tok
-
 import Text.Parsec.Language (haskellStyle)
-import Model.Keywords
-import Model.AST
+
+import Keywords
+import AST
 
 type Parser a = GenParser Char PatternsExpr a
 -- ----------------------------------------------------- [ Define Token Parser ]

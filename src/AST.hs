@@ -1,5 +1,5 @@
 -- | The AST for the Sif Language.
-module Model.AST where
+module AST where
 
 import Data.Maybe
 import Data.List

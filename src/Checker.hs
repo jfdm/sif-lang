@@ -4,4 +4,6 @@
 -- The typing rules are contained with the formal model.
 module Checker where
 
-import Model.Plang
+import AST
+import TypeSystem
+

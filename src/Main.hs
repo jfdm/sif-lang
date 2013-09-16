@@ -6,7 +6,7 @@ module Main (main) where
 import System.Environment (getArgs)
 import System.IO
 import Parser
-import Model.AST
+import AST
 -- import Transform.Dot
 -- import Prettifier
 
