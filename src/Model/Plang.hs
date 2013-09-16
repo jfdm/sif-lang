@@ -137,29 +137,11 @@ mkUsesPP (P s) (P p) desc = U $ mkRelation' s p desc
 mkAssoc :: String -> String -> Maybe String -> Association a
 mkAssoc from to desc = L $ Relation' from to desc
 
--- | System         | 'o-' | Component | System Pattern *uses* Component Pattern                |
-
--- |----------------+------+-----------+--------------------------------------------------------|
--- | Pattern        | '->' | Pattern   | Pattern is *linked* pattern                            |
--- |----------------+------+-----------+--------------------------------------------------------|
--- | Concrete       | '=>' | Abstract  | Concrete pattern *implements* Abstract pattern.        |
--- | Composite      | 'o-' | Primitive | Composite pattern *uses* Primitive/Comp Pattern        |
-
--- Deployment Pattern *extends* System Pattern
-mkExtends :: Deployment a -> System a -> Maybe String -> Specialisation a
-mkExtends (D d) (S s) desc = E $ mkRelation' d s desc
-
--- Implementation Pattern *implements* Component Patterns
-mkRealises :: Implementation a -> Component a -> Maybe String -> Realisation a
-mkRealises (I i) (C s) desc = R $ mkRelation' i s desc
-
--- | 
-
 
  -- Generic Relation Constructor.
 
 mkRelation' :: Pattern' -> Pattern' -> Maybe String -> Relation'
 mkRelation' t f d = Relation' (ident t) (ident f) d
--- modifier checks here?
+
 
 -- --------------------------------------------------------------------- [ EOF ]
