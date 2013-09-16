@@ -7,6 +7,7 @@ import Text.Parsec.String (GenParser)
 import qualified Text.Parsec.Token as Tok
 
 import Text.Parsec.Language (haskellStyle)
+import Model.Keywords
 import Model.AST
 
 type Parser a = GenParser Char PatternsExpr a
@@ -14,16 +15,10 @@ type Parser a = GenParser Char PatternsExpr a
 
 --lexer :: Tok.TokenParser [Pattern]
 lexer = Tok.makeTokenParser style
-    where ops = ["<-", ":"]
-          names = ["linkedTo", "uses"]                                        -- instance relations
-                  ++ [":extends", ":implements"]                              -- class relations
-                  ++ ["Abstract", "Integration"]                              -- modifiers
-                  ++ [ "Pattern", "Component", "System", "Deployment",
-                       "Admin", "Implementation"]                             -- types 
-                  ++ ["from", "import", "relations", "patterns", "language" ] -- kwords
-          style = haskellStyle {Tok.reservedOpNames = ops,
-                                Tok.reservedNames = names,
-                                Tok.commentLine = "--"}
+        where
+          style = haskellStyle {Tok.reservedOpNames = sifOperators,
+                                Tok.reservedNames = sifKeywords,
+                                Tok.commentLine = sifCmtLine}
 
 -- ------------------------------------------------------ [ Define Lexer Rules ]
 
