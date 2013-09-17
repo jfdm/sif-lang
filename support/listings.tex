@@ -1,14 +1,18 @@
 %% -------------------------------------------- [ Sif Listings Package Setting ]
 
 \usepackage{listings}
+\usepackage{mathtools}
 
 \lstdefinelanguage{sif}
   {%
   % Keywords
-  keywords={linkedTo, uses, ofType, extends, implements,
-    Pattern, Abstract, Integration, language, from, import, as},
+  keywords={linkedTo, uses, extends, implements,
+    Component, System, Deployment, Admin, Implementation,
+    Pattern,
+    Abstract, Concrete,
+    language, from, import, as, relations, patterns},
   % Comments
   comment=[l]\#,
   % Literate
-  literate={<-}{{$\leftarrow$}}{1}
+  literate={<-}{{$\leftarrow$}}{1} {:=}{{$\coloneqq$}}{1} {->}{{$\rightarrow$}}{1} {=>}{{$\Rightarrow$}}{1}
 }

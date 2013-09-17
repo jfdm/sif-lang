@@ -16,40 +16,41 @@
 ;;; CODE
 ;; --------------------------------------------------- [ Constraints ]
 (defvar sif-relations '(
-    "extends" "implements" "ofType" "linkedTo" "uses" 
+    "extends" "implements" "linkedTo" "uses" 
 ))
 ;; ------------------------------------------------------ [ Keywords ]
 (defvar sif-keywords '(
-  "from" "import" "as" "end" "language"
+  "from" "import" "language" "relations" "patterns" "as"
+))
+
+;; --------------------------------------------------------- [ Types ]
+(defvar sif-builtin '(
+    "Pattern"
 ))
 ;; --------------------------------------------------------- [ Types ]
 (defvar sif-types '(
-    "Abstract" "Pattern" "Integration"
+    "Component" "System" "Deployment" "Admin" "Implementation"
 ))
 ;; ----------------------------------------------------- [ Constants ]
-(defvar sif-constants '(
-    "NONE" "ALL" "STATIC"
-))
-;; ----------------------------------------------------- [ Structure ]
-(defvar sif-functions '(
-                    
+(defvar sif-modifiers '(
+    "Abstract" "Concrete"
 ))
 ;; -------------------------------------------------- [ Assign Faces ]
 (defvar sif-font-lock-defaults
   `((
-    ( ,(regexp-opt sif-relations  'words) . font-lock-reference-face)
-    ( ,(regexp-opt sif-keywords     'words) . font-lock-keyword-face)
-    ( ,(regexp-opt sif-types        'words) . font-lock-type-face)
-    ( ,(regexp-opt sif-constants    'words) . font-lock-constant-face)
-    ( ,(regexp-opt sif-functions 'words) . font-lock-function-name-face)
-
+    ( ,(regexp-opt sif-relations 'words) . font-lock-constant-face)
+    ( ,(regexp-opt sif-keywords  'words) . font-lock-keyword-face)
+    ( ,(regexp-opt sif-modifiers 'words) . font-lock-builtin-face)
+    ( ,(regexp-opt sif-builtin   'words) . font-lock-type-face)
+    ( ,(regexp-opt sif-types     'words) . font-lock-variable-name-face)
+    ( "=>\\|:=\\|o-\\|->\\|<-\\|:" . font-lock-constant-face)
 )))
 ;; --------------------------------------------------- [ Clear memory ]
 (setq sif-relations    nil
       sif-keywords     nil
       sif-types        nil
-      sif-constants    nil
-      sif-functions    nil
+      sif-modifiers    nil
+      sif-builtin      nil
 )
 ;; -------------------------------------------------------------------
 ;; SIF Definition
@@ -61,8 +62,14 @@
   (defvar sif-mode-hook nil "Hook for sif-mode")
   (modify-syntax-entry ?-  "_ 123" sif-mode-syntax-table)
   (modify-syntax-entry ?\n ">" sif-mode-syntax-table)
-           (modify-syntax-entry ?\{  "(}1nb" sif-mode-syntax-table)
-           (modify-syntax-entry ?\}  "){4nb" sif-mode-syntax-table)
+  (modify-syntax-entry ?\{  "(}1nb" sif-mode-syntax-table)
+  (modify-syntax-entry ?\}  "){4nb" sif-mode-syntax-table)
+  
+  (mapcar (lambda (x)
+            (modify-syntax-entry x "_" sif-mode-syntax-table))
+          ;; Some of these are actually OK by default.
+          "!#$%&*+./:<=>?@^|~")
+
 
   (make-local-variable 'sif-font-lock-defaults)
   (make-local-variable 'comment-start)
