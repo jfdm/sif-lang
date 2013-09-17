@@ -41,9 +41,8 @@ sifKWordTypAdmin  = "Admin"
 sifKWordTypImpl   = "Implementation"
 
 -- -------------------------------------------------------------------- [ Misc ]
-sifKWordMisc = [sifKWordLet, sifKWordFrom, sifKWordImport, sifKWordRelation,
+sifKWordMisc = [sifKWordFrom, sifKWordImport, sifKWordRelation,
                 sifKWordPattern, sifKWordLang, sifKWordAs]
-sifKWordLet      = "let"
 sifKWordFrom     = "from"
 sifKWordAs       = "as"
 sifKWordImport   = "import"

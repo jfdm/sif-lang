@@ -16,11 +16,11 @@ data Modifier = Abstract
 
 -- | Type Heirarchy
 -- TyPattern ::= Pattern | Deployment | System | Admin | Component | Implementation
-newtype Pattern a = P Pattern'
-newtype Deployment a = D Pattern'
-newtype System a = S Pattern'
-newtype Admin a = A Pattern'
-newtype Component a = C Pattern'
+newtype Pattern a        = P Pattern'
+newtype Deployment a     = D Pattern'
+newtype System a         = S Pattern'
+newtype Admin a          = A Pattern'
+newtype Component a      = C Pattern'
 newtype Implementation a = I Pattern'
 
 

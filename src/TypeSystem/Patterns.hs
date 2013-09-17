@@ -1,8 +1,5 @@
 -- | Smart constructors for our Sif Lang
-module TypeSystem.Patterns
-    ( mkPattern, mkDeployment, mkSystem, mkAdmin,
-      mkComponent, mkImplementation
-    ) where
+module TypeSystem.Patterns where
 
 import TypeSystem.Types
 

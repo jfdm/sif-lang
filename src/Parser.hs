@@ -22,7 +22,7 @@ parseSif fname =
       Right ast -> ast
 
 -- | Definition for a pattern language
--- parsePlang ::= parseMetadata parseImports parsePattern+ parseRelation*;
+-- parsePlang ::= parseMetadata parseImports? parsePattern+ parseRelation*;
 parsePlang :: Parser PlangAST
 parsePlang = do (title, label) <- parseMetadata
                 optionMaybe parseImports
@@ -30,7 +30,7 @@ parsePlang = do (title, label) <- parseMetadata
                 many parsePattern
                 reserved sifKWordRelation
                 relations <- manyTill parseRelations eof
-                pState <- getState -- Make sure we get 
+                pState <- getState
                 return (PlangAST title label (reverse pState) ((reverse . concat) relations))
              <?> "Language Instance"
 
@@ -66,7 +66,7 @@ parseImportM :: Parser PatternsExpr
 parseImportM = do reserved sifKWordFrom
                   lang <- identifier
                   reserved sifKWordImport
-                  pIDs <- sepBy1 identifier comma
+                  pIDs <- parseIDList
                   return $ map (`mkImportPattern` lang) pIDs
                <?> "Many Imports"
 
@@ -81,10 +81,9 @@ parseImportLang = do reserved sifKWordImport
 -- ----------------------------------------------- [ Pattern Parsing Functions ]
 
 -- | Pattern Definition
--- parsePattern ::= let <id> := parseModifier? parseType? Pattern(<title>?) ;
+-- parsePattern ::= <id> := parseModifier? parseType? Pattern(<title>?) ;
 parsePattern :: Parser PatternExpr
-parsePattern = do reserved sifKWordLet
-                  ident <- identifier
+parsePattern = do ident <- identifier
                   reservedOp sifOpAssignment
                   mod <- optionMaybe parsePatternModifier
                   typ <- optionMaybe parsePatternType
@@ -108,17 +107,17 @@ parsePatternModifier = do try $ reserved sifKWordTypModAbs
 -- ---------------------------------------------------- [ Pattern Type Parsing ]
 -- | Parse the type information
 -- parsePatternType ::= ("Component" | "System" | "Deployment"
---                         | "Admin" | "Implementation")
+--                         | "Admin" | "Implementation");
 parsePatternType :: Parser TyPattern
-parsePatternType = do try $ reserved "Component"
+parsePatternType = do try $ reserved sifKWordTypComp
                       return TyComponent
-               <|> do reserved "System"
+               <|> do reserved sifKWordTypSys
                       return TySystem
-               <|> do reserved "Deployment"
+               <|> do reserved sifKWordTypDeplo
                       return TyDeployment
-               <|> do reserved "Admin"
+               <|> do reserved sifKWordTypAdmin
                       return TyAdmin
-               <|> do reserved "Implementation"
+               <|> do reserved sifKWordTypImpl
                       return TyImplementation
                <?> "Pattern Type"
 
@@ -131,8 +130,8 @@ parseRelations = try parseRelationM <|> parseRelation1 <?> "Relations"
 
 -- ----------------------------------- [ Functions for 1-Many Relation Parsing ]
 
+-- | Parse a 1-2-Many Relation
 -- parserelationM ::= parseRelationFrom parseIDList;
--- Nasty Code!
 parseRelationM :: Parser RelationsExpr
 parseRelationM = do (from, typ) <- parseRelationFrom 
                     tos <- parseIDList
@@ -146,6 +145,7 @@ parseRelationM = do (from, typ) <- parseRelationFrom
 
 -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
 
+-- | Parse a 1-2-1 Relation with optional description.
 -- parseRelation1 ::= parseRelationFrom <id> parseRelDesc?
 parseRelation1 :: Parser RelationsExpr            
 parseRelation1 = do (from, typ) <- parseRelationFrom
@@ -155,11 +155,12 @@ parseRelation1 = do (from, typ) <- parseRelationFrom
                     let toP = getPattern to ps
                     if isNothing toP
                     then fail $ "To Pattern in relation doesn't exist: " ++ to
-                    else return [mkRelation from to typ desc] -- Dirty Hack                  
+                    else return [mkRelation from to typ desc]                 
                   <?> "1-2-1 Relation with Description"
 
 -- ------------------------------------------------- [ Relation Util Functions ]
 
+-- | Parse the from and type of relation.
 -- parseRelationFrom ::= <id> parseRelationType ;
 parseRelationFrom :: Parser (ID, TyRelation)
 parseRelationFrom = do from <- identifier
@@ -171,11 +172,13 @@ parseRelationFrom = do from <- identifier
                        else return (from, typ)
                     <?> "From Relation"
 
+-- | Parse the relation type.
 -- parseRelationType ::= parseRelationTypeOp | parseRelationTypeTxt ;
 parseRelationType :: Parser TyRelation
 parseRelationType = try parseRelationTypeOp <|> parseRelationTypeTxt <?> "Relation Type"
 
--- parseRelationTypeOp ::= ("->" | "o-" | "<-" | "=>" )
+-- | Parse the operator indicator for a relation type.
+-- parseRelationTypeOp ::= ("->" | "o-" | "<-" | "=>" );
 parseRelationTypeOp :: Parser TyRelation
 parseRelationTypeOp = do try $ reservedOp sifOpAssociation
                          return TyAssociation
@@ -187,7 +190,8 @@ parseRelationTypeOp = do try $ reservedOp sifOpAssociation
                          return TyRealisation
                   <?> "Relation Type Operator"
 
--- parseRelationTypeTxt ::= ("linkedTo" | "uses" | "extends" | "implements")
+-- | Parse the textual indicator for a relation type.
+-- parseRelationTypeTxt ::= ("linkedTo" | "uses" | "extends" | "implements");
 parseRelationTypeTxt :: Parser TyRelation
 parseRelationTypeTxt = do try $ reserved sifKWordAssociation
                           return TyAssociation
@@ -199,6 +203,7 @@ parseRelationTypeTxt = do try $ reserved sifKWordAssociation
                           return TyRealisation
                    <?> "Relation Type Textual"
 
+-- | Parse a description.
 -- parseRelationDesc ::= ":" <desc>
 parseRelationDesc :: Parser String
 parseRelationDesc = do reservedOp sifOpDescription
@@ -207,14 +212,22 @@ parseRelationDesc = do reservedOp sifOpDescription
 
 -- ---------------------------------------------------- [ ID Parsing Functions ]
 
+-- | Parse a list of IDs
 -- parseIDs ::= parseID1 | parseIDList;
 parseIDs :: Parser IDs
-parseIDs = try parseIDList <|> parseID1 <?> "ID Lists"
+parseIDs = try parseIDListB <|> parseID1 <?> "ID Lists"
 
--- parseIDList ::= [ <id> (',' <id>)* ];
+-- | Parse a list of IDs delineated by brackets.
+-- parseIDListB ::= [ parseIDList ];
+parseIDListB :: Parser IDs
+parseIDListB = brackets parseIDList
+
+-- | Parse a csv list of IDs
+-- parseIDList ::= <id> (',' <id>)* ;
 parseIDList :: Parser IDs
-parseIDList = brackets $ sepBy1 identifier comma
+parseIDList = sepBy1 identifier comma
 
+-- | Parse a single ID
 -- parseID1 ::= <id>;
 parseID1 :: Parser IDs
 parseID1 = do id <- identifier
