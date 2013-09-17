@@ -35,10 +35,9 @@ output language. Currently only the Dot language is supported.
 + __Examples__
     + Various examples of existing pattern languages can be found in
       the examples folder.
-+ __Grammar__
-    + The eBNF grammer can be found in the grammar folder. Both type
-      set and antlr4 version of the grammar are provided. The Antlr4
-      grammar will be the authoritative version.
++ __Specification__
+    + The Language and Type-System Specification can be found in this
+      folder.
 + __Support__
     + External tooling support will be detailing in the support
       folder. Support is currently given for:
