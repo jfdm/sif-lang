@@ -3,6 +3,7 @@
 
 name:                sif
 version:             0.1.0.0
+cabal-version:       >=1.8
 synopsis:            A Typed Specification Language for Software System Pattern Languages
 -- description:         
 license:             BSD3
@@ -12,10 +13,11 @@ maintainer:          jfdm@st-andrews.ac.uk
 -- copyright:           
 -- category:            
 build-type:          Simple
-cabal-version:       >=1.8
 
-executable sif
-main-is:            Main.hs
-hs-source-dirs:     src            
+
+executable          sif
+  main-is:             Main.hs
+  hs-Source-Dirs:      src            
   -- other-modules:       
   build-depends:       base ==4.6.*, parsec ==3.1.*, wl-pprint ==1.1.*
+  ghc-options:         -XDoAndIfThenElse
