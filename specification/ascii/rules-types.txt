@@ -1,0 +1,37 @@
+# Typing Rules for Pattern and Relation Types
+
+# Patterns
+
+----------------
+E |- p : Pattern
+
+-------------------
+E |- p : Deployment
+
+---------------
+E |- p : System
+
+--------------
+E |- p : Admin
+
+------------------
+E |- p : Component
+
+-----------------------
+E |- p : Implementation
+
+# Relations
+
+-----------------------
+E |- r : Specialisation
+
+--------------------
+E |- r : Realisation
+
+--------------------
+E |- r : Aggregation
+
+--------------------
+E |- r : Association
+
+

@@ -1,0 +1,55 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Stylings
+% ---------------------------------------------- [ Headings ]
+\counterwithout{section}{chapter}
+\setsecnumdepth{subsubsection}
+\headstyles{komalike}
+%% ----------------------------------------------------------------- [ Colours ]
+\definecolor{sta-blue}{cmyk}{1.0, 0.68, 0.0, 0.12}
+% ----------------------------------------------- [ Margins ]
+\settrimmedsize{297mm}{210mm}{*}
+\setlength{\trimtop}{0pt}
+\setlength{\trimedge}{\stockwidth}
+\addtolength{\trimedge}{-\paperwidth}
+\settypeblocksize{634pt}{448.13pt}{*}
+\setulmargins{4cm}{*}{*}
+\setlrmargins{*}{*}{1}
+\setmarginnotes{17pt}{51pt}{\onelineskip}
+\setheadfoot{\onelineskip}{2\onelineskip}
+\setheaderspaces{*}{2\onelineskip}{*}
+\checkandfixthelayout
+
+\setlength{\parskip}{1.3ex plus 0.2ex minus 0.2ex}
+\setlength{\parindent}{0pt}
+\fixpdflayout
+%% ------------------------------------------------------------ [ New Commands ]
+
+\newcommand{\email}[1]{\texttt{\href{mailto:#1}{#1}}}
+
+\hypersetup{%
+  linkcolor=sta-blue, 
+  anchorcolor=sta-blue,
+  citecolor=sta-blue, 
+  urlcolor=sta-blue
+}
+
+% ---------------------------------------- [ Title Styling ]
+\setlength{\droptitle}{-12em}
+\pretitle{%
+  \begin{flushright}\LARGE\sffamily
+}
+\posttitle{%
+  \par\end{flushright}
+}
+\preauthor{%
+  \begin{flushright}\large\vskip 0.25em
+}
+\postauthor{%
+  \par\end{flushright}
+}
+\predate{%
+ \begin{flushright}\large
+}
+\postdate{%
+ \par\end{flushright}
+}

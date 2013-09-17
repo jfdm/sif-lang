@@ -1,0 +1,49 @@
+\section{Aggregation}
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Component$}
+\AxiomC{$\Gamma\vdash p_{2} : Component$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Component$}
+\AxiomC{$\Gamma\vdash p_{2} : Pattern$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : System$}
+\AxiomC{$\Gamma\vdash p_{2} : System$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : System$}
+\AxiomC{$\Gamma\vdash p_{2} : Deployment$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : System$}
+\AxiomC{$\Gamma\vdash p_{2} : Component$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : System$}
+\AxiomC{$\Gamma\vdash p_{2} : Admin$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : System$}
+\AxiomC{$\Gamma\vdash p_{2} : Pattern$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Implementation$}
+\AxiomC{$\Gamma\vdash p_{2} : Implementation$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+

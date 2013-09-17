@@ -1,0 +1,15 @@
+# Typing fules for Specialisation
+
+E |- a : Deployment, E |- b : System, E |- E'(a,b,E)
+----------------------------------------------------
+E |- a extends b : E
+E |- a : Component, E |- b : Component, E |- E'(a,b,E)
+------------------------------------------------------
+E |- a extends b : E
+E |- a : Component, E |- b : Pattern, E |- E'(a,b,E)
+----------------------------------------------------
+E |- a extends b : E
+E |- a : Pattern, E |- b : Pattern, E |- E'(a,b,E)
+--------------------------------------------------
+E |- a extends b : E
+

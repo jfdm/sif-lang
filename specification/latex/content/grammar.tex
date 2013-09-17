@@ -1,0 +1,83 @@
+\section{eBNF Grammar}
+
+\begin{bnf}
+\bnfprod{plang}{%
+  \bnfpn{langDecl}\bnfsp
+  \bnfpn{import}*\bnfsp
+  \bnfpn{pattern}+\bnfsp
+  \bnfpn{relation}*
+}\\
+\bnfprod{langDecl}{%
+  \bnfts{`language'}\bnfsp
+  \bnfpn{STRING}\bnfsp
+  \bnfts{`as'}\bnfsp
+  \bnfpn{ID}
+}\\
+\bnfprod{import}{%
+  \bnfts{`from'}\bnfsp
+  \bnfpn{ID}\bnfsp
+  \bnfts{`import'}
+  \bnfsp(\bnfsp\bnfpn{ID} \bnfor\bnfpn{IDLIST}\bnfsp)
+  \bnfor
+  \bnfts{`import'}\bnfsp\bnfpn{ID}
+}\\
+\bnfprod{pattern}{%
+  \bnfpn{ID}\bnfsp
+  \bnfts{`:='}\bnfsp
+  \bnfpn{modifier}?\bnfsp
+  \bnfpn{pType}?\bnfsp
+  \bnfts{`Pattern'}\bnfts{`('}\bnfsp\bnfpn{STRING}?\bnfsp\bnfts{`)'}
+}\\
+\bnfprod{modifier}{%
+  \bnfts{`Abstract'}
+  \bnfor
+  \bnfts{`Concrete'}
+}\\
+\bnfprod{pType}{%
+  \bnfts{`Component'}
+  \bnfor
+  \bnfts{`System'}
+  \bnfor
+  \bnfts{`Deployment'}
+  \bnfor
+  \bnfts{`Admin'}
+  \bnfor
+  \bnfts{`Implementation'}
+}\\
+\bnfprod{relation}{%
+  \bnfpn{ID}\bnfsp
+  \bnfpn{rType}\bnfsp
+  (\bnfpn{ID}\bnfsp(\bnfts{`:'}\bnfsp\bnfpn{STRING})? \bnfor \bnfts{`['}\bnfsp\bnfpn{IDLIST}\bnfsp\bnfts{`]'})
+}\\
+\bnfprod{rType}{%
+  \bnfpn{rTypeOp}\bnfor\bnfpn{rTypeTxt}
+}\\
+\bnfprod{rTypeOp}{%
+  \bnfts{`o-'}
+  \bnfor
+  \bnfts{`->'}
+  \bnfor
+  \bnfts{`<-'}
+  \bnfor
+  \bnfts{`=>'}
+}\\
+\bnfprod{rTypeTxt}{%
+  \bnfts{`uses'}
+  \bnfor
+  \bnfts{`linkedTo'}
+  \bnfor
+  \bnfts{`extends'}
+  \bnfor
+  \bnfts{`implements'}
+}\\
+\bnfprod{IDLIST}{%
+  \bnfpn{ID}\bnfsp(\bnfts{`,'}\bnfsp\bnfpn{ID})*
+}\\
+\bnfprod{ID}{%
+  \bnfts{standard identifier}
+}\\
+\bnfprod{STRING}{%
+  \bnfts{plain-old-strings}
+}
+\end{bnf}
+

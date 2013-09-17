@@ -1,0 +1,26 @@
+# ASCII form of the Sif Grammar.
+
+parsePlang ::= parseMetadata parseImports? parsePattern+ parseRelation*;
+parseLangDecl ::= language <title> as <id>
+parseImports ::= parseImport*;
+parseImport ::= parseImportM | parseImportLang
+parseImportM ::= from <lang> import <idlist>;
+parseImportLang ::= import <lang>;
+parsePattern ::= <id> := parseModifier? parseType? Pattern(<title>?) ;
+parseModifier ::= ( "Abstract" | "Concrete");
+parsePatternType ::= ("Component" | "System" | "Deployment" | "Admin" | "Implementation");
+parseRelation ::= parseRelationM | parseRelation1 ;
+parserelationM ::= parseRelationFrom parseIDList;
+parseRelation1 ::= parseRelationFrom <id> parseRelDesc?
+parseRelationFrom ::= <id> parseRelationType ;
+parseRelationType ::= parseRelationTypeOp | parseRelationTypeTxt ;
+parseRelationTypeOp ::= ("->" | "o-" | "<-" | "=>" );
+parseRelationTypeTxt ::= ("linkedTo" | "uses" | "extends" | "implements");
+parseRelationDesc ::= ":" <desc>
+parseIDs ::= parseID1 | parseIDList;
+parseIDListB ::= [ parseIDList ];
+parseIDList ::= <id> (',' <id>)* ;
+parseID1 ::= <id>;
+
+
+# Generated from Parser.hs comments.

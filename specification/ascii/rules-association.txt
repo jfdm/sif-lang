@@ -1,0 +1,147 @@
+# Typing Rules for Association
+
+E |- a : Pattern, E |- b : Deployment, E |- L'(a,b,L)
+-----------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Pattern, E |- b : System, E |- L'(a,b,L)
+-------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Pattern, E |- b : Admin, E |- L'(a,b,L)
+------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Pattern, E |- b : Component, E |- L'(a,b,L)
+----------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Pattern, E |- b : Implementation, E |- L'(a,b,L)
+---------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Deployment, E |- b : Pattern, E |- L'(a,b,L)
+-----------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Deployment, E |- b : System, E |- L'(a,b,L)
+----------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Deployment, E |- b : Admin, E |- L'(a,b,L)
+---------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Deployment, E |- b : Component, E |- L'(a,b,L)
+-------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Deployment, E |- b : Implementation, E |- L'(a,b,L)
+------------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : System, E |- b : Pattern, E |- L'(a,b,L)
+-------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : System, E |- b : Deployment, E |- L'(a,b,L)
+----------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : System, E |- b : Admin, E |- L'(a,b,L)
+-----------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : System, E |- b : Component, E |- L'(a,b,L)
+---------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : System, E |- b : Implementation, E |- L'(a,b,L)
+--------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Admin, E |- b : Pattern, E |- L'(a,b,L)
+------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Admin, E |- b : Deployment, E |- L'(a,b,L)
+---------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Admin, E |- b : System, E |- L'(a,b,L)
+-----------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Admin, E |- b : Component, E |- L'(a,b,L)
+--------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Admin, E |- b : Implementation, E |- L'(a,b,L)
+-------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Component, E |- b : Pattern, E |- L'(a,b,L)
+----------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Component, E |- b : Deployment, E |- L'(a,b,L)
+-------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Component, E |- b : System, E |- L'(a,b,L)
+---------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Component, E |- b : Admin, E |- L'(a,b,L)
+--------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Component, E |- b : Implementation, E |- L'(a,b,L)
+-----------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Implementation, E |- b : Pattern, E |- L'(a,b,L)
+---------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Implementation, E |- b : Deployment, E |- L'(a,b,L)
+------------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Implementation, E |- b : System, E |- L'(a,b,L)
+--------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Implementation, E |- b : Admin, E |- L'(a,b,L)
+-------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Implementation, E |- b : Component, E |- L'(a,b,L)
+-----------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Pattern, E |- b : Pattern, E |- L'(a,b,L)
+--------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Deployment, E |- b : Deployment, E |- L'(a,b,L)
+--------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : System, E |- b : System, E |- L'(a,b,L)
+------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Admin, E |- b : Admin, E |- L'(a,b,L)
+----------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Component, E |- b : Component, E |- L'(a,b,L)
+------------------------------------------------------
+E |- a linkedTo b : L
+
+E |- a : Implementation, E |- b : Implementation, E |- L'(a,b,L)
+----------------------------------------------------------------
+E |- a linkedTo b : L
+
+
