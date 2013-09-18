@@ -23,7 +23,7 @@
 }\\
 \bnfprod{pattern}{%
   \bnfpn{ID}\bnfsp
-  \bnfts{`:='}\bnfsp
+  \bnfts{`$\coloneqq$'}\bnfsp
   \bnfpn{modifier}?\bnfsp
   \bnfpn{pType}?\bnfsp
   \bnfts{`Pattern'}\bnfts{`('}\bnfsp\bnfpn{STRING}?\bnfsp\bnfts{`)'}
@@ -55,11 +55,11 @@
 \bnfprod{rTypeOp}{%
   \bnfts{`o-'}
   \bnfor
-  \bnfts{`->'}
+  \bnfts{`$\rightarrow$'}
   \bnfor
-  \bnfts{`<-'}
+  \bnfts{`$\leftarrow$'}
   \bnfor
-  \bnfts{`=>'}
+  \bnfts{`$\Rightarrow$'}
 }\\
 \bnfprod{rTypeTxt}{%
   \bnfts{`uses'}
@@ -80,4 +80,3 @@
   \bnfts{plain-old-strings}
 }
 \end{bnf}
-

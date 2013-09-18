@@ -3,8 +3,7 @@
 \usepackage{listings}
 \usepackage{mathtools}
 
-\lstdefinelanguage{sif}
-  {%
+\lstdefinelanguage{sif}{%
   % Keywords
   keywords={linkedTo, uses, extends, implements,
     Component, System, Deployment, Admin, Implementation,
@@ -12,7 +11,22 @@
     Abstract, Concrete,
     language, from, import, as, relations, patterns},
   % Comments
-  comment=[l]\#,
+   morecomment=[l]--,%
+   morecomment=[n]{\{-}{-\}},
   % Literate
-  literate={<-}{{$\leftarrow$}}{1} {:=}{{$\coloneqq$}}{1} {->}{{$\rightarrow$}}{1} {=>}{{$\Rightarrow$}}{1}
+  literate={<-}{{$\leftarrow$}}{1}
+           {:=}{{$\coloneqq$}}{1} 
+           {->}{{$\rightarrow$}}{1}
+           {=>}{{$\Rightarrow$}}{1}
+}[keywords,comments,strings]%
+
+\lstset{%
+  language=sif,
+  tabsize=2,
+  basicstyle=\small,
+  stringstyle=\rmfamily,
+  keywordstyle=\color{black}\bfseries,
+  commentstyle=\footnotesize\sffamily,
+  numbers=left, numberstyle=\tiny,
+  frame=leftline
 }
