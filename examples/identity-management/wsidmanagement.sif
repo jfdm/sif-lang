@@ -1,0 +1,43 @@
+-- ---------------------------------------- [ Web Services Identity Management ]
+
+language "Web Services ID Management" as wsmgnt
+
+from soaidmanagement import abac, cred, cap, authiz, refmon, idfed
+
+patterns
+
+saml     := Pattern("SAML Assertion")
+xacml    := Pattern("XACML Authorization")
+appfwall := Pattern("Application Firewall")
+xmlfwall := Pattern("XML Firewall")
+liaf     := Pattern("Liberty Alliance ID Federation")
+liafs    := Pattern("Liberty Allliance PAOS ID Service")
+xacmla   := Pattern("XACML A/C Evaluation")
+
+relations
+
+saml => [cred, abac]
+
+appfwall => xacml
+
+xmlfwall <- appfwal
+
+liaf => idfed
+
+saml -> cap : "typeOf"
+
+appfwall o- saml
+appfwall -> xacmla : "enforces"
+
+xacml -> authiz : "defines"
+
+xacmla -> xacml : "enforces"
+xacmla -> refmon : "enforces"
+
+liaf o- saml
+liaf -> liafs : "Wireless Systems"
+
+-- Delessy, N.A.; Fernandez, E.B., "A Pattern-Driven Security Process
+-- for SOA Applications," Availability, Reliability and Security,
+-- 2008. ARES 08. Third International Conference on , vol., no.,
+-- pp.416,421, 4-7 March 2008 doi: 10.1109/ARES.2008.89

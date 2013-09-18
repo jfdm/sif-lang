@@ -1,0 +1,43 @@
+-- ------------------------------ [ A Pattern Language for Identity Management ]
+
+language "Identity Management" as identitymanagement
+
+patterns
+
+amat	:= Abstract Pattern("Access Matrix")
+refmon	:= Pattern("Reference Monitor")
+abac	:= Pattern("Attribute-Based Access Control")
+cred	:= Pattern("Credential")
+author	:= Pattern("Authenticator")
+cot		:= Pattern("Circle of Trust")
+idprov	:= Pattern("Identity Provider")
+acl     := Pattern("Access Control Lists")
+cap     := Pattern("Capability")
+saml    := Pattern("SAML Assertion")
+idfed   := Pattern("Identity Federation")
+
+relations
+
+acl => amat
+cap => amat
+
+saml => [cred, abac, cap]
+idfed => abac
+
+idfed o- [ cot, cred, author ]
+idfed o- idprov
+
+idprov o- cot
+
+author o- cred
+
+refmon -> acl : "enforces"
+refmon -> cap : "enforces"
+refmon -> abac : "enforces"
+
+
+-- Delessy, N.; Fernandez, E.B.; Larrondo-Petrie, M.M., "A Pattern
+-- Language for Identity Management," Computing in the Global
+-- Information Technology, 2007. ICCGI 2007. International
+-- Multi-Conference on , vol., no., pp.31,31, 4-9 March 2007 
+-- doi: 10.1109/ICCGI.2007.5
