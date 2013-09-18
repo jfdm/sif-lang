@@ -1,0 +1,108 @@
+\section{Typing Rules}
+
+\subsection{Aggregation}
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Component$}
+\AxiomC{$\Gamma\vdash p_{2} : Component$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Component$}
+\AxiomC{$\Gamma\vdash p_{2} : Pattern$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : System$}
+\AxiomC{$\Gamma\vdash p_{2} : System$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : System$}
+\AxiomC{$\Gamma\vdash p_{2} : Deployment$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : System$}
+\AxiomC{$\Gamma\vdash p_{2} : Component$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : System$}
+\AxiomC{$\Gamma\vdash p_{2} : Admin$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : System$}
+\AxiomC{$\Gamma\vdash p_{2} : Pattern$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Implementation$}
+\AxiomC{$\Gamma\vdash p_{2} : Implementation$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{uses}\; p_{2} : Aggregation $}
+\end{prooftree}
+
+\subsection{Association}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash ptype_{1} : Implementation$}
+\AxiomC{$\Gamma\vdash ptype_{2} : Component$}
+\AxiomC{$\Gamma\vdash x : ptype_{1}\quad\quad \Gamma\vdash y : ptype_{2}$}
+\TrinaryInfC{$\Gamma\vdash x\;\mathtt{linkedTo}\; y : Association $}
+\end{prooftree}
+
+\subsection{Realisation}
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Implementation$}
+\AxiomC{$\Gamma\vdash p_{2} : Component$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{implements}\; p_{2} : Realisation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Implementation$}
+\AxiomC{$\Gamma\vdash p_{2} : Pattern$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{implements}\; p_{2} : Realisation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Pattern$}
+\AxiomC{$\Gamma\vdash p_{2} : Pattern$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{implements}\; p_{2} : Realisation $}
+\end{prooftree}
+
+\subsection{Specialisation}
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Deployment$}
+\AxiomC{$\Gamma\vdash p_{2} : System$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{extends}\; p_{2} : Specialisation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Component$}
+\AxiomC{$\Gamma\vdash p_{2} : Component$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{extends}\; p_{2} : Specialisation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Component$}
+\AxiomC{$\Gamma\vdash p_{2} : Pattern$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{extends}\; p_{2} : Specialisation $}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Gamma\vdash p_{1} : Pattern$}
+\AxiomC{$\Gamma\vdash p_{2} : Pattern$}
+\BinaryInfC{$\Gamma\vdash p_{1}\;\mathtt{extends}\; p_{2} : Specialisation $}
+\end{prooftree}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../specification.tex"
+%%% End: 

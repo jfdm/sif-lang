@@ -1,0 +1,90 @@
+\section{Pattern Types}
+\subsection{Type Hierarchy}
+\begin{itemize}\tightlist\ttfamily
+\item Types ::=
+\begin{itemize}
+\item GenPattern
+\begin{itemize}
+\item Pattern
+\item Deployment
+\item System
+\item Admin
+\item Component
+\item Implementation
+\end{itemize}
+\end{itemize}
+\end{itemize}
+
+\subsection{Type Axioms}
+\subsubsection{Generic Pattern}
+
+\begin{prooftree}
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash p : GenPattern $}
+\end{prooftree}
+
+\subsubsection{Pattern}
+\begin{center}
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash p : Pattern $}
+\DisplayProof
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash Pattern : GenPattern $}
+\DisplayProof
+\end{center}
+
+\subsubsection{Deployment}
+\begin{center}
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash p : Deployment $}
+\DisplayProof
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash Deployment : GenPattern $}
+\DisplayProof
+\end{center}
+
+\subsubsection{System}
+\begin{center}
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash p : System $}
+\DisplayProof
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash System : GenPattern $}
+\DisplayProof
+\end{center}
+
+\subsubsection{Admin}
+\begin{center}
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash p : Admin $}
+\DisplayProof
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash Admin : GenPattern $}
+\DisplayProof
+\end{center}
+
+\subsubsection{Component}
+\begin{center}
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash p : Component $}
+\DisplayProof
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash Component : GenPattern $}
+\DisplayProof
+\end{center}
+
+\subsubsection{Implementation}
+\begin{center}
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash p : Implementation $}
+\DisplayProof
+\AxiomC{}
+\UnaryInfC{$\Gamma\vdash Implementation : GenPattern $}
+\DisplayProof
+\end{center}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../specification.tex"
+%%% End: 
