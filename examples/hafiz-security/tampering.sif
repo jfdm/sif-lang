@@ -7,24 +7,24 @@ from privilegeescalation import exeDomain
 
 patterns
 
-trustedPartitioning <- Pattern("Trust Partitioning")
-checkpointedSys <- Pattern("Checkpointed System")
-safeDataStruct <- Pattern("Safe Data Structure")
-serverSandbox <- Pattern("Server Sandbox")
-chroot <- Pattern("Chroot Jail")
-uniqueLocWriteReq <- Pattern("Unique Location for Each Write Request")
+trustedPartitioning := Pattern("Trust Partitioning")
+checkpointedSys := Pattern("Checkpointed System")
+safeDataStruct := Pattern("Safe Data Structure")
+serverSandbox := Pattern("Server Sandbox")
+chroot := Pattern("Chroot Jail")
+uniqueLocWriteReq := Pattern("Unique Location for Each Write Request")
 
 relations
 
-distResponsibility linkedTo trustedPartitioning : "Communicate between processes"
-distResponsibility linkedTo uniqueLocWriteReq : "Concurrent write race"
-distResponsibility linkedTo serverSandbox : "Constrain Environment"
+distResponsibility -> trustedPartitioning : "Communicate between processes"
+distResponsibility -> uniqueLocWriteReq : "Concurrent write race"
+distResponsibility -> serverSandbox : "Constrain Environment"
 
-exeDomain linkedTo serverSandbox : "Constrain Environment"
-exeDomain linkedTo safeDataStruct : "Data safety"
-exeDomain linkedTo checkpointedSys : "Graceful restart"
+exeDomain -> serverSandbox : "Constrain Environment"
+exeDomain -> safeDataStruct : "Data safety"
+exeDomain -> checkpointedSys : "Graceful restart"
 
-serverSandbox linkedTo chroot : "Sandbox Processes"
+serverSandbox -> chroot : "Sandbox Processes"
 
 
 -- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a

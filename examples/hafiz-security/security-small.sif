@@ -12,17 +12,17 @@ from infodisclosurecore import securitySession, mLevelSecurity
 
 patterns
 
-temp <- Pattern("Ignore Me")
+temp := Pattern("Ignore Me")
 
 relations
 
-enterSecServices linkedTo [infoObscurity, compartmentalisation]
-protectedSystem linkedTo [dmz, compartmentalisation]
-policy linkedTo [brokeredAuth, sap]
-infoObscurity linkedTo pseudoIdentity
-integrationReverseProxy linkedTo interceptingWebAgent
-authenticationEnforcer linkedTo securitySession
-rbac linkedTo mLevelSecurity
+enterSecServices -> [infoObscurity, compartmentalisation]
+protectedSystem -> [dmz, compartmentalisation]
+policy -> [brokeredAuth, sap]
+infoObscurity -> pseudoIdentity
+integrationReverseProxy -> interceptingWebAgent
+authenticationEnforcer -> securitySession
+rbac -> mLevelSecurity
 
 -- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
 -- pattern language (for security). In Proceedings of the ACM

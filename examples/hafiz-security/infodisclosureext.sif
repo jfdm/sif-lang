@@ -4,55 +4,55 @@ language "Info Disclosure Exterior" as infodisclosureext
 
 patterns
 
-dmz <- Pattern("Demilitarized Zone")
-frontDoor <- Pattern("Front Door")
-trustProxy <- Pattern("Trusted Proxy")
-protectionReverseProxy <- Pattern("Protection Reverse Proxy")
-packetFilterFwall <- Pattern("Packet Filter Firewall")
-netAddressBList <- Pattern("Network Address Blacklist")
-integrationReverseProxy <- Pattern("Integration Reverse Proxy")
-msgReplayDetection <- Pattern("Message Replay Detection")
-proxyBasedFwall <- Pattern("Proxy Based Firewall")
-statefulFwall <- Pattern("Stateful Firewall")
+dmz := Pattern("Demilitarized Zone")
+frontDoor := Pattern("Front Door")
+trustProxy := Pattern("Trusted Proxy")
+protectionReverseProxy := Pattern("Protection Reverse Proxy")
+packetFilterFwall := Pattern("Packet Filter Firewall")
+netAddressBList := Pattern("Network Address Blacklist")
+integrationReverseProxy := Pattern("Integration Reverse Proxy")
+msgReplayDetection := Pattern("Message Replay Detection")
+proxyBasedFwall := Pattern("Proxy Based Firewall")
+statefulFwall := Pattern("Stateful Firewall")
 
-infoObscurity <- Pattern("Information Obsurity")
-secureComms <- Pattern("Secure Communication")
-secureServiceProxy <- Pattern("Secure Service Proxy")
-secureAssocation <- Pattern("Security Association")
-secureContext <- Pattern("Security Context")
-msgInterceptingGateway <- Pattern("Message Intercepting Gateway")
-msgInspector <- Pattern("Message Inspector")
-secureMsgRouter <- Pattern("Secure Message Router")
+infoObscurity := Pattern("Information Obsurity")
+secureComms := Pattern("Secure Communication")
+secureServiceProxy := Pattern("Secure Service Proxy")
+secureAssocation := Pattern("Security Association")
+secureContext := Pattern("Security Context")
+msgInterceptingGateway := Pattern("Message Intercepting Gateway")
+msgInspector := Pattern("Message Inspector")
+secureMsgRouter := Pattern("Secure Message Router")
 
 relations
 
-dmz linkedTo frontDoor : "Enforce Policy"
+dmz -> frontDoor : "Enforce Policy"
 
-frontDoor linkedTo trustProxy : "Trust a 3rd Party"
-frontDoor linkedTo protectionReverseProxy : "Setup Firewall"
+frontDoor -> trustProxy : "Trust a 3rd Party"
+frontDoor -> protectionReverseProxy : "Setup Firewall"
 
-protectionReverseProxy linkedTo packetFilterFwall : "Filter All input"
-protectionReverseProxy linkedTo integrationReverseProxy : "Facade for Internal Services"
+protectionReverseProxy -> packetFilterFwall : "Filter All input"
+protectionReverseProxy -> integrationReverseProxy : "Facade for Internal Services"
 
-packetFilterFwall linkedTo netAddressBList : "Known Offenders"
+packetFilterFwall -> netAddressBList : "Known Offenders"
 
-integrationReverseProxy linkedTo msgReplayDetection : "Prevent Replay Attack"
-integrationReverseProxy linkedTo proxyBasedFwall : "Selectively Expose Service"
-integrationReverseProxy linkedTo msgInterceptingGateway : "Check and Validate Messaging"
+integrationReverseProxy -> msgReplayDetection : "Prevent Replay Attack"
+integrationReverseProxy -> proxyBasedFwall : "Selectively Expose Service"
+integrationReverseProxy -> msgInterceptingGateway : "Check and Validate Messaging"
 
-proxyBasedFwall linkedTo statefulFwall : "Stateful Check"
+proxyBasedFwall -> statefulFwall : "Stateful Check"
 
-msgInterceptingGateway linkedTo msgInspector : "Valiation Component"
-msgInterceptingGateway linkedTo secureMsgRouter : "Multi-Party Messaging"
+msgInterceptingGateway -> msgInspector : "Valiation Component"
+msgInterceptingGateway -> secureMsgRouter : "Multi-Party Messaging"
 
-infoObscurity linkedTo secureComms : "Unobservable Channel"
+infoObscurity -> secureComms : "Unobservable Channel"
 
-secureComms linkedTo secureServiceProxy : "Secure Facade"
-secureComms linkedTo secureAssocation : "Store Security Info"
+secureComms -> secureServiceProxy : "Secure Facade"
+secureComms -> secureAssocation : "Store Security Info"
 
-secureServiceProxy linkedTo integrationReverseProxy: "Enforce Policy"
+secureServiceProxy -> integrationReverseProxy: "Enforce Policy"
 
-secureAssocation linkedTo secureContext : "Container for Sec Attributes"
+secureAssocation -> secureContext : "Container for Sec Attributes"
 
 -- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
 -- pattern language (for security). In Proceedings of the ACM

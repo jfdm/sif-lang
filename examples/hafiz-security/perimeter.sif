@@ -5,41 +5,41 @@ from infodisclosurecore import rbac
 
 patterns
 
-policy <- Abstract Pattern("Policy")
-brokeredAuth <- Pattern("Brokered Authentication")
-sap <- Pattern("Single Access Point")
-singleThreadedFacade <- Pattern("Single Threaded Facade")
-pep <- Pattern("Policy Enforcement Point")
-authenticationEnforcer <- Pattern("Authentication Enforcer")
-authorisationEnforcer <- Pattern("Authorisation Enforcer")
-accountLockout <- Pattern("Account Lockout")
-interceptValidator <- Pattern("Intercepting Validator")
-contentDependentProcessing <- Pattern("Content Dependent Processing")
-errorDetectionCorrection <- Pattern("Error Detection and Correction")
-exceptionShield <- Pattern("Exception Shielding")
+policy := Abstract Pattern("Policy")
+brokeredAuth := Pattern("Brokered Authentication")
+sap := Pattern("Single Access Point")
+singleThreadedFacade := Pattern("Single Threaded Facade")
+pep := Pattern("Policy Enforcement Point")
+authenticationEnforcer := Pattern("Authentication Enforcer")
+authorisationEnforcer := Pattern("Authorisation Enforcer")
+accountLockout := Pattern("Account Lockout")
+interceptValidator := Pattern("Intercepting Validator")
+contentDependentProcessing := Pattern("Content Dependent Processing")
+errorDetectionCorrection := Pattern("Error Detection and Correction")
+exceptionShield := Pattern("Exception Shielding")
 
 relations
 
-policy linkedTo brokeredAuth : "External Authentication"
-policy linkedTo sap : "Decision Point"
+policy -> brokeredAuth : "External Authentication"
+policy -> sap : "Decision Point"
 
-brokeredAuth linkedTo authenticationEnforcer : "Check Credential"
+brokeredAuth -> authenticationEnforcer : "Check Credential"
 
-sap linkedTo pep : "Enforce Policy"
-sap linkedTo singleThreadedFacade : "Simple Perimeter"
+sap -> pep : "Enforce Policy"
+sap -> singleThreadedFacade : "Simple Perimeter"
 
-pep linkedTo authenticationEnforcer : "Check Identity" 
-pep linkedTo authorisationEnforcer : "Control Access" 
-pep linkedTo interceptValidator : "Check Input" 
+pep -> authenticationEnforcer : "Check Identity" 
+pep -> authorisationEnforcer : "Control Access" 
+pep -> interceptValidator : "Check Input" 
 
-authenticationEnforcer linkedTo accountLockout : "Prevent Brute Force Attacks"
-authorisationEnforcer linkedTo rbac : "Policy for A/C"
+authenticationEnforcer -> accountLockout : "Prevent Brute Force Attacks"
+authorisationEnforcer -> rbac : "Policy for A/C"
 
-interceptValidator linkedTo contentDependentProcessing : "Code and Data separation"
-interceptValidator linkedTo errorDetectionCorrection : "Integrity Check" 
+interceptValidator -> contentDependentProcessing : "Code and Data separation"
+interceptValidator -> errorDetectionCorrection : "Integrity Check" 
 
-contentDependentProcessing linkedTo exceptionShield : "Protect with exception and hide exception metadata" 
-errorDetectionCorrection linkedTo exceptionShield : "Protect with exception and hide exception metadata"
+contentDependentProcessing -> exceptionShield : "Protect with exception and hide exception metadata" 
+errorDetectionCorrection -> exceptionShield : "Protect with exception and hide exception metadata"
 
 -- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
 -- pattern language (for security). In Proceedings of the ACM

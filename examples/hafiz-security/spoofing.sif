@@ -3,23 +3,23 @@ language "Spoofing" as spoofing
 
 patterns
 
-interceptingWebAgent <- Pattern("Intercepting Web Agent")
-credentialTokeniser <- Pattern("Credential Tokenizer")
-sso <- Pattern("Single Sign On")
-ssoDelegator <- Pattern("SSO Felegator")
-assertBuilder <- Pattern("Assertion Builder")
-passwordSynchroniser <- Pattern("Password Synchronizer")
+interceptingWebAgent := Pattern("Intercepting Web Agent")
+credentialTokeniser := Pattern("Credential Tokenizer")
+sso := Pattern("Single Sign On")
+ssoDelegator := Pattern("SSO Felegator")
+assertBuilder := Pattern("Assertion Builder")
+passwordSynchroniser := Pattern("Password Synchronizer")
 
 relations
 
-interceptingWebAgent linkedTo credentialTokeniser: "Reusable Credential" 
-interceptingWebAgent linkedTo sso : "Reuse Authentication" 
+interceptingWebAgent -> credentialTokeniser: "Reusable Credential" 
+interceptingWebAgent -> sso : "Reuse Authentication" 
 
-sso linkedTo ssoDelegator : "Separate processing component"
+sso -> ssoDelegator : "Separate processing component"
 
-sso linkedTo credentialTokeniser : "Manage Credential" 
-sso linkedTo assertBuilder : "SAML Assertions" 
-sso linkedTo passwordSynchroniser  : "Manage Passwords" 
+sso -> credentialTokeniser : "Manage Credential" 
+sso -> assertBuilder : "SAML Assertions" 
+sso -> passwordSynchroniser  : "Manage Passwords" 
 
 -- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
 -- pattern language (for security). In Proceedings of the ACM

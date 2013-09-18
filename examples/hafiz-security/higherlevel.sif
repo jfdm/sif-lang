@@ -6,46 +6,46 @@ from perimeter import policy
 
 patterns
 
-assetIdentification <- Pattern("Security Needs Identification of Enterprise Asses")
-assetEval <- Pattern("Asset Evaluation")
-vulnAssessment <- Pattern("Vulnerability Assessment")
-riskDetermination <- Pattern("Risk Determination")
-defenseDepth <- Pattern("Defense in Depth")
-enterSecApproaches <- Pattern("Enterprise Security Approaches")
-enterSecServices <- Pattern("Enterprise Security Services")
-lowHangingFruit <- Pattern("Low Hanging Fruit")
-protectedSystem <- Pattern("Protected System")
-hideImplementation <- Pattern("Hidden Implementation")
-minefield <- Pattern("Minefield")
-whiteHatsHackThyselves <- Pattern("White Hats Hack Thyselves")
+assetIdentification := Pattern("Security Needs Identification of Enterprise Asses")
+assetEval := Pattern("Asset Evaluation")
+vulnAssessment := Pattern("Vulnerability Assessment")
+riskDetermination := Pattern("Risk Determination")
+defenseDepth := Pattern("Defense in Depth")
+enterSecApproaches := Pattern("Enterprise Security Approaches")
+enterSecServices := Pattern("Enterprise Security Services")
+lowHangingFruit := Pattern("Low Hanging Fruit")
+protectedSystem := Pattern("Protected System")
+hideImplementation := Pattern("Hidden Implementation")
+minefield := Pattern("Minefield")
+whiteHatsHackThyselves := Pattern("White Hats Hack Thyselves")
 
 relations
 
-assetIdentification linkedTo assetEval : "Value of Asset"
-assetIdentification linkedTo vulnAssessment : "Identify Threats"
+assetIdentification -> assetEval : "Value of Asset"
+assetIdentification -> vulnAssessment : "Identify Threats"
 
-assetEval linkedTo riskDetermination : "Rank Assets"
+assetEval -> riskDetermination : "Rank Assets"
 
-vulnAssessment linkedTo riskDetermination : "Rank Threats"
+vulnAssessment -> riskDetermination : "Rank Threats"
 
-riskDetermination linkedTo defenseDepth : "Strong Protection"
-riskDetermination linkedTo enterSecApproaches : "Select and Integrate Countermeasure"
+riskDetermination -> defenseDepth : "Strong Protection"
+riskDetermination -> enterSecApproaches : "Select and Integrate Countermeasure"
 
-defenseDepth linkedTo enterSecApproaches : "Choose Defense Mechanism"
+defenseDepth -> enterSecApproaches : "Choose Defense Mechanism"
 
-enterSecApproaches linkedTo lowHangingFruit : "Where to start"
-enterSecApproaches linkedTo enterSecServices : "Solution to use"
+enterSecApproaches -> lowHangingFruit : "Where to start"
+enterSecApproaches -> enterSecServices : "Solution to use"
 
-lowHangingFruit linkedTo enterSecServices : "Solution to use"
+lowHangingFruit -> enterSecServices : "Solution to use"
 
-enterSecServices linkedTo protectedSystem : "Protect Resources"
-enterSecServices linkedTo hideImplementation : "Security by Obscurity"
-enterSecServices linkedTo whiteHatsHackThyselves : "Test Adopted Solution"
+enterSecServices -> protectedSystem : "Protect Resources"
+enterSecServices -> hideImplementation : "Security by Obscurity"
+enterSecServices -> whiteHatsHackThyselves : "Test Adopted Solution"
 
-protectedSystem linkedTo policy : "Rules for Protection"
-hideImplementation linkedTo minefield: "Variation in System"
+protectedSystem -> policy : "Rules for Protection"
+hideImplementation -> minefield: "Variation in System"
 
-whiteHatsHackThyselves linkedTo riskDetermination : "Mitigate vulnerability found"
+whiteHatsHackThyselves -> riskDetermination : "Mitigate vulnerability found"
 
 
 -- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a

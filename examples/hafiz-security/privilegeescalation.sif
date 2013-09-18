@@ -4,29 +4,29 @@ language "Privilege Escalation" as privilegeescalation
 
 patterns
 
-compartmentalisation <- Pattern("Compartmentalisation")
-distResponsibility <- Pattern("Distributed Responsiblitly")
-exeDomain <- Pattern("Execution Domain")
+compartmentalisation := Pattern("Compartmentalisation")
+distResponsibility := Pattern("Distributed Responsiblitly")
+exeDomain := Pattern("Execution Domain")
 
-controlledProcCreation <- Pattern("Controlled Process Creation")
-secureResourcePooling <- Pattern("Secure Resource Pooling")
+controlledProcCreation := Pattern("Controlled Process Creation")
+secureResourcePooling := Pattern("Secure Resource Pooling")
 
-controlledObjectFactory <- Pattern("Controlled Object Factory")
+controlledObjectFactory := Pattern("Controlled Object Factory")
 
-controlledVirtualAddressSpace <- Pattern("Controlled Virtual Address Space")
+controlledVirtualAddressSpace := Pattern("Controlled Virtual Address Space")
 
 relations
 
-compartmentalisation linkedTo distResponsibility : "Efficient Partition"
+compartmentalisation -> distResponsibility : "Efficient Partition"
 
-distResponsibility linkedTo compartmentalisation : "Re-Partition"
-distResponsibility linkedTo exeDomain : "Restrict Resources"
+distResponsibility -> compartmentalisation : "Re-Partition"
+distResponsibility -> exeDomain : "Restrict Resources"
 
-exeDomain linkedTo controlledProcCreation : "Restrict Privilege Inheritance"
-exeDomain linkedTo controlledObjectFactory : "Protect Object Rights"
-exeDomain linkedTo controlledVirtualAddressSpace : "Protect Virtual Memory"
+exeDomain -> controlledProcCreation : "Restrict Privilege Inheritance"
+exeDomain -> controlledObjectFactory : "Protect Object Rights"
+exeDomain -> controlledVirtualAddressSpace : "Protect Virtual Memory"
 
-controlledProcCreation linkedTo secureResourcePooling : "Limit Process Lifetime"
+controlledProcCreation -> secureResourcePooling : "Limit Process Lifetime"
 
 -- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
 -- pattern language (for security). In Proceedings of the ACM

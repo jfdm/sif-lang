@@ -6,44 +6,44 @@ from infodisclosureext import infoObscurity
 
 patterns
 
-obliviousTransfer <- Pattern("Oblivious Transfer")
-pseudoIdentity <- Pattern("Pseudonymous Identity")
-anonymitySet <- Pattern("Anonymity Set")
-chaining <- Pattern("Chaining")
-randomExit <- Pattern("Random Exit")
-batchRouting <- Pattern("Batched Routing")
-randomWait <- Pattern("Random Wait")
-coverTraffic <- Pattern("Cover Traffic")
-linkPadding <- Pattern("Linked Padding")
-morphedRepr <- Pattern("Morphed Representation")
-layeredEncryption <- Pattern("Layered Encryption")
-constantLengthPadding <- Pattern("Constent Length Padding")
+obliviousTransfer := Pattern("Oblivious Transfer")
+pseudoIdentity := Pattern("Pseudonymous Identity")
+anonymitySet := Pattern("Anonymity Set")
+chaining := Pattern("Chaining")
+randomExit := Pattern("Random Exit")
+batchRouting := Pattern("Batched Routing")
+randomWait := Pattern("Random Wait")
+coverTraffic := Pattern("Cover Traffic")
+linkPadding := Pattern("Linked Padding")
+morphedRepr := Pattern("Morphed Representation")
+layeredEncryption := Pattern("Layered Encryption")
+constantLengthPadding := Pattern("Constent Length Padding")
 
 relations
 
-infoObscurity linkedTo obliviousTransfer : "Zero Knowledge Communication"
-infoObscurity linkedTo pseudoIdentity : "Assume Alias"
+infoObscurity -> obliviousTransfer : "Zero Knowledge Communication"
+infoObscurity -> pseudoIdentity : "Assume Alias"
 
-pseudoIdentity linkedTo anonymitySet : "Mix with probable suspects"
-pseudoIdentity linkedTo chaining : "Deep defense"
-pseudoIdentity linkedTo morphedRepr : "Hide Identifiable Traits"
+pseudoIdentity -> anonymitySet : "Mix with probable suspects"
+pseudoIdentity -> chaining : "Deep defense"
+pseudoIdentity -> morphedRepr : "Hide Identifiable Traits"
 
-anonymitySet linkedTo batchRouting : "Mixing Strategy"
-anonymitySet linkedTo randomWait : "Mixing Strategy"
-anonymitySet linkedTo morphedRepr : "Hide Identifiable Traits"
-anonymitySet linkedTo chaining: "Deep Defense"
+anonymitySet -> batchRouting : "Mixing Strategy"
+anonymitySet -> randomWait : "Mixing Strategy"
+anonymitySet -> morphedRepr : "Hide Identifiable Traits"
+anonymitySet -> chaining: "Deep Defense"
 
-batchRouting linkedTo coverTraffic : "Create Proable Suspects"
-randomWait linkedTo coverTraffic : "Create Proable Suspects"
+batchRouting -> coverTraffic : "Create Proable Suspects"
+randomWait -> coverTraffic : "Create Proable Suspects"
 
-coverTraffic linkedTo linkPadding : "Prevent Traffic Shaping"
+coverTraffic -> linkPadding : "Prevent Traffic Shaping"
 
-chaining linkedTo randomExit : "Unpredictable Chaining"
-chaining linkedTo morphedRepr : "Hide Identifiable Traits"
+chaining -> randomExit : "Unpredictable Chaining"
+chaining -> morphedRepr : "Hide Identifiable Traits"
 
-morphedRepr linkedTo layeredEncryption : "Protect Confidentiality"
+morphedRepr -> layeredEncryption : "Protect Confidentiality"
 
-layeredEncryption linkedTo constantLengthPadding : "Make Indistinguishable"
+layeredEncryption -> constantLengthPadding : "Make Indistinguishable"
 
 -- Munawar Hafiz, Paul Adamczyk, and Ralph E. Johnson. 2012. Growing a
 -- pattern language (for security). In Proceedings of the ACM
