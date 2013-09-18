@@ -1,42 +1,36 @@
 -- ----------------------------- [ Tropyc: A Pattern Language for Cryptography ]
-
 language "Tropyc" as tropyc
 
 patterns
 
-p1 <- Abstract Pattern("Generic OO Crypto Architecture")
+p1 := Pattern("Generic OO Crypto Architecture")
 
-infosec <- Pattern("Information Secrecy"){
-    :extends p1
-}
+infosec	   := Pattern("Information Secrecy")
+senderauth := Pattern("Sender Authentication")
+sig        := Pattern("Signature")
+msgint     := Pattern("Message Integrity")
 
-senderauth <- Pattern("Sender Authentication"){
-    :extends p1
-}
-
-sig <- Pattern("Signature"){
-	:extends p1
-}
-
-msgint <- Pattern("Message Integrity"){
-		:extends p1
-}
-
-swa		<- Pattern("Secrecy with Authentication")
-sws		<- Pattern("Secrecy with Signature")
-sigapp	<- Pattern("Signature with Appendix")
-swi		<- Pattern("Secrecy with Integrity")
-ssa		<- Pattern("Secrecy with Signature with Appendix")
+swa	   := Pattern("Secrecy with Authentication")
+sws	   := Pattern("Secrecy with Signature")
+sigapp := Pattern("Signature with Appendix")
+swi	   := Pattern("Secrecy with Integrity")
+ssa    := Pattern("Secrecy with Signature with Appendix")
 
 relations
 
-swa		uses [ infosec, senderauth ]
-sws		uses [ infosec, sig ]
-sigapp	uses [ senderauth, msgint ]
-swi		uses infosec
-swi		uses msgint
-ssa		uses sws
-ssa		uses sigapp
+infosec	   uses p1
+senderauth uses p1 
+sig	       uses p1 
+msgint	   uses p1
+
+swa    uses [ infosec, senderauth ]
+sws	   uses [ infosec, sig ]
+sigapp uses [ senderauth, msgint ]
+
+swi	   uses infosec
+swi	   uses msgint
+ssa	   uses sws
+ssa	   uses sigapp
 
 -- Braga, A., Rubira, C., and Dahab, R. 1998. Tropyc: A pattern
 -- language for cryptographic object-oriented software. Chapter 16 in
