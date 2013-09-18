@@ -25,13 +25,18 @@ parseSif fname =
 -- parsePlang ::= parseMetadata parseImports? parsePattern+ parseRelation*;
 parsePlang :: Parser PlangAST
 parsePlang = do (title, label) <- parseMetadata
-                optionMaybe parseImports
+                imports <- optionMaybe parseImports
                 reserved sifKWordPattern
-                many parsePattern
+                patterns <- many parsePattern
                 reserved sifKWordRelation
                 relations <- manyTill parseRelations eof
                 pState <- getState
-                return (PlangAST title label (reverse pState) ((reverse . concat) relations))
+                let ps = fromMaybe [] imports ++ patterns
+                if canNub (map ident ps)
+                then fail "Duplicate Identifiers used"
+                else return (PlangAST title label
+                                      ps
+                                      ((reverse . concat) relations))
              <?> "Language Instance"
 
 -- ---------------------------------------------------- [ Language Declaration ]
@@ -50,9 +55,12 @@ parseMetadata = do reserved sifKWordLang
 
 -- | Definition of language imports
 -- parseImports ::= parseImport*;
-parseImports :: Parser ()
+parseImports :: Parser PatternsExpr
 parseImports = do is <- liftM concat $ many1 parseImport
-                  putState is
+                  if canNub (map ident is)
+                  then fail $ "Duplicate import specified"
+                  else putState is
+                  return is
                <?> "Imports"
 
 -- | Parse a single import
@@ -89,7 +97,7 @@ parsePattern = do ident <- identifier
                   typ <- optionMaybe parsePatternType
                   reserved sifKWordTypPat
                   name <- parens $ optionMaybe stringLiteral
-                  let p = mkPattern ident name (fromMaybe TyPattern typ) mod
+                  let p = mkPattern ident name (fromMaybe TyPattern typ) (fromMaybe TyModConcrete mod)
                   modifyState (p: )
                   return p
 
@@ -134,7 +142,7 @@ parseRelations = try parseRelationM <|> parseRelation1 <?> "Relations"
 -- parserelationM ::= parseRelationFrom parseIDList;
 parseRelationM :: Parser RelationsExpr
 parseRelationM = do (from, typ) <- parseRelationFrom 
-                    tos <- parseIDList
+                    tos <- parseIDListB
                     ps <- getState
                     let rs = if any (\p -> notElem (ident p) tos) ps
                              then fail $ "Unknown Identity used"

@@ -4,31 +4,25 @@ language "Tropyc" as tropyc
 
 patterns
 
-p1 <- Abstract Pattern("Generic OO Crypto Architecture")
+p1 := Abstract Pattern("Generic OO Crypto Architecture")
 
-infosec <- Pattern("Information Secrecy"){
-    :extends p1
-}
+infosec			:= Pattern("Information Secrecy")
+senderauth		:= Pattern("Sender Authentication")
+sig				:= Pattern("Signature")
+msgint			:= Pattern("Message Integrity")
 
-senderauth <- Pattern("Sender Authentication"){
-    :extends p1
-}
-
-sig <- Pattern("Signature"){
-	:extends p1
-}
-
-msgint <- Pattern("Message Integrity"){
-		:extends p1
-}
-
-swa		<- Integration Pattern("Secrecy with Authentication")
-sws		<- Integration Pattern("Secrecy with Signature")
-sigapp	<- Integration Pattern("Signature with Appendix")
-swi		<- Integration Pattern("Secrecy with Integrity")
-ssa		<- Integration Pattern("Secrecy with Signature with Appendix")
+swa		:= System Pattern("Secrecy with Authentication")
+sws		:= System Pattern("Secrecy with Signature")
+sigapp	:= System Pattern("Signature with Appendix")
+swi		:= System Pattern("Secrecy with Integrity")
+ssa		:= System Pattern("Secrecy with Signature with Appendix")
 
 relations
+
+infosec		<- p1
+senderauth	<- p1 
+sig			<- p1 
+msgint		<- p1
 
 swa		uses [ infosec, senderauth ]
 sws		uses [ infosec, sig ]

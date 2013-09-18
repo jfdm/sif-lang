@@ -40,17 +40,17 @@ data PatternExpr = PatternExpr {
       ident      :: ID,      
       origin     :: Maybe String,
       typ        :: TyPattern,
-      modifier   :: Maybe TyModifier
+      modifier   :: TyModifier
     } deriving (Show, Eq)
 
 -- Smart Constructors
 
 -- | Make an import pattern
 mkImportPattern :: ID -> String -> PatternExpr
-mkImportPattern id origin = PatternExpr (Just id) id (Just origin) TyPattern Nothing
+mkImportPattern id origin = PatternExpr (Just id) id (Just origin) TyPattern TyModConcrete
 
 -- | Make a pattern
-mkPattern :: ID -> Maybe String -> TyPattern -> Maybe TyModifier -> PatternExpr
+mkPattern :: ID -> Maybe String -> TyPattern -> TyModifier -> PatternExpr
 mkPattern id title typ mod = PatternExpr title id Nothing typ mod
 
 -- --------------------------------------------------------------- [ Relations ]
@@ -63,10 +63,10 @@ data TyRelation = TyAssociation    -- ^ Association
 
 -- | Relation Representation
 data RelationExpr = RelationExpr {
-      from :: ID,
-      to   :: ID,
-      rtpy :: TyRelation,
-      desc :: Maybe String
+      from  :: ID,
+      to    :: ID,
+      rtype :: TyRelation,
+      desc  :: Maybe String
     } deriving (Show, Eq)
 
 -- Smart Constructor for Relations
@@ -80,5 +80,14 @@ mkRelation from to typ desc = RelationExpr from to typ desc
 getPattern :: ID -> PatternsExpr -> Maybe PatternExpr
 getPattern id [] = Nothing
 getPattern id ps = find (\x -> ident x == id) ps
+
+canNub :: Eq a => [a] -> Bool
+canNub xs = if isNothing check
+            then False
+            else True
+            where
+              check = find (\x -> length x > 1) xs'
+              xs' = map (\x -> elemIndices x xs) xs
+
   
 -- --------------------------------------------------------------------- [ EOF ]
