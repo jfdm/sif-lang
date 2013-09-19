@@ -8,7 +8,9 @@ import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
 import Data.List
 import Data.Function
+
 import AST
+import Types
 import Keywords
 
 -- | A Pretty Printer of our plang AST.

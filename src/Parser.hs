@@ -11,6 +11,7 @@ import Data.List
 import Lexer
 import Keywords
 import AST
+import Types
 
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 
@@ -75,7 +76,7 @@ parseImportM = do reserved sifKWordFrom
                   lang <- identifier
                   reserved sifKWordImport
                   pIDs <- parseIDList
-                  return $ map (`mkImportPattern` lang) pIDs
+                  return $ map (`mkImportPatternExpr` lang) pIDs
                <?> "Many Imports"
 
 -- | Import a pattern language
@@ -83,7 +84,7 @@ parseImportM = do reserved sifKWordFrom
 parseImportLang :: Parser PatternsExpr
 parseImportLang = do reserved sifKWordImport
                      lang <- identifier
-                     return [mkImportPattern lang lang]
+                     return [mkImportPatternExpr lang lang]
                   <?> "Language Import"
 
 -- ----------------------------------------------- [ Pattern Parsing Functions ]
@@ -97,7 +98,7 @@ parsePattern = do ident <- identifier
                   typ <- optionMaybe parsePatternType
                   reserved sifKWordTypPat
                   name <- parens $ optionMaybe stringLiteral
-                  let p = mkPattern ident name (fromMaybe TyPattern typ) (fromMaybe TyModConcrete mod)
+                  let p = mkPatternExpr ident name (fromMaybe TyPattern typ) (fromMaybe TyModConcrete mod)
                   modifyState (p: )
                   return p
 
@@ -116,7 +117,7 @@ parsePatternModifier = do try $ reserved sifKWordTypModAbs
 -- | Parse the type information
 -- parsePatternType ::= ("Component" | "System" | "Deployment"
 --                         | "Admin" | "Implementation");
-parsePatternType :: Parser TyPattern
+parsePatternType :: Parser TyGenPattern
 parsePatternType = do try $ reserved sifKWordTypComp
                       return TyComponent
                <|> do reserved sifKWordTypSys
@@ -146,7 +147,7 @@ parseRelationM = do (from, typ) <- parseRelationFrom
                     ps <- getState
                     let rs = if any (\p -> notElem (ident p) tos) ps
                              then fail $ "Unknown Identity used"
-                             else map (\to -> mkRelation from to typ Nothing) tos
+                             else map (\to -> mkRelationExpr from to typ Nothing) tos
                     return rs
               <?> "1-2-Many Relation"
 
@@ -163,7 +164,7 @@ parseRelation1 = do (from, typ) <- parseRelationFrom
                     let toP = getPattern to ps
                     if isNothing toP
                     then fail $ "To Pattern in relation doesn't exist: " ++ to
-                    else return [mkRelation from to typ desc]                 
+                    else return [mkRelationExpr from to typ desc]                 
                   <?> "1-2-1 Relation with Description"
 
 -- ------------------------------------------------- [ Relation Util Functions ]

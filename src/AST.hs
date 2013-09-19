@@ -4,6 +4,8 @@ module AST where
 import Data.Maybe
 import Data.List
 
+import Types
+
 -- -------------------------------------------------------- [ Pattern Language ]
 data PlangAST = PlangAST {
       title    :: String,
@@ -19,47 +21,27 @@ type IDs           = [ ID ]
 type ID            = String
 
 -- ---------------------------------------------------------------- [ Patterns ]
--- | Type Heirarchy
-data TyPattern = TyPattern
-               | TyComponent
-               | TySystem
-               | TyDeployment
-               | TyAdmin 
-               | TyImplementation
-               | TyImport -- ^ Nasty Hack 
-               deriving (Show, Eq, Enum, Ord)
-
--- | Type Modifiers
-data TyModifier = TyModAbstract
-                | TyModConcrete
-                deriving (Show, Eq, Read, Enum, Ord)
 
 -- | Pattern Representation
 data PatternExpr = PatternExpr {
       name       :: Maybe String,
       ident      :: ID,      
       origin     :: Maybe String,
-      typ        :: TyPattern,
+      typ        :: TyGenPattern,
       modifier   :: TyModifier
     } deriving (Show, Eq)
 
 -- Smart Constructors
 
 -- | Make an import pattern
-mkImportPattern :: ID -> String -> PatternExpr
-mkImportPattern id origin = PatternExpr (Just id) id (Just origin) TyPattern TyModConcrete
+mkImportPatternExpr :: ID -> String -> PatternExpr
+mkImportPatternExpr id origin = PatternExpr (Just id) id (Just origin) TyPattern TyModConcrete
 
 -- | Make a pattern
-mkPattern :: ID -> Maybe String -> TyPattern -> TyModifier -> PatternExpr
-mkPattern id title typ mod = PatternExpr title id Nothing typ mod
+mkPatternExpr :: ID -> Maybe String -> TyGenPattern -> TyModifier -> PatternExpr
+mkPatternExpr id title typ mod = PatternExpr title id Nothing typ mod
 
 -- --------------------------------------------------------------- [ Relations ]
--- | Type Heirarchy
-data TyRelation = TyAssociation    -- ^ Association
-                | TySpecialisation -- ^ Specialisation
-                | TyRealisation    -- ^ Realisation
-                | TyAggregation    -- ^ Aggregation
-                deriving (Show, Eq, Enum, Ord)
 
 -- | Relation Representation
 data RelationExpr = RelationExpr {
@@ -72,8 +54,8 @@ data RelationExpr = RelationExpr {
 -- Smart Constructor for Relations
 
 -- | Make a relation 
-mkRelation :: ID -> ID -> TyRelation -> Maybe String -> RelationExpr
-mkRelation from to typ desc = RelationExpr from to typ desc
+mkRelationExpr :: ID -> ID -> TyRelation -> Maybe String -> RelationExpr
+mkRelationExpr from to typ desc = RelationExpr from to typ desc
 
 -- -------------------------------------------------------- [ Accessor Methods ]
 -- | Get Pattern

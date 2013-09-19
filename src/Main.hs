@@ -5,20 +5,20 @@ module Main (main) where
 
 import System.Environment (getArgs)
 import System.IO
-import Parser
-import AST
-import Pretty.AST
 
--- import Model
--- import Transform.Dot
--- import Prettifier
+import qualified Data.Map as Map
+import Parser
+import qualified AST
+import TypeSystem
+import Checker
 
 main :: IO ()
 main = do args <- getArgs 
           content <- readFile $ head args
-          let ast = parseSif content
-          print (prettyPlangAST ast)
+          let res = chkPlangSpec $! parseSif content
+          print res
+          putStrLn " It checks"
 
---          putStr $ unlines (plang2Dot ast)
+
 
 -- --------------------------------------------------------------------- [ EOF ]
