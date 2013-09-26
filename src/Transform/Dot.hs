@@ -1,115 +1,119 @@
 -- | Transform the Pattern Language into a Dot representation.
-module Transform.Dot (plang2Dot) where
+module Transform.Dot (plang2Dot, extDot) where
 
+import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
 import Data.List
+import Data.Function
+
 import Model
-import Examples.Tampering
-import Examples.Tropyc
+import Types
+import Keywords
 
--- ------------------------------------------------- [ Tranformation Functions ]
+-- | File extension
+extDot = ".dot"
+
 -- | Transform a Pattern Language into it's Dot equivalent
-plang2Dot :: Plang -> [String]
-plang2Dot plang = heed ++ pbody ++ rbody ++ foot
+plang2Dot :: PlangSpec -> Doc
+plang2Dot plang = text "digraph" <+> text "G" <+> lbrace
+                  <$$> indent 4 (vcat [ibody, pbody, rbody])
+                  <$$> rbrace
                   where
-                    heed = ["digraph G {\n"]
-                    foot = ["\n}\n"]
-                    pbody = doPatterns $ break (isJust . Model.origin) ps
-                    rbody = doRelations ps
-                    ps = Model.patterns plang
+                    ibody = imports2Dot (imports plang)     <$$> empty
+                    pbody = patterns2Dot (patterns plang)   <$$> empty
+                    rbody = relations2Dot (relations plang) 
 
--- | Do the transformation of a (Local Patterns, Imports Patterns) tuple into Dot Form
-doPatterns :: (Patterns, Patterns) -> [String]
-doPatterns (pats, imps) = nub $ imports2Dot imps ++ patterns2Dot pats
-                          
--- -- ---------------------------------------------------------- [ Imports to Dot ]
+-- ----------------------------------------------------------------- [ Imports ]
 
--- | Transform a list of Imported Patterns into Dot Form.
-imports2Dot :: Patterns -> [String]
-imports2Dot [] = [""]
-imports2Dot imps = map (unlines . imports2Dot') getGroups
-                   where
-                     getGroups = groupBy groupImports imps
-                     groupImports x y = Model.origin x == Model.origin y
+-- | Dottify the Imports
+-- @TODO
+imports2Dot :: Patterns -> Doc
+imports2Dot is = empty
 
--- | Do the transformation of Imports
-imports2Dot' :: Patterns -> [String]
-imports2Dot' imps = heed ++ body ++ foot
-                    where
-                      heed = ["subgraph cluster_" ++ label ++ " {\n"]
-                      foot = ["label=\"" ++ label ++ "\"\ncolor=black;\n}\n"]
-                      label = fromJust (Model.origin (head imps))
-                      body = patterns2Dot imps
+-- | Dottify the Import
+import2Dot :: Pattern -> Doc
+import2Dot i = empty
 
--- ---------------------------------------------------------- [ Pattern To Dot ]
+-- ---------------------------------------------------------------- [ Patterns ]
 
--- | Transform a List of Patterns to Dot Form.
+-- | Dottify the Patterns
+patterns2Dot :: Patterns -> Doc
+patterns2Dot ps = vsep $ map pattern2Dot ps
 
-patterns2Dot :: Patterns -> [String]
-patterns2Dot = map pattern2Dot
+-- | Dottify the pattern.
+pattern2Dot :: PatternItem -> Doc
+pattern2Dot (k, v) = text k <+>
+                     genPatternStyle v k <>
+                     semi
 
--- | Transform a Pattern into Dot Form
-pattern2Dot :: Pattern -> String
-pattern2Dot p = genDotNode (Model.ident p) (Model.name p) (Model.modifier p)
+-- | Generate the pattern style
+genPatternStyle :: Pattern -> String -> Doc
+genPatternStyle p id = genStyle [genPatternShape (ptype p),       -- Shape 
+                                 genModifierStyle (modifier p),   -- Line
+                                 genLabel (fromMaybe id (name p)) -- Label 
+                                ]
 
--- -------------------------------------------------------- [ Relations to Dot ]
+-- | Generate the Pattern Shapes.
+--
+-- The shapes were chosen at random.
+genPatternShape :: TyGenPattern -> Doc
+genPatternShape t = case t of 
+                      TyComponent      -> genStylePair "shape"  "septagon"
+                      TySystem         -> genStylePair "shape"  "octagon"
+                      TyDeployment     -> genStylePair "shape"  "doubleoctagon"
+                      TyAdmin          -> genStylePair "shape"  "house"
+                      TyImplementation -> genStylePair "shape"  "trapezium"
+                      TyPattern        -> genStylePair "shape"  "ellipse"
 
--- | Transform the relations in the pattern language to Dot Form
-doRelations :: Patterns -> [String]
-doRelations = concatMap patternRels2Dot
+-- | Determine the modifier styles.
+genModifierStyle :: TyModifier -> Doc
+genModifierStyle m = case m of
+                       TyModAbstract -> genStyle' "dashed"
+                       TyModConcrete -> genStyle' "solid"
+                     where
+                       genStyle' style = genStylePair "style" style
 
-                   
-patternRels2Dot :: Pattern -> [String]
-patternRels2Dot p = nub $ extends2Dot ++ implements2Dot ++ requires2Dot ++ generals2Dot
-                    where 
-                      extends2Dot    = relations2Dot p (Model.extends p)    "extends"
-                      implements2Dot = relations2Dot p (Model.implements p) "implements"
-                      requires2Dot   = relations2Dot p (Model.requires p)   "uses"
-                      generals2Dot   = relations2Dot p (Model.links p)      "links"
+-- --------------------------------------------------------------- [ Relations ]
 
--- | Generic Transform of Relation to Dot Form
-relations2Dot :: Pattern -> Maybe Relations -> String -> [String]
-relations2Dot _ Nothing _ = [""]
-relations2Dot p (Just rs) t = map (\r -> genDotEdge from (Model.to r) (Model.desc r) t) rs
-                              where
-                                from = Model.ident p
+-- | Dottify the relations
+relations2Dot :: Relations -> Doc
+relations2Dot rs = vsep $ map relation2Dot rs
 
--- -------------------------------------------------- [ Generate Dot Functions ]
--- | Gen Dot Node
-genDotNode :: ID -> String -> Maybe Modifier -> String
-genDotNode id label m = id ++ genDotNodeStyling label m
+relation2Dot :: Relation -> Doc
+relation2Dot r = text (from r)
+                 <+> text "->"
+                 <+> text (to r)
+                 <+> genRelationStyle (rtype r) (desc r)
+                 <> semi
 
--- | Gen Dot Edge
-genDotEdge :: ID -> ID -> Maybe String -> String -> String
-genDotEdge a b l t =  a ++ " -> " ++ b ++ genDotEdgeStyling l t
+genRelationStyle :: TyRelation -> Maybe String -> Doc
+genRelationStyle t d = genStyle [genStylePair "style" lStyle,  -- Line
+                                 genStylePair "dir" dStyle,    -- Direction
+                                 genStylePair arrowEnd aStyle, -- Arrow
+                                 maybe empty genLabel d        -- Label
+                                ]
+                       where
+                         (lStyle, dStyle, arrowEnd, aStyle) = genArrowStyle t
+                         
 
--- | Generate Dot Edge Styling
-genDotEdgeStyling :: Maybe String -> String -> String
-genDotEdgeStyling desc t = " [" ++ styling ++ label ++ "];"
-                           where
-                             styling = case t of
-                                         "implements" -> implements
-                                         "extends" -> extends
-                                         "uses" -> uses
-                                         otherwise -> links
+genArrowStyle :: TyRelation -> (String, String, String, String)
+genArrowStyle t = case t of
+                    TySpecialisation -> ("solid", "back", "arrowtail", "onormal")
+                    TyAggregation    -> ("solid", "back", "arrowtail", "odiamond")
+                    TyRealisation    -> ("dashed", "back", "arrowtail", "empty")
+                    TyAssociation    -> ("solid", "forward", "arrowhead", "normal")
 
-                             implements = "style=\"dashed\", dir=\"back\", arrowtail=\"empty\""
-                             extends = "style=\"solid\", dir=\"forward\", arrowhead=\"empty\""
-                             uses = "style=\"solid\", dir=\"back\", arrowtail=\"diamond\""
-                             links = "style=\"solid\", dir=\"forward\", arrowhead=\"normal\""
-                             label = if isNothing desc
-                                     then ""
-                                     else ", label=\"" ++ fromJust desc ++ "\""
 
--- | Generate Dot Node Styling
-genDotNodeStyling :: String -> Maybe Modifier -> String
-genDotNodeStyling l m = " [" ++ style ++ shape ++ label ++ "];"
-                        where
-                          shape = "shape=box, "
-                          label = "label=\"" ++ l ++ "\""
-                          style = if isNothing m
-                                  then "style=rounded, " 
-                                  else case fromJust m of
-                                         Abstract -> "style=\"rounded,dashed\", "
-                                         Integration -> "style=\"rounded,diagonals\", "
+-- -------------------------------------------------------------------- [ Util ] 
+-- | Generate the syntactic sugar for styles in Dot.
+genStyle :: [Doc] -> Doc
+genStyle styling = brackets (hcat (punctuate comma styling))
+
+-- | Generate a Dot <key,value> pairing.
+genStylePair :: String -> String -> Doc
+genStylePair k v = text k <> equals <> dquotes (text v)
+
+genLabel :: String -> Doc
+genLabel l = genStylePair "label" l
+
 -- --------------------------------------------------------------------- [ EOF ]

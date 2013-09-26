@@ -27,7 +27,7 @@ data PatternExpr = PatternExpr {
       name       :: Maybe String,
       ident      :: ID,      
       origin     :: Maybe String,
-      typ        :: TyGenPattern,
+      ptype      :: TyGenPattern,
       modifier   :: TyModifier
     } deriving (Show, Eq)
 

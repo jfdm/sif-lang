@@ -6,19 +6,19 @@ module Main (main) where
 import System.Environment (getArgs)
 import System.IO
 
-import qualified Data.Map as Map
+import qualified AST as AST
 import Parser
-import qualified AST
-import TypeSystem
+import Model
 import Checker
+import Transform
 
 main :: IO ()
 main = do args <- getArgs 
           content <- readFile $ head args
-          let res = chkPlangSpec $! parseSif content
-          print res
-          putStrLn " It checks"
-
-
+          let ast = parseSif content
+          let model = chkPlangSpec ast
+          let prettyModel = plang2Sif model
+          putStrLn $ show (title model) ++ " type checks"
+          putStrLn "Caveat: Imports are not checked for now. Sorry!"
 
 -- --------------------------------------------------------------------- [ EOF ]

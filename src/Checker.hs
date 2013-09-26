@@ -5,50 +5,54 @@ module Checker (chkPlangSpec) where
 
 import Data.Maybe
 import Data.List
-import qualified Data.Map as Map  
 
 import AST hiding (getPattern)
-import TypeSystem
+import Model
 import Types
 import Parser
 
 
 chkPlangSpec :: PlangAST -> PlangSpec
-chkPlangSpec spec = PlangSpec tit ps rs
+chkPlangSpec spec = PlangSpec tit lab is ps rs
     where
-      tit = (title spec)
-      ps = doPatterns (ps', is)
-      (ps', is) = break (isJust . AST.origin) (AST.patterns spec)
-      rs = doRelations (AST.relations spec) ps
+      tit = (AST.title spec)
+      lab = (AST.label spec)
+      ps = doPatterns ps'
+      is = doImports is'
+      (ps', is') = break (isJust . AST.origin) (AST.patterns spec)
+      rs = doRelations (AST.relations spec) (ps ++ is)
 
-doPatterns :: (PatternsExpr, PatternsExpr) -> PMap
-doPatterns (ps, is) = Map.fromList $ genPatterns ps ++ getImports is
-
-genPatterns :: PatternsExpr -> PatternValues
-genPatterns ps = map genPattern ps
-
-genPattern :: PatternExpr -> (String, Pattern)
-genPattern p = (AST.ident p, newP)
-               where
-                 newP = Pattern (AST.name p) (modifier p) (typ p)
-
-getImports :: PatternsExpr -> PatternValues
-getImports [] = []
-getImports imps = concatMap getImportGroups groups
+-- ----------------------------------------------------------------- [ Imports ]
+doImports :: PatternsExpr -> Patterns
+doImports [] = []
+doImports is = concatMap getImportGroups groups
     where
-      groups = groupBy groupImports imps
+      groups = groupBy groupImports is
       groupImports x y = AST.origin x == AST.origin y
 
-getImportGroups :: PatternsExpr -> PatternValues
+-- @TODO
+getImportGroups :: PatternsExpr -> Patterns
 getImportGroups is = []
 -- 1. Locate plang specification
 -- 2. Read in spec
 -- 3. Extract imported Pattern.
 
-doRelations :: RelationsExpr -> PMap -> Relations
-doRelations rs ps = map (\x -> genRelation x ps) rs
+-- ---------------------------------------------------------------- [ Patterns ]
 
-genRelation :: RelationExpr -> PMap -> Relation
+doPatterns :: PatternsExpr -> Patterns
+doPatterns ps = map genPattern ps
+
+genPattern :: PatternExpr -> PatternItem
+genPattern p = (id, newP)
+               where
+                 id = (AST.ident p)
+                 newP = mkPattern (AST.name p) (AST.ident p) (AST.modifier p) (AST.ptype p)
+
+-- --------------------------------------------------------------- [ Relations ]
+doRelations :: RelationsExpr -> Patterns -> Relations
+doRelations rs ps = reverse $ map (\x -> genRelation x ps) rs
+
+genRelation :: RelationExpr -> Patterns -> Relation
 genRelation r ps = case (AST.rtype r) of
                      TyAssociation -> mkAssociates x y desc
                      TySpecialisation -> mkSpecial x y desc

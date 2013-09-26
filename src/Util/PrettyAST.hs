@@ -1,8 +1,5 @@
 -- | A pretty printing function for the AST
-module Pretty.AST
-    (
-     prettyPlangAST
-    ) where
+module Util.PrettyAST ( prettyPlangAST ) where
 
 import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
@@ -17,25 +14,25 @@ import Keywords
 prettyPlangAST :: PlangAST -> Doc
 prettyPlangAST plang = prettyMetadata (title plang) (label plang) 
                        <$$> empty
-                       <$$> prettyImports imps
+                       <$$> prettyImports is
                        <$$> empty
-                       <$$> string sifKWordPattern
+                       <$$> text sifKWordPattern
                        <$$> empty
-                       <$$> prettyPatterns patts
+                       <$$> prettyPatterns ps
                        <$$> empty
-                       <$$> string sifKWordRelation
+                       <$$> text sifKWordRelation
                        <$$> empty
                        <$$> prettyRelations (relations plang)
                        where
-                         (patts, imps) = break (isJust . origin) (patterns plang)
+                         (ps, is) = break (isJust . origin) (patterns plang)
 
 -- ---------------------------------------------------- [ Language Declaration ]
 -- | Prettify Language Declaration
 prettyMetadata :: String -> ID -> Doc
-prettyMetadata title id = string sifKWordLang
-                          <+> dquotes (string title)
-                          <+> string sifKWordAs
-                          <+> string id
+prettyMetadata title id = text sifKWordLang
+                          <+> dquotes (text title)
+                          <+> text sifKWordAs
+                          <+> text id
 
 -- ----------------------------------------------------------------- [ Imports ]
 
@@ -56,16 +53,16 @@ prettyImport ps = prettyImportM imps <$> prettyLangImport langImps
 prettyImportM :: PatternsExpr -> Doc
 prettyImportM ps = vsep $ map f ps
                    where
-                     f p = string sifKWordFrom
-                           <+> string (fromJust (origin p))
-                           <+> string sifKWordImport
-                           <+> string (ident p)
+                     f p = text sifKWordFrom
+                           <+> text (fromJust (origin p))
+                           <+> text sifKWordImport
+                           <+> text (ident p)
 
 -- | Prettify a Language Import
 prettyLangImport :: PatternsExpr -> Doc
 prettyLangImport ps = vsep $ map f ps
                       where
-                        f p = string sifKWordImport <+> string (fromJust (origin p))
+                        f p = text sifKWordImport <+> text (fromJust (origin p))
 
 
 -- ---------------------------------------------------------------- [ Patterns ]
@@ -78,22 +75,22 @@ prettyPatterns ps = vsep $ map prettyPattern ps
 -- | Prettify a Pattern
 prettyPattern :: PatternExpr -> Doc
 prettyPattern p = text (ident p)
-                  <+> string sifOpAssignment
-                  <+> string mod
-                  <+> string ptype
-                  <+> string sifKWordTypPat
-                  <> parens (dquotes (string (fromMaybe "" (name p))))
+                  <+> text sifOpAssignment
+                  <+> text mod
+                  <+> t
+                  <+> text sifKWordTypPat
+                  <> parens (dquotes (text (fromMaybe "" (name p))))
                   where
                     mod = case modifier p of
                             TyModAbstract -> sifKWordTypModAbs
                             TyModConcrete -> sifKWordTypModConc
-                    ptype = case typ p of 
-                              TyComponent      -> sifKWordTypComp
-                              TyPattern        -> sifKWordTypPat
-                              TySystem         -> sifKWordTypSys
-                              TyDeployment     -> sifKWordTypDeplo
-                              TyAdmin          -> sifKWordTypAdmin
-                              TyImplementation -> sifKWordTypImpl
+                    t = case ptype p of 
+                              TyComponent      -> text sifKWordTypComp
+                              TySystem         -> text sifKWordTypSys
+                              TyDeployment     -> text sifKWordTypDeplo
+                              TyAdmin          -> text sifKWordTypAdmin
+                              TyImplementation -> text sifKWordTypImpl
+                              TyPattern        -> empty
 
 -- --------------------------------------------------------------- [ Relations ]
 
@@ -104,18 +101,18 @@ prettyRelations rs = vsep $ map prettyRelation (reverse rs)
 
 -- | Prettify a list of relations
 prettyRelation :: RelationExpr -> Doc
-prettyRelation rel = string (from rel)
-                     <+> string rtyp
-                     <+> string (to rel)
-                     <+> descrip
-                     where
-                       descrip = if isNothing (desc rel)
-                                 then empty
-                                 else colon <+> string (fromJust (desc rel))
-                       rtyp = case rtype rel of
-                                 TyAssociation    -> sifOpAssociation
-                                 TySpecialisation -> sifOpSpecialisation
-                                 TyRealisation    -> sifOpRealisation
-                                 TyAggregation    -> sifOpAggregation
+prettyRelation r = text (from r)
+                   <+> t
+                   <+> text (to r)
+                   <+> descrip
+                   where
+                     descrip = if isNothing (desc rel)
+                               then empty
+                               else colon <+> text (fromJust (desc rel))
+                     t = case rtype rel of
+                           TyAssociation    ->text sifOpAssociation
+                           TySpecialisation ->text sifOpSpecialisation
+                           TyRealisation    ->text sifOpRealisation
+                           TyAggregation    ->text sifOpAggregation
 
 -- --------------------------------------------------------------------- [ EOF ]

@@ -37,7 +37,7 @@ parsePlang = do (title, label) <- parseMetadata
                 then fail "Duplicate Identifiers used"
                 else return (PlangAST title label
                                       ps
-                                      ((reverse . concat) relations))
+                                      (reverse (concat relations)))
              <?> "Language Instance"
 
 -- ---------------------------------------------------- [ Language Declaration ]
@@ -59,7 +59,7 @@ parseMetadata = do reserved sifKWordLang
 parseImports :: Parser PatternsExpr
 parseImports = do is <- liftM concat $ many1 parseImport
                   if canNub (map ident is)
-                  then fail $ "Duplicate import specified"
+                  then fail "Duplicate import specified"
                   else putState is
                   return is
                <?> "Imports"
@@ -145,12 +145,10 @@ parseRelationM :: Parser RelationsExpr
 parseRelationM = do (from, typ) <- parseRelationFrom 
                     tos <- parseIDListB
                     ps <- getState
-                    let rs = if any (\p -> notElem (ident p) tos) ps
-                             then fail $ "Unknown Identity used"
-                             else map (\to -> mkRelationExpr from to typ Nothing) tos
-                    return rs
+                    if all (\p -> ident p `elem` tos) ps
+                    then fail "Unknown Identity used"
+                    else return $ map (\to -> mkRelationExpr from to typ Nothing) tos
               <?> "1-2-Many Relation"
-
 
 -- -------------------------------------- [ Functions for 1-1 Relation Parsing ]
 
