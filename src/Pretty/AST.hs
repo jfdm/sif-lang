@@ -1,5 +1,8 @@
 -- | A pretty printing function for the AST
-module Pretty.AST (prettyPlangAST) where
+module Pretty.AST
+    (
+     prettyPlangAST
+    ) where
 
 import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
@@ -75,22 +78,22 @@ prettyPatterns ps = vsep $ map prettyPattern ps
 -- | Prettify a Pattern
 prettyPattern :: PatternExpr -> Doc
 prettyPattern p = text (ident p)
-                  <+> text sifOpAssignment
-                  <+> text mod
-                  <+> t
-                  <+> text sifKWordTypPat
+                  <+> string sifOpAssignment
+                  <+> string mod
+                  <+> string ptype
+                  <+> string sifKWordTypPat
                   <> parens (dquotes (string (fromMaybe "" (name p))))
                   where
                     mod = case modifier p of
                             TyModAbstract -> sifKWordTypModAbs
                             TyModConcrete -> sifKWordTypModConc
-                    t = case ptype p of 
-                              TyComponent      -> text sifKWordTypComp
-                              TySystem         -> text sifKWordTypSys
-                              TyDeployment     -> text sifKWordTypDeplo
-                              TyAdmin          -> text sifKWordTypAdmin
-                              TyImplementation -> text sifKWordTypImpl
-                              TyPattern        -> empty
+                    ptype = case typ p of 
+                              TyComponent      -> sifKWordTypComp
+                              TyPattern        -> sifKWordTypPat
+                              TySystem         -> sifKWordTypSys
+                              TyDeployment     -> sifKWordTypDeplo
+                              TyAdmin          -> sifKWordTypAdmin
+                              TyImplementation -> sifKWordTypImpl
 
 -- --------------------------------------------------------------- [ Relations ]
 
@@ -101,14 +104,14 @@ prettyRelations rs = vsep $ map prettyRelation (reverse rs)
 
 -- | Prettify a list of relations
 prettyRelation :: RelationExpr -> Doc
-prettyRelation rel = text (from rel)
-                     <+> text rtyp
-                     <+> text (to rel)
+prettyRelation rel = string (from rel)
+                     <+> string rtyp
+                     <+> string (to rel)
                      <+> descrip
                      where
                        descrip = if isNothing (desc rel)
                                  then empty
-                                 else colon <+> text (fromJust (desc rel))
+                                 else colon <+> string (fromJust (desc rel))
                        rtyp = case rtype rel of
                                  TyAssociation    -> sifOpAssociation
                                  TySpecialisation -> sifOpSpecialisation
