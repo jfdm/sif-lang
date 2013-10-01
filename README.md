@@ -28,7 +28,8 @@ Supplied alongside with the sif specification is the Sif
 _Runtime_. The runtime is actually a model checking and translation
 tool. The model checker checks a Sif file for both syntaxtic and
 semantic correctness. The translation tool translate a Sif file to an
-output language. Currently only the Dot language is supported.
+output language. Currently only the Dot language is supported,
+alongside an identity transformer.
 
 ## Repository Contents
 
@@ -45,7 +46,7 @@ output language. Currently only the Dot language is supported.
         2. The Emacs text editor.
         3. Snippets for the Yasnippet Emacs package.
 + __src__
-    + This folder contains the sif model checker.
+    + This folder contains the sif model/type checker.
 + __Branch Information__
     + Sif-lang has been built upon a GIT repository. The GIT
       repository allows us to track the development of

@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                sif
-version:             0.1.0.0
+version:             2013.10.01
 cabal-version:       >=1.8
 synopsis:            A Typed Specification Language for Software System Pattern Languages
 -- description:         

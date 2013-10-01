@@ -1,15 +1,21 @@
-# _*_ mode: org _*_
-#+TITLE: ChangeLog	
+#+TITLE: ChangeLog
 
+* v2013.09.04 to v2013.10.01
+** User Visible Changes
++ Added proper Transformer Support to Dot and Sif langs.
++ Added rudimentary CLI.
+** Internal Changes
++ Improved Cabal build system
++ Rewrote Type Checker
++ Updated necessary files.
+** Misc Changes
++ Updated specification
 * v2013.08.20a to v2013.09.04
-
 ** User Visible Changes
 + Resulting graph has pretty formatting.
-
 ** Internal Changes
 + New Stateful parser to provide basic semantic checks
 + Pretty Printer.
-
 ** Misc Changes
 + Addition of proper software project build tooling.
   + Changelog
