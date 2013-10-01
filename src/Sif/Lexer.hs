@@ -1,5 +1,5 @@
 -- | The Lexer
-module Lexer where
+module Sif.Lexer where
 
 import Control.Monad (void)
 import Text.Parsec
@@ -7,8 +7,8 @@ import Text.Parsec.String (GenParser)
 import qualified Text.Parsec.Token as Tok
 import Text.Parsec.Language (haskellStyle)
 
-import Keywords
-import AST
+import Sif.Keywords
+import Sif.AST
 
 type Parser a = GenParser Char PatternsExpr a
 -- ----------------------------------------------------- [ Define Token Parser ]

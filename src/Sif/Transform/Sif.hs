@@ -2,16 +2,16 @@
 -- Sif input format.
 -- 
 -- Notably all lists and imports will be flattened.
-module Transform.Sif ( plang2Sif, extSif ) where
+module Sif.Transform.Sif ( plang2Sif, extSif ) where
 
 import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
 import Data.List
 import Data.Function
 
-import Model
-import Types
-import Keywords
+import Sif.Model
+import Sif.Types
+import Sif.Keywords
 
 -- | File extension
 extSif = ".sif"

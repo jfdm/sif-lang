@@ -1,5 +1,5 @@
 -- | Types in our Sif Lang
-module Types where
+module Sif.Types where
 
 -- ----------------------------------------------------- [ Pattern Definitions ]
 

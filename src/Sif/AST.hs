@@ -1,10 +1,10 @@
 -- | The AST for the Sif Language.
-module AST where
+module Sif.AST where
 
 import Data.Maybe
 import Data.List
 
-import Types
+import Sif.Types
 
 -- -------------------------------------------------------- [ Pattern Language ]
 data PlangAST = PlangAST {
@@ -39,7 +39,7 @@ mkImportPatternExpr id origin = PatternExpr (Just id) id (Just origin) TyPattern
 
 -- | Make a pattern
 mkPatternExpr :: ID -> Maybe String -> TyGenPattern -> TyModifier -> PatternExpr
-mkPatternExpr id title typ mod = PatternExpr title id Nothing typ mod
+mkPatternExpr id title = PatternExpr title id Nothing
 
 -- --------------------------------------------------------------- [ Relations ]
 
@@ -55,7 +55,7 @@ data RelationExpr = RelationExpr {
 
 -- | Make a relation 
 mkRelationExpr :: ID -> ID -> TyRelation -> Maybe String -> RelationExpr
-mkRelationExpr from to typ desc = RelationExpr from to typ desc
+mkRelationExpr = RelationExpr
 
 -- -------------------------------------------------------- [ Accessor Methods ]
 -- | Get Pattern
@@ -64,12 +64,10 @@ getPattern id [] = Nothing
 getPattern id ps = find (\x -> ident x == id) ps
 
 canNub :: Eq a => [a] -> Bool
-canNub xs = if isNothing check
-            then False
-            else True
+canNub xs = isJust check
             where
               check = find (\x -> length x > 1) xs'
-              xs' = map (\x -> elemIndices x xs) xs
+              xs' = map (`elemIndices` xs) xs
 
   
 -- --------------------------------------------------------------------- [ EOF ]

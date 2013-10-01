@@ -1,5 +1,5 @@
 -- | The parser.
-module Parser (parseSif) where
+module Sif.Parser (parseSif) where
 
 import Control.Applicative hiding ((<|>), many)
 import Control.Monad
@@ -8,10 +8,10 @@ import Text.Parsec
 import Data.Maybe
 import Data.List
 
-import Lexer
-import Keywords
-import AST
-import Types
+import Sif.Lexer
+import Sif.Keywords
+import Sif.AST
+import Sif.Types
 
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 

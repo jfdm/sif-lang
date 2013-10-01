@@ -1,14 +1,14 @@
 -- | Transform the Pattern Language into a Dot representation.
-module Transform.Dot (plang2Dot, extDot) where
+module Sif.Transform.Dot (plang2Dot, extDot) where
 
 import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
 import Data.List
 import Data.Function
 
-import Model
-import Types
-import Keywords
+import Sif.Model
+import Sif.Types
+import Sif.Keywords
 
 -- | File extension
 extDot = ".dot"
@@ -71,7 +71,7 @@ genModifierStyle m = case m of
                        TyModAbstract -> genStyle' "dashed"
                        TyModConcrete -> genStyle' "solid"
                      where
-                       genStyle' style = genStylePair "style" style
+                       genStyle' = genStylePair "style"
 
 -- --------------------------------------------------------------- [ Relations ]
 
@@ -114,6 +114,6 @@ genStylePair :: String -> String -> Doc
 genStylePair k v = text k <> equals <> dquotes (text v)
 
 genLabel :: String -> Doc
-genLabel l = genStylePair "label" l
+genLabel = genStylePair "label"
 
 -- --------------------------------------------------------------------- [ EOF ]

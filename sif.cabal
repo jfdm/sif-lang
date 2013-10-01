@@ -18,6 +18,14 @@ build-type:          Simple
 executable          sif
   main-is:             Main.hs
   hs-Source-Dirs:      src            
---  other-modules:     
-  build-depends:       base ==4.6.*, parsec ==3.1.*, wl-pprint ==1.1.*, containers
-  ghc-options:         -XDoAndIfThenElse
+  other-modules:       Sif.AST,
+                       Sif.Keywords,
+                       Sif.Lexer,
+                       Sif.Model,
+                       Sif.Parser,
+                       Sif.Transform,
+                       Sif.Transform.Dot,
+                       Sif.Transform.Sif,
+                       Sif.Util.PrettyAST
+  build-depends:       base ==4.6.*, parsec ==3.1.*, wl-pprint ==1.1.*, cmdargs ==0.10.5, containers 
+  extensions:          DoAndIfThenElse

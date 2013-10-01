@@ -1,5 +1,5 @@
 -- | Sif Keywords
-module Keywords where
+module Sif.Keywords where
 
 import Data.List
 

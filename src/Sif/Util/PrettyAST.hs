@@ -1,14 +1,14 @@
 -- | A pretty printing function for the AST
-module Util.PrettyAST ( prettyPlangAST ) where
+module Sif.Util.PrettyAST ( prettyPlangAST ) where
 
 import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
 import Data.List
 import Data.Function
 
-import AST
-import Types
-import Keywords
+import Sif.AST
+import Sif.Types
+import Sif.Keywords
 
 -- | A Pretty Printer of our plang AST.
 prettyPlangAST :: PlangAST -> Doc
