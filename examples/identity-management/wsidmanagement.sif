@@ -20,7 +20,7 @@ saml => [cred, abac]
 
 appfwall => xacml
 
-xmlfwall <- appfwal
+xmlfwall <- appfwall
 
 liaf => idfed
 
