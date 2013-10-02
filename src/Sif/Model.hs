@@ -119,8 +119,12 @@ mkAggregate a b desc =
 getPattern :: String -> Patterns -> Pattern
 getPattern id ps = case isNothing res of
                      False -> fromJust res
-                     otherwise -> error "oops"
+                     otherwise -> error $ "Pattern with ID: " ++ id
+                                        ++ " not found"
     where
       res = find (\x -> ident x == id) ps
 
 -- --------------------------------------------------------------------- [ EOF ]
+
+
+

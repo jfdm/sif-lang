@@ -11,6 +11,9 @@ import Sif.Model
 import Sif.Types
 import Sif.Parser
 
+import Debug.Trace
+import Text.Show.Pretty
+
 -- | Do the transformation
 chkPlangSpec :: PlangAST -> Either String PlangSpec
 chkPlangSpec spec = case rs of
@@ -21,11 +24,12 @@ chkPlangSpec spec = case rs of
       lab = AST.label spec
       ps = doPatterns ps'
       is = doImports is'
-      (ps', is') = break (isJust . AST.origin) (AST.patterns spec)
+      (is', ps') =  break (isNothing . AST.origin) (AST.patterns spec)
       rs = doRelations (AST.relations spec) (ps ++ is)
 
 -- ----------------------------------------------------------------- [ Imports ]
--- | Deal with imports.
+-- | Identifiy the differnent imported namespaces and convert each
+-- group.
 doImports :: PatternsExpr -> Patterns
 doImports [] = []
 doImports is = concatMap getImportGroups groups
@@ -33,9 +37,19 @@ doImports is = concatMap getImportGroups groups
       groups = groupBy groupImports is
       groupImports x y = AST.origin x == AST.origin y
 
--- @TODO
+-- | Convert each pattern in the group of imports
 getImportGroups :: PatternsExpr -> Patterns
-getImportGroups is = []
+getImportGroups [] = []
+getImportGroups is = map genImpPattern is
+
+
+genImpPattern :: PatternExpr -> Pattern
+genImpPattern i = mkImpPattern (AST.name     i)
+                               (AST.ident    i)
+                               (AST.origin   i)
+                               (AST.modifier i)
+                               (AST.ptype    i)
+-- Plan for dealing with imports
 -- 1. Locate plang specification
 -- 2. Read in spec
 -- 3. Extract imported Pattern.
@@ -43,7 +57,7 @@ getImportGroups is = []
 -- ---------------------------------------------------------------- [ Patterns ]
 -- | Deal with patterns
 doPatterns :: PatternsExpr -> Patterns
-doPatterns = map genPattern
+doPatterns ps = map genPattern ps
 
 -- | Deal with a pattern
 genPattern :: PatternExpr -> Pattern

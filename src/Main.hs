@@ -29,7 +29,7 @@ main = do
            else id) $ cmdArgs sifOptions
 
   contents <- readFile $ file opts
-  putStrLn "Caveat: Imports are not checked for now. Sorry!"
+  putStrLn "Caveat: Imports are not properly checked for now. Sorry!"
   putStrLn $ "Using file: " ++ file opts ++ "\n"
 
   -- Parse The File
@@ -37,7 +37,7 @@ main = do
   case parseSif contents of
     Left err -> do
          putStrLn $ file opts ++ " failed to parse."
-         print $ show err
+         print err
          exitWith (ExitFailure 1)
     Right ast' -> do
          if not (ast opts)
