@@ -5,7 +5,12 @@ module Main (main) where
 
 import System.Console.CmdArgs
 import System.Environment (getArgs, withArgs)
+import System.IO
+import System.FilePath
 import System.Exit
+
+import Text.Show.Pretty
+import Text.PrettyPrint.Leijen as PP
 
 import qualified Sif.AST as AST
 import qualified Sif.Model as Model
@@ -24,6 +29,7 @@ main = do
            else id) $ cmdArgs sifOptions
 
   contents <- readFile $ file opts
+  putStrLn "Caveat: Imports are not checked for now. Sorry!"
   putStrLn $ "Using file: " ++ file opts ++ "\n"
 
   -- Parse The File
@@ -34,10 +40,15 @@ main = do
          print $ show err
          exitWith (ExitFailure 1)
     Right ast' -> do
-         putStrLn $ case ast opts of
-                      True -> show ast'
-                      otherwise -> ""
-
+         if not (ast opts)
+         then putStrLn ""
+         else do
+           let fname = addExtension (file opts) ".ast"
+           writeFile fname (ppShow ast')
+           putStrLn $ "AST for: "
+                                ++ file opts
+                                ++ " has been written in "
+                                ++ fname
          -- Type Check it.
          putStrLn "Converting AST to Model\n"
          case chkPlangSpec ast' of
@@ -50,20 +61,32 @@ main = do
                               ++ show (Model.title res)
                               ++ " " 
                               ++ "type checks"
-                   case model opts of
-                     True -> print res
-                     otherwise -> putStrLn ""
-                      
+                   if not (model opts)
+                   then putStrLn ""
+                   else do
+                     let fname = addExtension (file opts) ".model"
+                     writeFile fname (ppShow res)
+                     putStrLn $ "Model for: "
+                                ++ file opts
+                                ++ " has been written in "
+                                ++ fname
                    -- If requested print the transformation
-                   -- Dirty Dirty Code that needs re doing.
-                   case to opts of
-                     "dot"     -> print $ plang2Dot res
-                     "sif"     -> print $ plang2Sif res
-                     ""        -> putStrLn ""
-                     otherwise -> error "Unsupported Format"
-         
-                   putStrLn "Caveat: Imports are not checked for now. Sorry!"
-
+                   if null $ to opts
+                   then exitSuccess
+                   else do
+                     case transformPlang (to opts) res of
+                       Left err -> do
+                                  putStrLn err
+                                  exitWith (ExitFailure 1)
+                       Right (ext, doc) -> do
+                                  let fname = addExtension (file opts) ext
+                                  handle <- openFile fname WriteMode
+                                  hPutDoc handle doc
+                                  hClose handle
+                                  putStrLn $ "File: "
+                                             ++ fname
+                                             ++ " has been written."
+                     exitSuccess
 
 -- ----------------------------------------------------------------- [ Options ]
 
@@ -95,6 +118,14 @@ sifOptions = SifOptions {
              }
              &= summary "Sif (C) Jan de Muijnck-Hughes 2013"
              &= program "sif"
-             &= details ["Sif is a Statically typed DSL for the specification of software system pattern languages. The Sif binary provides both a type-checker and transformation tool for Sif instances.", "", "The type-checker checks a Sif instance for both syntaxtic and semantic correctness. Please consult the specification for the typing rules.", "", "The transformation aspect allows for well typed Sif files to be convert into an alternate format. Supported transformations are: Dot and Sif.", "Caveat: Imports are not checked for now. Sorry!"]
+             &= details ["Sif is a Statically typed DSL for the specification of software system pattern languages. " ++
+                         "The Sif binary provides both a type-checker and transformation tool for Sif instances.",
+                         "",
+                         "The type-checker checks a Sif instance for both syntaxtic and semantic correctness. " ++
+                         "Please consult the specification for the typing rules.",
+                         "",
+                         "The transformation aspect allows for well typed Sif files to be convert into an alternate format. " ++
+                         "Supported transformations are: Dot and Sif.", "Caveat: Imports are not checked for now. Sorry!"
+                        ]
 
 -- --------------------------------------------------------------------- [ EOF ]

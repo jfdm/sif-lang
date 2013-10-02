@@ -26,5 +26,5 @@ executable          sif
                        Sif.Transform.Dot,
                        Sif.Transform.Sif,
                        Sif.Util.PrettyAST
-  build-depends:       base ==4.6.*, parsec ==3.1.*, wl-pprint ==1.1.*, cmdargs ==0.10.5, containers 
+  build-depends:       base ==4.6.*, parsec ==3.1.*, wl-pprint ==1.1.*, cmdargs ==0.10.5, filepath, pretty-show, containers 
   extensions:          DoAndIfThenElse

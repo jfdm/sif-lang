@@ -1,5 +1,5 @@
 -- | Transform the Pattern Language into a Dot representation.
-module Sif.Transform.Dot (plang2Dot, extDot) where
+module Sif.Transform.Dot (plang2Dot, extDot, fmtDot) where
 
 import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
@@ -11,6 +11,7 @@ import Sif.Types
 import Sif.Keywords
 
 -- | File extension
+fmtDot = "dot"
 extDot = ".dot"
 
 -- | Transform a Pattern Language into it's Dot equivalent
@@ -18,6 +19,7 @@ plang2Dot :: PlangSpec -> Doc
 plang2Dot plang = text "digraph" <+> text "G" <+> lbrace
                   <$$> indent 4 (vcat [ibody, pbody, rbody])
                   <$$> rbrace
+                  <$$> empty
                   where
                     ibody = imports2Dot (imports plang)     <$$> empty
                     pbody = patterns2Dot (patterns plang)   <$$> empty

@@ -2,7 +2,7 @@
 -- Sif input format.
 -- 
 -- Notably all lists and imports will be flattened.
-module Sif.Transform.Sif ( plang2Sif, extSif ) where
+module Sif.Transform.Sif ( plang2Sif, extSif, fmtSif ) where
 
 import Text.PrettyPrint.Leijen as PP
 import Data.Maybe
@@ -14,6 +14,7 @@ import Sif.Types
 import Sif.Keywords
 
 -- | File extension
+fmtSif = "sif"
 extSif = ".sif"
 
 -- | Transform a Pattern Language into it's Sif equivalent
@@ -29,6 +30,7 @@ plang2Sif plang = prettyMetadata (title plang) (label plang)
                   <$$> string sifKWordRelation
                   <$$> empty
                   <$$> prettyRelations (relations plang)
+                  <$$> empty
                   where                         
                     is = imports plang
                     ps = patterns plang
