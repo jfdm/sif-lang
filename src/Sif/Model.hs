@@ -110,6 +110,7 @@ mkAggregate a b desc =
       (TySystem, TyAdmin)                  -> Right res
       (TySystem, TyPattern)                -> Right res
       (TyImplementation, TyImplementation) -> Right res
+      (TyPattern, TyPattern)               -> Right res
       otherwise                            -> Left $ error "Invalid Aggregation"
     where
       res = Relation TyAggregation a b desc
