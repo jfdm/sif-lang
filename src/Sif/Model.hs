@@ -2,6 +2,7 @@
 module Sif.Model where
 
 import Data.Maybe
+import Data.List
 
 import Sif.Types
 
@@ -26,14 +27,14 @@ data Pattern = Pattern {
       ptype     :: TyGenPattern  -- ^ Type of pattern.
     } deriving (Show)
 
-type Patterns = [(String, Pattern)]
+type Patterns = [Pattern]
 
 -- | Definition of a relation between two patterns
 data Relation = Relation {
-      rtype :: TyRelation,  -- ^ The type of relation
-      from  :: String,      -- ^ Identifier of the originator
-      to    :: String,      -- ^ Identifier of the recipient
-      desc  :: Maybe String -- ^ A description if provided.
+      rtype :: TyRelation,   -- ^ The type of relation
+      from  :: Pattern,      -- ^ Identifier of the originator
+      to    :: Pattern,      -- ^ Identifier of the recipient
+      desc  :: Maybe String  -- ^ A description if provided.
     } deriving (Show)
 
 type Relations = [Relation]
@@ -57,54 +58,68 @@ mkImpPattern :: Maybe String -- ^ name
 mkImpPattern = Pattern
 
 -- | Create an association between two patterns.
-mkAssociates :: PatternItem -> PatternItem -> Maybe String -> Relation
-mkAssociates (x, _) (y, _) = Relation TyAssociation x y
+mkAssociates :: Pattern
+             -> Pattern
+             -> Maybe String
+             -> Either String Relation
+mkAssociates x y desc = Right $ Relation TyAssociation x y desc
 
 -- | Define a specialisation relation between two patterns.
-mkSpecial :: PatternItem -> PatternItem -> Maybe String -> Relation
-mkSpecial (x, a) (y, b) desc =
+mkSpecial :: Pattern
+          -> Pattern
+          -> Maybe String
+          -> Either String Relation
+mkSpecial a b desc =
     case (ptype a, ptype b) of
-      (TyDeployment, TySystem)   -> res
-      (TyComponent, TyComponent) -> res
-      (TyComponent, TyPattern)   -> res
-      (TyPattern, TyPattern)     -> res
-      otherwise                  -> error "Invalid Specialisation"
+      (TySystem, TySystem)       -> Right res
+      (TyDeployment, TySystem)   -> Right res
+      (TyComponent, TyComponent) -> Right res
+      (TyComponent, TyPattern)   -> Right res
+      (TyPattern, TyPattern)     -> Right res
+      otherwise                  -> Left $ error "Invalid Specialisation"
     where
-      res = Relation TySpecialisation x y desc
+      res = Relation TySpecialisation a b desc
 
 -- | Define a realisation relation between two patterns.      
-mkRealise :: PatternItem -> PatternItem -> Maybe String -> Relation
-mkRealise (x, a) (y, b) desc =
+mkRealise :: Pattern                 
+          -> Pattern
+          -> Maybe String
+          -> Either String Relation
+mkRealise a b desc =
     case (ptype a, ptype b) of 
-      (TyImplementation, TyComponent) -> res
-      (TyImplementation, TyPattern)   -> res
-      (TyPattern, TyPattern)          -> res
-      otherwise                       -> error "Invalid Realisation"
+      (TyComponent, TyComponent)      -> Right res
+      (TyImplementation, TyComponent) -> Right res
+      (TyImplementation, TyPattern)   -> Right res
+      (TyPattern, TyPattern)          -> Right res
+      otherwise                       -> Left $ error "Invalid Realisation"
     where
-      res = Relation TyRealisation x y desc
+      res = Relation TyRealisation a b desc
 
 -- | Define an aggregation relation between two patterns      
-mkAggregate :: PatternItem -> PatternItem -> Maybe String -> Relation
-mkAggregate (x, a) (y, b) desc =
+mkAggregate :: Pattern
+            -> Pattern
+            -> Maybe String
+            -> Either String Relation
+mkAggregate a b desc =
     case (ptype a, ptype b) of 
-      (TyComponent, TyComponent)           -> res
-      (TyComponent, TyPattern)             -> res
-      (TySystem, TySystem)                 -> res
-      (TySystem, TyDeployment)             -> res
-      (TySystem, TyComponent)              -> res
-      (TySystem, TyAdmin)                  -> res
-      (TySystem, TyPattern)                -> res
-      (TyImplementation, TyImplementation) -> res
-      otherwise                            -> error "Invalid Aggregation"
+      (TyComponent, TyComponent)           -> Right res
+      (TyComponent, TyPattern)             -> Right res
+      (TySystem, TySystem)                 -> Right res
+      (TySystem, TyDeployment)             -> Right res
+      (TySystem, TyComponent)              -> Right res
+      (TySystem, TyAdmin)                  -> Right res
+      (TySystem, TyPattern)                -> Right res
+      (TyImplementation, TyImplementation) -> Right res
+      otherwise                            -> Left $ error "Invalid Aggregation"
     where
-      res = Relation TyAggregation x y desc
+      res = Relation TyAggregation a b desc
 
 -- | Retrieve a pattern from an association list.
-getPattern :: String -> Patterns -> PatternItem
+getPattern :: String -> Patterns -> Pattern
 getPattern id ps = case isNothing res of
-                     False -> (id, fromJust res)
+                     False -> fromJust res
                      otherwise -> error "oops"
     where
-      res = lookup id ps
+      res = find (\x -> ident x == id) ps
 
 -- --------------------------------------------------------------------- [ EOF ]

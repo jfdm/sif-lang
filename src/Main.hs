@@ -5,6 +5,7 @@ module Main (main) where
 
 import System.Console.CmdArgs
 import System.Environment (getArgs, withArgs)
+import System.Exit
 
 import qualified Sif.AST as AST
 import qualified Sif.Model as Model
@@ -26,34 +27,42 @@ main = do
   putStrLn $ "Using file: " ++ file opts ++ "\n"
 
   -- Parse The File
-  let resAST = parseSif contents
-  putStrLn $ "Read in AST for file"
-  putStrLn $ case ast opts of
-               True -> show resAST
-               otherwise -> ""
+  putStrLn "Read in AST for file"
+  case parseSif contents of
+    Left err -> do
+         putStrLn $ file opts ++ " failed to parse."
+         print $ show err
+         exitWith (ExitFailure 1)
+    Right ast' -> do
+         putStrLn $ case ast opts of
+                      True -> show ast'
+                      otherwise -> ""
 
-  -- Type Check it.
-  let resModel = chkPlangSpec resAST
-  putStrLn $ "Converting AST to Model"
-  putStrLn $ case model opts of
-               True -> show resModel
-               otherwise -> ""
-
-  putStrLn $ "Pattern language " ++ show (Model.title resModel) ++ " " ++ "type checks\n"
-
-  -- Dirty Dirty Code that needs re doing.
-
-  -- If requested print the transformation
-  let resTrans = case to opts of
-                   "dot" -> plang2Dot resModel
-                   "sif" -> plang2Sif resModel
-                   otherwise -> error "Unsupported Format"
-
-  case to opts of 
-    "" -> putStrLn ""
-    otherwise -> print resTrans
-
-  putStrLn "Caveat: Imports are not checked for now. Sorry!"
+         -- Type Check it.
+         putStrLn "Converting AST to Model\n"
+         case chkPlangSpec ast' of
+           Left err -> do
+                   putStrLn "Specification does not type check"
+                   print $ show err
+                   exitWith (ExitFailure 1)
+           Right res -> do
+                   putStrLn $ "Pattern language "
+                              ++ show (Model.title res)
+                              ++ " " 
+                              ++ "type checks"
+                   case model opts of
+                     True -> print res
+                     otherwise -> putStrLn ""
+                      
+                   -- If requested print the transformation
+                   -- Dirty Dirty Code that needs re doing.
+                   case to opts of
+                     "dot"     -> print $ plang2Dot res
+                     "sif"     -> print $ plang2Sif res
+                     ""        -> putStrLn ""
+                     otherwise -> error "Unsupported Format"
+         
+                   putStrLn "Caveat: Imports are not checked for now. Sorry!"
 
 
 -- ----------------------------------------------------------------- [ Options ]
@@ -86,5 +95,6 @@ sifOptions = SifOptions {
              }
              &= summary "Sif (C) Jan de Muijnck-Hughes 2013"
              &= program "sif"
+             &= details ["Sif is a Statically typed DSL for the specification of software system pattern languages. The Sif binary provides both a type-checker and transformation tool for Sif instances.", "", "The type-checker checks a Sif instance for both syntaxtic and semantic correctness. Please consult the specification for the typing rules.", "", "The transformation aspect allows for well typed Sif files to be convert into an alternate format. Supported transformations are: Dot and Sif.", "Caveat: Imports are not checked for now. Sorry!"]
 
 -- --------------------------------------------------------------------- [ EOF ]

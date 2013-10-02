@@ -106,10 +106,10 @@ prettyRelation r = text (from r)
                    <+> text (to r)
                    <+> descrip
                    where
-                     descrip = if isNothing (desc rel)
+                     descrip = if isNothing (desc r)
                                then empty
-                               else colon <+> text (fromJust (desc rel))
-                     t = case rtype rel of
+                               else colon <+> text (fromJust (desc r))
+                     t = case rtype r of
                            TyAssociation    ->text sifOpAssociation
                            TySpecialisation ->text sifOpSpecialisation
                            TyRealisation    ->text sifOpRealisation

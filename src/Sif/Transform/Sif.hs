@@ -57,24 +57,25 @@ prettyPatterns :: Patterns -> Doc
 prettyPatterns ps = vsep $ map prettyPattern ps
 
 -- | Prettify a Pattern
-prettyPattern :: PatternItem -> Doc
-prettyPattern (k, v) = text k
-                    <+> text sifOpAssignment
-                    <+> text m
-                    <+> t
-                    <+> text sifKWordTypPat
-                    <> parens (dquotes (string (fromMaybe "" (name v))))
-                    where
-                      m = case modifier v of 
-                            TyModAbstract -> sifKWordTypModAbs
-                            TyModConcrete -> sifKWordTypModConc
-                      t = case ptype v of 
-                            TyComponent      -> text sifKWordTypComp
-                            TySystem         -> text sifKWordTypSys
-                            TyDeployment     -> text sifKWordTypDeplo
-                            TyAdmin          -> text sifKWordTypAdmin
-                            TyImplementation -> text sifKWordTypImpl
-                            TyPattern        -> empty
+prettyPattern :: Pattern -> Doc
+prettyPattern p = text id
+                  <+> text sifOpAssignment
+                  <+> text m
+                  <+> t
+                  <+> text sifKWordTypPat
+                  <> parens (dquotes (string (fromMaybe "" (name p))))
+                  where
+                    id = ident p
+                    m = case modifier p of 
+                          TyModAbstract -> sifKWordTypModAbs
+                          TyModConcrete -> sifKWordTypModConc
+                    t = case ptype p of 
+                          TyComponent      -> text sifKWordTypComp
+                          TySystem         -> text sifKWordTypSys
+                          TyDeployment     -> text sifKWordTypDeplo
+                          TyAdmin          -> text sifKWordTypAdmin
+                          TyImplementation -> text sifKWordTypImpl
+                          TyPattern        -> empty
 
 -- --------------------------------------------------------------- [ Relations ]
 
@@ -84,9 +85,9 @@ prettyRelations rs = vsep $ map prettyRelation rs
 
 -- | Prettify Relation
 prettyRelation :: Relation -> Doc
-prettyRelation r = text (from r)
+prettyRelation r = text ((ident . from) r)
                    <+> text rtyp
-                   <+> text (to r)
+                   <+> text ((ident . to) r)
                    <+> descrip
                    where
                      descrip = if isNothing (desc r)

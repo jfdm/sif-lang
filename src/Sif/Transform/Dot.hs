@@ -41,14 +41,16 @@ patterns2Dot :: Patterns -> Doc
 patterns2Dot ps = vsep $ map pattern2Dot ps
 
 -- | Dottify the pattern.
-pattern2Dot :: PatternItem -> Doc
-pattern2Dot (k, v) = text k <+>
-                     genPatternStyle v k <>
-                     semi
+pattern2Dot :: Pattern -> Doc
+pattern2Dot p = text id <+>
+                genPatternStyle id p <>
+                semi
+                where
+                  id = ident p
 
 -- | Generate the pattern style
-genPatternStyle :: Pattern -> String -> Doc
-genPatternStyle p id = genStyle [genPatternShape (ptype p),       -- Shape 
+genPatternStyle :: String -> Pattern -> Doc
+genPatternStyle id p = genStyle [genPatternShape (ptype p),       -- Shape 
                                  genModifierStyle (modifier p),   -- Line
                                  genLabel (fromMaybe id (name p)) -- Label 
                                 ]
@@ -80,9 +82,9 @@ relations2Dot :: Relations -> Doc
 relations2Dot rs = vsep $ map relation2Dot rs
 
 relation2Dot :: Relation -> Doc
-relation2Dot r = text (from r)
+relation2Dot r = text ((ident . from) r)
                  <+> text "->"
-                 <+> text (to r)
+                 <+> text ((ident . to) r)
                  <+> genRelationStyle (rtype r) (desc r)
                  <> semi
 

@@ -16,11 +16,8 @@ import Sif.Types
 -- ------------------------------------------- [ Pattern Language Model Parser ]
 
 -- | Parses a Sif Spec file into the corresponding AST
-parseSif :: String -> PlangAST
-parseSif fname =
-    case runParser (runLex parsePlang) [] "" fname of
-      Left err -> error (show err)
-      Right ast -> ast
+parseSif :: String -> Either ParseError PlangAST
+parseSif fname = runParser (runLex parsePlang) [] "" fname
 
 -- | Definition for a pattern language
 -- parsePlang ::= parseMetadata parseImports? parsePattern+ parseRelation*;

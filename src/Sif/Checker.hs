@@ -12,8 +12,10 @@ import Sif.Types
 import Sif.Parser
 
 -- | Do the transformation
-chkPlangSpec :: PlangAST -> PlangSpec
-chkPlangSpec spec = PlangSpec tit lab is ps rs
+chkPlangSpec :: PlangAST -> Either String PlangSpec
+chkPlangSpec spec = case rs of
+                      Left err  -> Left err
+                      Right rs' -> Right $ PlangSpec tit lab is ps rs'
     where
       tit = AST.title spec
       lab = AST.label spec
@@ -44,24 +46,22 @@ doPatterns :: PatternsExpr -> Patterns
 doPatterns = map genPattern
 
 -- | Deal with a pattern
-genPattern :: PatternExpr -> PatternItem
-genPattern p = (id, newP)
-               where
-                 id = AST.ident p
-                 newP = mkPattern (AST.name p) (AST.ident p) (AST.modifier p) (AST.ptype p)
+genPattern :: PatternExpr -> Pattern
+genPattern p = mkPattern (AST.name p) (AST.ident p) (AST.modifier p) (AST.ptype p)
 
 -- --------------------------------------------------------------- [ Relations ]
 -- | Deal with relations
-doRelations :: RelationsExpr -> Patterns -> Relations
-doRelations rs ps = reverse $ map (`genRelation` ps) rs
+-- remember to reverse
+doRelations :: RelationsExpr -> Patterns -> Either String Relations
+doRelations rs ps = sequence (map (`genRelation` ps) (reverse rs))
 
 -- | Deal with a relation
-genRelation :: RelationExpr -> Patterns -> Relation
+genRelation :: RelationExpr -> Patterns -> Either String Relation
 genRelation r ps = case AST.rtype r of
                      TyAssociation    -> mkAssociates x y desc
-                     TySpecialisation -> mkSpecial x y desc
-                     TyAggregation    -> mkAggregate x y desc
-                     TyRealisation    -> mkRealise x y desc
+                     TySpecialisation -> mkSpecial    x y desc
+                     TyAggregation    -> mkAggregate  x y desc
+                     TyRealisation    -> mkRealise    x y desc
                    where
                      desc = AST.desc r
                      x = getPattern (AST.from r) ps
