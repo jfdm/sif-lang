@@ -1,5 +1,16 @@
 #+TITLE: ChangeLog
 
+* v2013.10.1 to v2013.10.2
+** User Visible Changes
++ Added new typing rules
++ Added file IO to Main.hs
+** Internal Changes
++ Added idiomatic error handling using Either
++ Tidied up main to be more idiomatic
++ stopped used of association lists; relations have pointers to patterns and do not use ID's
++ Removed redundant code as a result of dropping association lists
++ Improved the parser error handling and moved it to Main.
++ Improved transformation code
 * v2013.09.04 to v2013.10.01
 ** User Visible Changes
 + Added proper Transformer Support to Dot and Sif langs.
