@@ -18,19 +18,19 @@ ssa    := Pattern("Secrecy with Signature with Appendix")
 
 relations
 
-infosec	   uses p1
-senderauth uses p1 
-sig	       uses p1 
-msgint	   uses p1
+infosec	   linkedTo p1
+senderauth linkedTo p1 
+sig	       linkedTo p1 
+msgint	   linkedTo p1
 
-swa    uses [ infosec, senderauth ]
-sws	   uses [ infosec, sig ]
-sigapp uses [ senderauth, msgint ]
+swa    linkedTo [ infosec, senderauth ]
+sws	   linkedTo [ infosec, sig ]
+sigapp linkedTo [ senderauth, msgint ]
 
-swi	   uses infosec
-swi	   uses msgint
-ssa	   uses sws
-ssa	   uses sigapp
+swi	   linkedTo infosec
+swi	   linkedTo msgint
+ssa	   linkedTo sws
+ssa	   linkedTo sigapp
 
 -- Braga, A., Rubira, C., and Dahab, R. 1998. Tropyc: A pattern
 -- language for cryptographic object-oriented software. Chapter 16 in
