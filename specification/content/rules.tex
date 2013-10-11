@@ -58,8 +58,8 @@
 \subsection{Association}
 
 \begin{prooftree}
-\AxiomC{$\Gamma\vdash ptype_{1} : Implementation$}
-\AxiomC{$\Gamma\vdash ptype_{2} : Component$}
+\AxiomC{$\Gamma\vdash ptype_{1} : GenPattern$}
+\AxiomC{$\Gamma\vdash ptype_{2} : GenPattern$}
 \AxiomC{$\Gamma\vdash x : ptype_{1}\quad\quad \Gamma\vdash y : ptype_{2}$}
 \TrinaryInfC{$\Gamma\vdash x\;\mathtt{linkedTo}\; y : Association $}
 \end{prooftree}
