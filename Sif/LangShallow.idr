@@ -52,9 +52,9 @@ using (G : List LTy, G' : List LTy)
 
   Value : LTy -> Type
   Value LANG        = GModel MODEL
-  Value (PATTERN _) = GModel MODEL -- @TODO Replace with Actors...
-  Value PNODE       = GModel MODEL
-  Value RELATION    = GModel MODEL
+  Value (PATTERN _) = GModel ELEM
+  Value PNODE       = GModel ELEM
+  Value RELATION    = GModel LINK
   Value AFFECT      = GModel LINK
   Value REQUIREMENT = GModel ELEM
 
@@ -69,29 +69,32 @@ using (G : List LTy, G' : List LTy)
     Performance    : String -> Expr G REQUIREMENT
     Supportability : String -> Expr G REQUIREMENT
 
-    Component : List (Expr G REQUIREMENT) -> List (Expr G AFFECT) -> Expr G (PATTERN COMPONENT)
-    System    : List (Expr G REQUIREMENT) -> List (Expr G AFFECT) -> Expr G (PATTERN SYSTEM)
-    Generic   : List (Expr G REQUIREMENT) -> List (Expr G AFFECT) -> Expr G (PATTERN GENERIC)
-    Deploy    : List (Expr G REQUIREMENT) -> List (Expr G AFFECT) -> Expr G (PATTERN DEPLOY)
-    Admin     : List (Expr G REQUIREMENT) -> List (Expr G AFFECT) -> Expr G (PATTERN ADMIN)
-    Code      : List (Expr G REQUIREMENT) -> List (Expr G AFFECT) -> Expr G (PATTERN CODE)
+    Component : String -> Expr G (PATTERN COMPONENT)
+    System    : String -> Expr G (PATTERN SYSTEM)
+    Generic   : String -> Expr G (PATTERN GENERIC)
+    Deploy    : String -> Expr G (PATTERN DEPLOY)
+    Admin     : String -> Expr G (PATTERN ADMIN)
+    Code      : String -> Expr G (PATTERN CODE)
 
-    Effects  : Expr G REQUIREMENT -> Contrib -> Expr G REQUIREMENT -> Expr G AFFECT
-    Impacts  : Expr G REQUIREMENT -> Contrib -> Expr G REQUIREMENT -> Expr G AFFECT
+    Effects  : Expr G (PATTERN ty) -> Contrib -> Expr G REQUIREMENT -> Expr G AFFECT
+    Impacts  : Expr G (PATTERN ty) -> Contrib -> Expr G REQUIREMENT -> Expr G AFFECT
 
-    LinkedTo    : Expr G (PATTERN x)-> Expr G (PATTERN y) -> Expr G RELATION
-    Implements  : Expr G (PATTERN x)-> Expr G (PATTERN y) -> {auto prf : ValidR x y} -> Expr G RELATION
-    Uses        : Expr G (PATTERN x)-> Expr G (PATTERN y) -> {auto prf : ValidU x y} -> Expr G RELATION
-    Specialises : Expr G (PATTERN x)-> Expr G (PATTERN y) -> {auto prf : ValidI x y} -> Expr G RELATION
+    LinkedTo    : Expr G (PATTERN x) -> Expr G (PATTERN y) -> Expr G RELATION
+    Implements  : Expr G (PATTERN x) -> Expr G (PATTERN y) -> {auto prf : ValidR x y} -> Expr G RELATION
+    Uses        : Expr G (PATTERN x) -> Expr G (PATTERN y) -> {auto prf : ValidU x y} -> Expr G RELATION
+    Specialises : Expr G (PATTERN x) -> Expr G (PATTERN y) -> {auto prf : ValidI x y} -> Expr G RELATION
 
-    MkPattern : Expr G (PATTERN x) -> Expr G PNODE
+    MkNode : Expr G (PATTERN x) -> Expr G PNODE
 
-    Lang : List (Expr G PNODE) -> List (Expr G RELATION) -> Expr G LANG
+    MkLang : List (Expr G REQUIREMENT)
+          -> List (Expr G PNODE)
+          -> List (Expr G AFFECT)
+          -> List (Expr G RELATION)
+          -> Expr G LANG
 
 -- ------------------------------------------------------ [ Control Constructs ]
     Let    : Expr G t -> Expr (t::G) t' -> Expr G t'
     Bind   : Expr G a -> Expr G b -> Expr G b
---    Return : Value t -> Expr G t
 
 -- ------------------------------------------------------------------ [ Memory ]
 
@@ -101,7 +104,6 @@ using (G : List LTy, G' : List LTy)
 
   instance Default (Env Nil) where
     default = []
-
 
   read : HasType G t -> Env G -> Value t
   read Here      (val :: store) = val
@@ -131,9 +133,6 @@ using (G : List LTy, G' : List LTy)
   (>>=) : Expr G a -> (() -> Expr G b) -> Expr G b
   (>>=) a b = Bind a (b ())
 
-  -- return : Value a -> Expr G a
-  -- return val = Return val
-
   syntax "PLang" = {G : List LTy} -> Expr G LANG
   syntax "Pattern" [x] = {G : List LTy} -> Expr G (PATTERN x)
 
@@ -150,26 +149,28 @@ using (G : List LTy, G' : List LTy)
   compile (Effects a c b) = pure $ Effects c !(compile a) !(compile b)
   compile (Impacts a c b) = pure $ Impacts c !(compile a) !(compile b)
 
-  compile (Component rs as) = pure $ GRLSpec !(mapE (compile) rs) !(mapE (compile) as)
-  compile (System    rs as) = pure $ GRLSpec !(mapE (compile) rs) !(mapE (compile) as)
-  compile (Generic   rs as) = pure $ GRLSpec !(mapE (compile) rs) !(mapE (compile) as)
-  compile (Deploy    rs as) = pure $ GRLSpec !(mapE (compile) rs) !(mapE (compile) as)
-  compile (Admin     rs as) = pure $ GRLSpec !(mapE (compile) rs) !(mapE (compile) as)
-  compile (Code      rs as) = pure $ GRLSpec !(mapE (compile) rs) !(mapE (compile) as)
+  compile (Component n) = pure $ Task (Just n) UNKNOWN
+  compile (System    n) = pure $ Task (Just n) UNKNOWN
+  compile (Generic   n) = pure $ Task (Just n) UNKNOWN
+  compile (Deploy    n) = pure $ Task (Just n) UNKNOWN
+  compile (Admin     n) = pure $ Task (Just n) UNKNOWN
+  compile (Code      n) = pure $ Task (Just n) UNKNOWN
 
-  compile (MkPattern p) = compile p
+  compile (MkNode p) = compile p
 
-  compile (Implements  a b) = pure $ combineGRLs !(compile a) !(compile b)
-  compile (LinkedTo    a b) = pure $ combineGRLs !(compile a) !(compile b)
-  compile (Uses        a b) = pure $ combineGRLs !(compile a) !(compile b)
-  compile (Specialises a b) = pure $ combineGRLs !(compile a) !(compile b)
+  -- unless rs are folded potential bottle neck later on.
+  compile (Implements  a b) = pure $ AND !(compile a) [!(compile b)]
+  compile (LinkedTo    a b) = pure $ AND !(compile a) [!(compile b)]
+  compile (Uses        a b) = pure $ AND !(compile a) [!(compile b)]
+  compile (Specialises a b) = pure $ AND !(compile a) [!(compile b)]
 
-  compile (Lang ps rs) = do
+  compile (MkLang fs ps as rs) = do
+      fs' <- mapE (compile) fs
       ps' <- mapE (compile) ps
+      as' <- mapE (compile) as
       rs' <- mapE (compile) rs
-      pure $ foldGRLS (GRLSpec Nil Nil) (ps' ++ rs')
+      pure $ GRLSpec (fs' ++ ps') (as' ++ rs')
 
---  compile (Return res) = pure $ res
   compile (Let expr body) = do
     val <- compile expr
     updateM (\xs => alloc val xs)

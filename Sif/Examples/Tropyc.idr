@@ -3,6 +3,8 @@ module Sif.Examples.Tropyc
 import Sif.LangShallow
 
 using (G : List LTy)
+  avail : Expr G REQUIREMENT
+  avail = sif (Functional "as")
 
   infosec : Expr G $ PATTERN DEPLOY
   infosec = sif (do
