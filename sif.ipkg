@@ -4,6 +4,9 @@ opts = "-p effects -p containers -p grl"
 
 modules = Sif.Problem
         , Sif.Pattern
-        , Sif.LangShallow
+
+        , Sif.PLangSpec
+        , Sif.PLangSpec.Definition
+
         , Sif.Examples.InfoSec
         , Sif.Examples.Tropyc
