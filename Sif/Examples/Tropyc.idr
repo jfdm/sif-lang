@@ -6,7 +6,7 @@ using (G : List LTy)
 
   tropyc : Expr G LANG
   tropyc = with List (sif (do
-    let metapattern = Component "Cryptographic MetaPattern"
+    let metapattern = Generic "Cryptographic MetaPattern"
     let mauth = Component "Message Authentication"
     let infosec = Component "Information Secrecy"
     let senderauth = Component "Sender Authentication"
