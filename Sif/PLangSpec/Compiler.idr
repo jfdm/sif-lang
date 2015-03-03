@@ -38,49 +38,52 @@ free (_::store) = store
 -- ----------------------------------------------------- [ Construct gamRL Model ]
 
 covering
-evalDecl : Env gam -> Decl gam t -> Value t
-evalDecl env (Var x) = read x env
+evalDecl : Env gam -> Decl gam t -> (Env gam, Value t)
+evalDecl env (Var x) = (env, read x env)
 
-evalDecl env (Functional     n) = Goal (Just n) UNKNOWN
-evalDecl env (Usability      n) = Goal (Just n) UNKNOWN
-evalDecl env (Reliability    n) = Goal (Just n) UNKNOWN
-evalDecl env (Performance    n) = Goal (Just n) UNKNOWN
-evalDecl env (Supportability n) = Goal (Just n) UNKNOWN
+evalDecl env (Functional     n) = (env, Goal (Just n) UNKNOWN)
+evalDecl env (Usability      n) = (env, Goal (Just n) UNKNOWN)
+evalDecl env (Reliability    n) = (env, Goal (Just n) UNKNOWN)
+evalDecl env (Performance    n) = (env, Goal (Just n) UNKNOWN)
+evalDecl env (Supportability n) = (env, Goal (Just n) UNKNOWN)
 
-evalDecl env (Provides a c b) = Effects c (evalDecl env a) (evalDecl env b)
-evalDecl env (Affects a c b)  = Impacts c (evalDecl env a) (evalDecl env b)
+evalDecl env (Provides a c b) = (env, Effects c (snd $ evalDecl env a) (snd $ evalDecl env b))
+evalDecl env (Affects a c b)  = (env, Impacts c (snd $ evalDecl env a) (snd $ evalDecl env b))
 
-evalDecl env (Component n) = Task (Just n) UNKNOWN
-evalDecl env (System    n) = Task (Just n) UNKNOWN
-evalDecl env (Generic   n) = Task (Just n) UNKNOWN
-evalDecl env (Deploy    n) = Task (Just n) UNKNOWN
-evalDecl env (Admin     n) = Task (Just n) UNKNOWN
-evalDecl env (Code      n) = Task (Just n) UNKNOWN
+evalDecl env (Component n) = (env, Task (Just n) UNKNOWN)
+evalDecl env (System    n) = (env, Task (Just n) UNKNOWN)
+evalDecl env (Generic   n) = (env, Task (Just n) UNKNOWN)
+evalDecl env (Deploy    n) = (env, Task (Just n) UNKNOWN)
+evalDecl env (Admin     n) = (env, Task (Just n) UNKNOWN)
+evalDecl env (Code      n) = (env, Task (Just n) UNKNOWN)
 
 -- unless rs are folded potential bottle neck later on.
-evalDecl env (Implements  a b) = AND (evalDecl env a) [(evalDecl env b)]
-evalDecl env (LinkedTo    a b) = AND (evalDecl env a) [(evalDecl env b)]
-evalDecl env (Uses        a b) = AND (evalDecl env a) [(evalDecl env b)]
-evalDecl env (Specialises a b) = AND (evalDecl env a) [(evalDecl env b)]
+evalDecl env (Implements  a b) = (env, AND (snd $ evalDecl env a) [(snd $ evalDecl env b)])
+evalDecl env (LinkedTo    a b) = (env, AND (snd $ evalDecl env a) [(snd $ evalDecl env b)])
+evalDecl env (Uses        a b) = (env, AND (snd $ evalDecl env a) [(snd $ evalDecl env b)])
+evalDecl env (Specialises a b) = (env, AND (snd $ evalDecl env a) [(snd $ evalDecl env b)])
 
-doInterp : Env gam
-        -> Stmt gam
-        -> GModel MODEL
-        -> (Env gam, GModel MODEL)
-doInterp env (Dcl expr) g =
-  let d = (evalDecl env expr) in (env, insertIntoGRL d g)
+covering
+interp : Env gam -> Stmt gam -> {[STATE (GModel MODEL)]} Eff (Env gam)
+interp env (Dcl expr) = do
+    let (env', x) = evalDecl env expr
+    updateM (\g => insertIntoGRL x g)
+    pure env'
 
-doInterp env (Let expr body) g =
-  let d           = evalDecl expr         in
-  let env'        = alloc d env           in
-  let g'          = insertIntoGRL d g     in
-  let (env'', g') = doInterp env' body g' in (free env'', insertIntoGRL d' g')
+interp env (Let expr body) = do
+  let (_, x) = evalDecl env expr
+  updateM (\g => insertIntoGRL x g)
 
-doInterp env (Seq x y) g =
-  let (env', g') = doInterp env x g      in
-  let g''        = insertIntoGRL g' g    in
-  let (env'', y') = doInterp env' y g''  in (env'', insertIntoGRL y' g')
+  let env' = alloc x env
+  env'' <- interp env' body
+  pure $ free env''
 
-interp : Stmt [] -> GModel MODEL
-interp ss = snd $ doInterp Nil ss (GRLSpec Nil Nil)
+interp env (Seq x y) = do
+  env' <- interp env x
+  pure $ interp env' y
+
+compile : Stmt Nil -> GModel MODEL
+compile ss = runPureInit [(GRLSpec Nil Nil)] (do interp Nil ss; get)
+
+
 -- --------------------------------------------------------------------- [ EOF ]
