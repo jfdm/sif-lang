@@ -9,83 +9,104 @@ import public GRL
 import Sif.PLangSpec.Definition
 
 
-using (G : List LTy)
-
-  Value : LTy -> Type
-  Value LANG        = GModel MODEL
-  Value (PATTERN _) = GModel ELEM
-  Value PNODE       = GModel ELEM
-  Value RELATION    = GModel LINK
-  Value AFFECT      = GModel LINK
-  Value REQUIREMENT = GModel ELEM
+Value : LTy -> Type
+Value LANG        = GModel MODEL
+Value (PATTERN _) = GModel ELEM
+Value PNODE       = GModel ELEM
+Value RELATION    = GModel LINK
+Value AFFECT      = GModel LINK
+Value REQUIREMENT = GModel ELEM
 
 -- ------------------------------------------------------------------ [ Memory ]
 
-  data Env : List LTy -> Type where
-   Nil  : Env Nil
-   (::) : Value t -> Env ts -> Env (t :: ts)
+data Env : List LTy -> Type where
+ Nil  : Env Nil
+ (::) : Value t -> Env ts -> Env (t :: ts)
 
-  instance Default (Env Nil) where
-    default = []
+instance Default (Env Nil) where
+  default = []
 
-  read : HasType G t -> Env G -> Value t
-  read Here      (val :: store) = val
-  read (There x) (val :: store) = read x store
+read : HasType gam t -> Env gam -> Value t
+read Here      (val :: store) = val
+read (There x) (val :: store) = read x store
 
-  write : HasType G t -> Value t -> Env G -> Env G
-  write Here      val (_ :: store)    = val :: store
-  write (There x) val (val' :: store) = val' :: write x val store
+write : HasType gam t -> Value t -> Env gam -> Env gam
+write Here      val (_ :: store)    = val :: store
+write (There x) val (val' :: store) = val' :: write x val store
 
-  alloc : Value t -> Env G -> Env (t::G)
-  alloc = (::)
+alloc : Value t -> Env gam -> Env (t::gam)
+alloc = (::)
 
-  free : Env (t::G) -> Env G
-  free (_::store) = store
+free : Env (t::gam) -> Env gam
+free (_::store) = store
 
--- ----------------------------------------------------- [ Construct GRL Model ]
-  compile : Expr G t -> {[STATE (Env G)]} Eff $ Value t
-  compile (Var x) = pure $ read x !(get)
+-- ----------------------------------------------------- [ Construct gamRL Model ]
 
-  compile (Functional     n) = pure $ Goal (Just n) UNKNOWN
-  compile (Usability      n) = pure $ Goal (Just n) UNKNOWN
-  compile (Reliability    n) = pure $ Goal (Just n) UNKNOWN
-  compile (Performance    n) = pure $ Goal (Just n) UNKNOWN
-  compile (Supportability n) = pure $ Goal (Just n) UNKNOWN
+namespace Decls
+  data DList : Type where
+    Nil  : DList
+    (::) : GModel ty -> DList -> DList
 
-  compile (Effects a c b) = pure $ Effects c !(compile a) !(compile b)
-  compile (Impacts a c b) = pure $ Impacts c !(compile a) !(compile b)
+  dApp : DList -> DList -> DList
+  dApp Nil ys = ys
+  dApp (x::xs) ys = x :: dApp xs ys
 
-  compile (Component n) = pure $ Task (Just n) UNKNOWN
-  compile (System    n) = pure $ Task (Just n) UNKNOWN
-  compile (Generic   n) = pure $ Task (Just n) UNKNOWN
-  compile (Deploy    n) = pure $ Task (Just n) UNKNOWN
-  compile (Admin     n) = pure $ Task (Just n) UNKNOWN
-  compile (Code      n) = pure $ Task (Just n) UNKNOWN
+  instance Default DList where
+    default = Nil
 
-  compile (MkNode p) = compile p
+CompileEffs : List LTy -> List EFFECT
+CompileEffs gam = [STATE (Env gam)]
 
-  -- unless rs are folded potential bottle neck later on.
-  compile (Implements  a b) = pure $ AND !(compile a) [!(compile b)]
-  compile (LinkedTo    a b) = pure $ AND !(compile a) [!(compile b)]
-  compile (Uses        a b) = pure $ AND !(compile a) [!(compile b)]
-  compile (Specialises a b) = pure $ AND !(compile a) [!(compile b)]
+covering
+evalDecl : Decl gam t -> {[STATE (Env gam)]} Eff $ Value t
+evalDecl (Var x) = pure $ read x !(get)
 
-  compile (MkLang fs ps as rs) = do
-      fs' <- mapE (compile) fs
-      ps' <- mapE (compile) ps
-      as' <- mapE (compile) as
-      rs' <- mapE (compile) rs
-      pure $ GRLSpec (fs' ++ ps') (as' ++ rs')
+evalDecl (Functional     n) = pure $ Goal (Just n) UNKNOWN
+evalDecl (Usability      n) = pure $ Goal (Just n) UNKNOWN
+evalDecl (Reliability    n) = pure $ Goal (Just n) UNKNOWN
+evalDecl (Performance    n) = pure $ Goal (Just n) UNKNOWN
+evalDecl (Supportability n) = pure $ Goal (Just n) UNKNOWN
 
-  compile (Let expr body) = do
-    val <- compile expr
-    updateM (\xs => alloc val xs)
-    bval <- compile body
-    updateM (\xs => free xs)
-    pure bval
+evalDecl (Provides a c b) = pure $ Effects c !(evalDecl a) !(evalDecl b)
+evalDecl (Affects a c b)  = pure $ Impacts c !(evalDecl a) !(evalDecl b)
 
-  compile (Bind x y) = do
-    compile x
-    compile y
+evalDecl (Component n) = pure $ Task (Just n) UNKNOWN
+evalDecl (System    n) = pure $ Task (Just n) UNKNOWN
+evalDecl (Generic   n) = pure $ Task (Just n) UNKNOWN
+evalDecl (Deploy    n) = pure $ Task (Just n) UNKNOWN
+evalDecl (Admin     n) = pure $ Task (Just n) UNKNOWN
+evalDecl (Code      n) = pure $ Task (Just n) UNKNOWN
+
+-- unless rs are folded potential bottle neck later on.
+evalDecl (Implements  a b) = pure $ AND !(evalDecl a) [!(evalDecl b)]
+evalDecl (LinkedTo    a b) = pure $ AND !(evalDecl a) [!(evalDecl b)]
+evalDecl (Uses        a b) = pure $ AND !(evalDecl a) [!(evalDecl b)]
+evalDecl (Specialises a b) = pure $ AND !(evalDecl a) [!(evalDecl b)]
+
+covering
+interp' : Stmt gam -> {CompileEffs gam} Eff $ DList
+interp' (Dcl decl) = do
+  d <- evalDecl decl
+  pure [d]
+
+interp' (Let expr body) = do
+  d <- evalDecl expr
+  updateM (\xs => alloc d xs)
+  ds <- interp' body
+  updateM (\xs => free xs)
+  pure (dApp [d] ds)
+
+interp' (Seq x y) = do
+  xs <- interp' x
+  ys <- interp' y
+  pure (dApp xs (dApp ys xs))
+
+interp : Stmt gam -> GModel MODEL
+interp ss = mkModel (run (interp' ss)) (GRLSpec Nil Nil)
+  where
+
+    mkModel : DList -> GModel MODEL -> GModel MODEL
+    mkModel Nil g = g
+    mkModel (d::ds) g = insertIntoGRL d (mkModel ds g)
 
 -- --------------------------------------------------------------------- [ EOF ]

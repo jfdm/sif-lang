@@ -35,51 +35,53 @@ data ValidU : PTy -> PTy -> Type where
 
 data LTy = PATTERN PTy | RELATION | AFFECT | REQUIREMENT | LANG | PNODE
 
-using (G : List LTy, G' : List LTy)
+using (gam : List LTy)
 
   data HasType : List LTy -> LTy -> Type where
     Here  : HasType (t::ts) t
     There : HasType ts t -> HasType (t'::ts) t
 
-  data Expr : List LTy -> LTy -> Type where
+  data Decl : List LTy -> LTy -> Type where
 -- -------------------------------------------------------- [ PLang Constructs ]
-    Var : HasType G t  -> Expr G t
+    Var : HasType gam t  -> Decl gam t
 
-    Functional     : String -> Expr G REQUIREMENT
-    Usability      : String -> Expr G REQUIREMENT
-    Reliability    : String -> Expr G REQUIREMENT
-    Performance    : String -> Expr G REQUIREMENT
-    Supportability : String -> Expr G REQUIREMENT
+    Functional     : String -> Decl gam REQUIREMENT
+    Usability      : String -> Decl gam REQUIREMENT
+    Reliability    : String -> Decl gam REQUIREMENT
+    Performance    : String -> Decl gam REQUIREMENT
+    Supportability : String -> Decl gam REQUIREMENT
 
-    Component : String -> Expr G (PATTERN COMPONENT)
-    System    : String -> Expr G (PATTERN SYSTEM)
-    Generic   : String -> Expr G (PATTERN GENERIC)
-    Deploy    : String -> Expr G (PATTERN DEPLOY)
-    Admin     : String -> Expr G (PATTERN ADMIN)
-    Code      : String -> Expr G (PATTERN CODE)
+    Component : String -> Decl gam (PATTERN COMPONENT)
+    System    : String -> Decl gam (PATTERN SYSTEM)
+    Generic   : String -> Decl gam (PATTERN GENERIC)
+    Deploy    : String -> Decl gam (PATTERN DEPLOY)
+    Admin     : String -> Decl gam (PATTERN ADMIN)
+    Code      : String -> Decl gam (PATTERN CODE)
 
-    Effects  : Expr G (PATTERN ty) -> Contrib -> Expr G REQUIREMENT -> Expr G AFFECT
-    Impacts  : Expr G (PATTERN ty) -> Contrib -> Expr G REQUIREMENT -> Expr G AFFECT
+    Provides : Decl gam (PATTERN ty) -> Contrib -> Decl gam REQUIREMENT -> Decl gam AFFECT
+    Affects  : Decl gam (PATTERN ty) -> Contrib -> Decl gam REQUIREMENT -> Decl gam AFFECT
 
-    LinkedTo    : Expr G (PATTERN x) -> Expr G (PATTERN y) -> Expr G RELATION
-    Implements  : Expr G (PATTERN x) -> Expr G (PATTERN y) -> {auto prf : ValidR x y} -> Expr G RELATION
-    Uses        : Expr G (PATTERN x) -> Expr G (PATTERN y) -> {auto prf : ValidU x y} -> Expr G RELATION
-    Specialises : Expr G (PATTERN x) -> Expr G (PATTERN y) -> {auto prf : ValidI x y} -> Expr G RELATION
+    LinkedTo    : Decl gam (PATTERN x) -> Decl gam (PATTERN y) -> Decl gam RELATION
+    Implements  : Decl gam (PATTERN x) -> Decl gam (PATTERN y) -> {auto prf : ValidR x y} -> Decl gam RELATION
+    Uses        : Decl gam (PATTERN x) -> Decl gam (PATTERN y) -> {auto prf : ValidU x y} -> Decl gam RELATION
+    Specialises : Decl gam (PATTERN x) -> Decl gam (PATTERN y) -> {auto prf : ValidI x y} -> Decl gam RELATION
 
-    MkNode : Expr G (PATTERN x) -> Expr G PNODE
+    -- MkNode : Decl gam (PATTERN x) -> Decl gam PNODE
 
-    MkLang : List (Expr G REQUIREMENT)
-          -> List (Expr G PNODE)
-          -> List (Expr G AFFECT)
-          -> List (Expr G RELATION)
-          -> Expr G LANG
+    -- MkLang : List (Decl gam REQUIREMENT)
+    --       -> List (Decl gam PNODE)
+    --       -> List (Decl gam AFFECT)
+    --       -> List (Decl gam RELATION)
+    --       -> Decl gam LANG
 
 -- ------------------------------------------------------ [ Control Constructs ]
-    Let    : Expr G t -> Expr (t::G) t' -> Expr G t'
-    Bind   : Expr G a -> Expr G b -> Expr G b
+  data Stmt : List LTy -> Type where
+    Dcl : Decl gam t -> Stmt gam
+    Let : Decl gam t -> Stmt (t::gam) -> Stmt gam
+    Seq : Stmt gam -> Stmt gam -> Stmt gam
 
 -- ---------------------------------------------------------------- [ Notation ]
-  mkLet : TTName -> Expr G t -> Expr (t::G) t' -> Expr G t'
+  mkLet : TTName -> Decl gam t -> Stmt (t::gam) -> Stmt gam
   mkLet _ expr body = Let expr body
 
   dsl sif
@@ -89,13 +91,13 @@ using (G : List LTy, G' : List LTy)
     let         = mkLet
 
   implicit
-  convVar : (ix : HasType G t) -> Expr G t
+  convVar : (ix : HasType gam t) -> Decl gam t
   convVar = Var
 
-  (>>=) : Expr G a -> (() -> Expr G b) -> Expr G b
-  (>>=) a b = Bind a (b ())
+  (>>=) : Stmt gam -> (() -> Stmt gam) -> Stmt gam
+  (>>=) a b = Seq a (b ())
 
-  syntax "PLang" = {G : List LTy} -> Expr G LANG
-  syntax "Pattern" [x] = {G : List LTy} -> Expr G (PATTERN x)
+  syntax "PLang" = {gam : List LTy} -> Decl gam LANG
+  syntax "Pattern" [x] = {gam : List LTy} -> Decl gam (PATTERN x)
 
 -- --------------------------------------------------------------------- [ EOF ]

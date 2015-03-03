@@ -2,51 +2,36 @@ module Sif.Examples.Tropyc
 
 import Sif.PLangSpec
 
-using (G : List LTy)
 
-  tropyc : Expr G LANG
-  tropyc = with List (sif (do
-    let metapattern = Generic "Cryptographic MetaPattern"
-    let mauth = Component "Message Authentication"
-    let infosec = Component "Information Secrecy"
-    let senderauth = Component "Sender Authentication"
-    let msgintegrity = Component "Message Integrity"
+tropyc : Stmt g
+tropyc = with List (sif (do
+  let metapattern = Generic "Cryptographic MetaPattern"
+  let mauth = Component "Message Authentication"
+  let infosec = Component "Information Secrecy"
+  let senderauth = Component "Sender Authentication"
+  let msgintegrity = Component "Message Integrity"
 
-    let swa = System "Secrecy with Authentication"
-    let sws = System "Secrecy with Signature"
-    let swapp = System "Signature with Appendix"
-    let swi = System "Secrecy with Integrity"
+  let swa = System "Secrecy with Authentication"
+  let sws = System "Secrecy with Signature"
+  let swapp = System "Signature with Appendix"
+  let swi = System "Secrecy with Integrity"
 
-    let swswa = System "Secrecy with Signature with Appendix"
+  let swswa = System "Secrecy with Signature with Appendix"
 
-    MkLang Nil
-         [MkNode metapattern,
-          MkNode mauth,
-          MkNode infosec,
-          MkNode infosec,
-          MkNode infosec,
-          MkNode senderauth,
-          MkNode msgintegrity,
-          MkNode swa,
-          MkNode sws,
-          MkNode swapp,
-          MkNode swswa]
-         Nil
-         [Specialises mauth metapattern,
-          Specialises infosec metapattern,
-          Specialises senderauth metapattern,
-          Specialises msgintegrity metapattern,
-          Uses swa mauth,
-          Uses swa infosec,
-          Uses sws infosec,
-          Uses sws senderauth,
-          Uses swapp senderauth,
-          Uses swapp msgintegrity,
-          Uses swi infosec,
-          Uses swi msgintegrity,
-          Uses swswa sws,
-          Uses swswa swapp
-          ]))
+  Dcl $ Specialises mauth metapattern
+  Dcl $ Specialises infosec metapattern
+  Dcl $ Specialises senderauth metapattern
+  Dcl $ Specialises msgintegrity metapattern
+  Dcl $ Uses swa mauth
+  Dcl $ Uses swa infosec
+  Dcl $ Uses sws infosec
+  Dcl $ Uses sws senderauth
+  Dcl $ Uses swapp senderauth
+  Dcl $ Uses swapp msgintegrity
+  Dcl $ Uses swi infosec
+  Dcl $ Uses swi msgintegrity
+  Dcl $ Uses swswa sws
+  Dcl $ Uses swswa swapp))
 
 -- main : IO ()
 -- main = print $ run $ compile tropyc
