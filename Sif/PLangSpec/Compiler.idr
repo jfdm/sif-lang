@@ -8,7 +8,6 @@ import public GRL
 
 import Sif.PLangSpec.Definition
 
-
 Value : LTy -> Type
 Value (PATTERN _) = GModel ELEM
 Value RELATION    = GModel LINK
