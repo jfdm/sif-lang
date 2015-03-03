@@ -7,5 +7,6 @@
 module Sif.PLangSpec
 
 import public Sif.PLangSpec.Definition
+import public Sif.PLangSpec.Compiler
 
 -- --------------------------------------------------------------------- [ EOF ]
