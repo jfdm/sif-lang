@@ -33,7 +33,7 @@ data ValidU : PTy -> PTy -> Type where
   UsesII : ValidU CODE      CODE
   UsesPP : ValidU GENERIC   GENERIC
 
-data LTy = PATTERN PTy | RELATION | AFFECT | REQUIREMENT | LANG | PNODE
+data LTy = PATTERN PTy | RELATION | AFFECT | REQUIREMENT
 
 using (gam : List LTy)
 

@@ -10,9 +10,7 @@ import Sif.PLangSpec.Definition
 
 
 Value : LTy -> Type
-Value LANG        = GModel MODEL
 Value (PATTERN _) = GModel ELEM
-Value PNODE       = GModel ELEM
 Value RELATION    = GModel LINK
 Value AFFECT      = GModel LINK
 Value REQUIREMENT = GModel ELEM
@@ -22,9 +20,6 @@ Value REQUIREMENT = GModel ELEM
 data Env : List LTy -> Type where
  Nil  : Env Nil
  (::) : Value t -> Env ts -> Env (t :: ts)
-
-instance Default (Env Nil) where
-  default = []
 
 read : HasType gam t -> Env gam -> Value t
 read Here      (val :: store) = val
@@ -42,71 +37,50 @@ free (_::store) = store
 
 -- ----------------------------------------------------- [ Construct gamRL Model ]
 
-namespace Decls
-  data DList : Type where
-    Nil  : DList
-    (::) : GModel ty -> DList -> DList
-
-  dApp : DList -> DList -> DList
-  dApp Nil ys = ys
-  dApp (x::xs) ys = x :: dApp xs ys
-
-  instance Default DList where
-    default = Nil
-
-CompileEffs : List LTy -> List EFFECT
-CompileEffs gam = [STATE (Env gam)]
-
 covering
-evalDecl : Decl gam t -> {[STATE (Env gam)]} Eff $ Value t
-evalDecl (Var x) = pure $ read x !(get)
+evalDecl : Env gam -> Decl gam t -> Value t
+evalDecl env (Var x) = read x env
 
-evalDecl (Functional     n) = pure $ Goal (Just n) UNKNOWN
-evalDecl (Usability      n) = pure $ Goal (Just n) UNKNOWN
-evalDecl (Reliability    n) = pure $ Goal (Just n) UNKNOWN
-evalDecl (Performance    n) = pure $ Goal (Just n) UNKNOWN
-evalDecl (Supportability n) = pure $ Goal (Just n) UNKNOWN
+evalDecl env (Functional     n) = Goal (Just n) UNKNOWN
+evalDecl env (Usability      n) = Goal (Just n) UNKNOWN
+evalDecl env (Reliability    n) = Goal (Just n) UNKNOWN
+evalDecl env (Performance    n) = Goal (Just n) UNKNOWN
+evalDecl env (Supportability n) = Goal (Just n) UNKNOWN
 
-evalDecl (Provides a c b) = pure $ Effects c !(evalDecl a) !(evalDecl b)
-evalDecl (Affects a c b)  = pure $ Impacts c !(evalDecl a) !(evalDecl b)
+evalDecl env (Provides a c b) = Effects c (evalDecl env a) (evalDecl env b)
+evalDecl env (Affects a c b)  = Impacts c (evalDecl env a) (evalDecl env b)
 
-evalDecl (Component n) = pure $ Task (Just n) UNKNOWN
-evalDecl (System    n) = pure $ Task (Just n) UNKNOWN
-evalDecl (Generic   n) = pure $ Task (Just n) UNKNOWN
-evalDecl (Deploy    n) = pure $ Task (Just n) UNKNOWN
-evalDecl (Admin     n) = pure $ Task (Just n) UNKNOWN
-evalDecl (Code      n) = pure $ Task (Just n) UNKNOWN
+evalDecl env (Component n) = Task (Just n) UNKNOWN
+evalDecl env (System    n) = Task (Just n) UNKNOWN
+evalDecl env (Generic   n) = Task (Just n) UNKNOWN
+evalDecl env (Deploy    n) = Task (Just n) UNKNOWN
+evalDecl env (Admin     n) = Task (Just n) UNKNOWN
+evalDecl env (Code      n) = Task (Just n) UNKNOWN
 
 -- unless rs are folded potential bottle neck later on.
-evalDecl (Implements  a b) = pure $ AND !(evalDecl a) [!(evalDecl b)]
-evalDecl (LinkedTo    a b) = pure $ AND !(evalDecl a) [!(evalDecl b)]
-evalDecl (Uses        a b) = pure $ AND !(evalDecl a) [!(evalDecl b)]
-evalDecl (Specialises a b) = pure $ AND !(evalDecl a) [!(evalDecl b)]
+evalDecl env (Implements  a b) = AND (evalDecl env a) [(evalDecl env b)]
+evalDecl env (LinkedTo    a b) = AND (evalDecl env a) [(evalDecl env b)]
+evalDecl env (Uses        a b) = AND (evalDecl env a) [(evalDecl env b)]
+evalDecl env (Specialises a b) = AND (evalDecl env a) [(evalDecl env b)]
 
-covering
-interp' : Stmt gam -> {CompileEffs gam} Eff $ DList
-interp' (Dcl decl) = do
-  d <- evalDecl decl
-  pure [d]
+doInterp : Env gam
+        -> Stmt gam
+        -> GModel MODEL
+        -> (Env gam, GModel MODEL)
+doInterp env (Dcl expr) g =
+  let d = (evalDecl env expr) in (env, insertIntoGRL d g)
 
-interp' (Let expr body) = do
-  d <- evalDecl expr
-  updateM (\xs => alloc d xs)
-  ds <- interp' body
-  updateM (\xs => free xs)
-  pure (dApp [d] ds)
+doInterp env (Let expr body) g =
+  let d           = evalDecl expr         in
+  let env'        = alloc d env           in
+  let g'          = insertIntoGRL d g     in
+  let (env'', g') = doInterp env' body g' in (free env'', insertIntoGRL d' g')
 
-interp' (Seq x y) = do
-  xs <- interp' x
-  ys <- interp' y
-  pure (dApp xs (dApp ys xs))
+doInterp env (Seq x y) g =
+  let (env', g') = doInterp env x g      in
+  let g''        = insertIntoGRL g' g    in
+  let (env'', y') = doInterp env' y g''  in (env'', insertIntoGRL y' g')
 
-interp : Stmt gam -> GModel MODEL
-interp ss = mkModel (run (interp' ss)) (GRLSpec Nil Nil)
-  where
-
-    mkModel : DList -> GModel MODEL -> GModel MODEL
-    mkModel Nil g = g
-    mkModel (d::ds) g = insertIntoGRL d (mkModel ds g)
-
+interp : Stmt [] -> GModel MODEL
+interp ss = snd $ doInterp Nil ss (GRLSpec Nil Nil)
 -- --------------------------------------------------------------------- [ EOF ]
