@@ -8,27 +8,27 @@ import public GRL
 
 import Sif.PLangSpec.Definition
 
-Value : LTy -> Type
-Value (PATTERN _) = GModel ELEM
-Value RELATION    = GModel LINK
-Value AFFECT      = GModel LINK
-Value REQUIREMENT = GModel ELEM
+interpTy : LTy -> Type
+interpTy (PATTERN _) = GModel ELEM
+interpTy RELATION    = GModel LINK
+interpTy AFFECT      = GModel LINK
+interpTy REQUIREMENT = GModel ELEM
 
 -- ------------------------------------------------------------------ [ Memory ]
 
 data Env : List LTy -> Type where
  Nil  : Env Nil
- (::) : Value t -> Env ts -> Env (t :: ts)
+ (::) : interpTy t -> Env ts -> Env (t :: ts)
 
-read : HasType gam t -> Env gam -> Value t
+read : HasType gam t -> Env gam -> interpTy t
 read Here      (val :: store) = val
 read (There x) (val :: store) = read x store
 
-write : HasType gam t -> Value t -> Env gam -> Env gam
+write : HasType gam t -> interpTy t -> Env gam -> Env gam
 write Here      val (_ :: store)    = val :: store
 write (There x) val (val' :: store) = val' :: write x val store
 
-alloc : Value t -> Env gam -> Env (t::gam)
+alloc : interpTy t -> Env gam -> Env (t::gam)
 alloc = (::)
 
 free : Env (t::gam) -> Env gam
@@ -37,7 +37,7 @@ free (_::store) = store
 -- ----------------------------------------------------- [ Construct gamRL Model ]
 
 covering
-evalDecl : Env gam -> Decl gam t -> (Env gam, Value t)
+evalDecl : Env gam -> Decl gam t -> (Env gam, interpTy t)
 evalDecl env (Var x) = (env, read x env)
 
 evalDecl env (Functional     n) = (env, Goal (Just n) UNKNOWN)
@@ -65,7 +65,7 @@ evalDecl env (Specialises a b) = (env, AND (snd $ evalDecl env a) [(snd $ evalDe
 covering
 interp : Env gam -> Stmt gam -> {[STATE (GModel MODEL)]} Eff (Env gam)
 interp env (Dcl expr) = do
-    let (env', x) = evalDecl env expr
+    let (env', x) = (evalDecl env expr)
     updateM (\g => insertIntoGRL x g)
     pure env'
 
@@ -79,7 +79,7 @@ interp env (Let expr body) = do
 
 interp env (Seq x y) = do
   env' <- interp env x
-  pure $ interp env' y
+  interp env' y
 
 compile : Stmt Nil -> GModel MODEL
 compile ss = runPureInit [(GRLSpec Nil Nil)] (do interp Nil ss; get)
