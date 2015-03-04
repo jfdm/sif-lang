@@ -42,7 +42,7 @@ using (m : GModel MODEL, p : Problem m PSPEC)
       ActsOn : (a : Pattern p x ACT)
              -> (c : Contrib)
              -> (f : Problem g FORCE)
---             -> {auto prf : usesForce f p = Yes prf'}
+             -> {auto prf : usesForce f p = Yes prf'}
              -> Pattern p (Impacts c x g) ACTION
 
       ||| Use of acts will affect other acts.

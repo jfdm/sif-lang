@@ -8,6 +8,3 @@ modules = Sif.Problem
         , Sif.PLangSpec
         , Sif.PLangSpec.Definition
         , Sif.PLangSpec.Compiler
-
-        , Sif.Examples.InfoSec
-        , Sif.Examples.Tropyc

@@ -1,4 +1,5 @@
-module Sif.Examples.Tropyc
+||| Modelling of the Tropyc Pattern Language.
+module Tropyc
 
 import Sif.PLangSpec
 

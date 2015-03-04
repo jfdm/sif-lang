@@ -38,7 +38,7 @@ free (_::store) = store
 
 covering
 evalDecl : Env gam -> Decl gam t -> (Env gam, interpTy t)
-evalDecl env (Var x) = (env, read x env)
+evalDecl {t} env (Var x) = (env, read x env)
 
 evalDecl env (Functional     n) = (env, Goal (Just n) UNKNOWN)
 evalDecl env (Usability      n) = (env, Goal (Just n) UNKNOWN)
