@@ -2,9 +2,10 @@ package sif
 
 opts = "-p effects -p containers -p grl"
 
-modules = Sif.Problem
+modules = Sif.Pattern.Problem
+        , Sif.Pattern.Solution
         , Sif.Pattern
 
-        , Sif.PLangSpec
         , Sif.PLangSpec.Definition
         , Sif.PLangSpec.Compiler
+        , Sif.PLangSpec

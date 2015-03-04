@@ -3,7 +3,7 @@
 ||| Intuitively, a problem is a list of functional and non-functional
 ||| requirements, together with possible links between each
 ||| requirement.
-module Sif.Problem
+module Sif.Pattern.Problem
 
 import Decidable.Equality
 import GRL

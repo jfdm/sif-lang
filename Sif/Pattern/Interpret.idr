@@ -5,7 +5,8 @@ import public Effect.State
 import public Effect.Exception
 
 import Sif.Model
-import Sif.Pattern
+import Sif.Pattern.Problem
+import Sif.Pattern.Solution
 
 -- ------------------------------------------------------------------- [ Types ]
 

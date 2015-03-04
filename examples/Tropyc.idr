@@ -3,7 +3,6 @@ module Tropyc
 
 import Sif.PLangSpec
 
-
 tropyc : Stmt g
 tropyc = with List (sif (do
   let metapattern = Generic "Cryptographic MetaPattern"
