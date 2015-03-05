@@ -47,7 +47,6 @@ using (m : GModel MODEL, p : Problem m PSPEC)
       ||| Properties are aspects of a solution that will affect
       ||| several forces in the problem.
       Property : (name : Maybe String)
-              -> (eval : EvalVal)
               -> (actions : Actions as p)
               -> (links : Relations rs p)
               -> Pattern p (GRLSpec gas ges) PROPERTY
