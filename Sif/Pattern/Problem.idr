@@ -14,11 +14,16 @@ import GRL
 data PTy = FORCE | FLINK | PSPEC
 data DTy = ANDTy | XORTy | IORTy
 
-genDComp : DTy -> GModel ELEM -> List (GModel ELEM) -> GModel LINK
-genDComp ty x xs with (ty)
-  | ANDTy = AND x xs
-  | XORTy = XOR x xs
-  | IORTy = IOR x xs
+instance Show DTy where
+  show ANDTy = "&&"
+  show XORTy = "XOR"
+  show IORTy = "||"
+
+genDComp : DTy -> GModel ELEM -> GModel ELEM -> GModel LINK
+genDComp ty x y with (ty)
+  | ANDTy = AND x [y]
+  | XORTy = XOR x [y]
+  | IORTy = IOR x [y]
 
 mutual
 
@@ -68,15 +73,15 @@ mutual
                    -> Problem (Goal name UNKNOWN) FORCE
 
     ||| State that the requirement can be broken down into other
-    ||| requirements.
+    ||| requirements. TODO Fix
     |||
     ||| @rty The type of breakdown.
     ||| @a   The requirement being divided.
-    ||| @ys  The requirements being linked to.
+    ||| @b   The requirements being linked to.
     HasSubReq : (rty : DTy)
               -> (a : Problem x FORCE)
-              -> (ys : Reqs yes)
-              -> Problem (genDComp rty x yes) FLINK
+              -> (b : Problem y FORCE)
+              -> Problem (genDComp rty x y) FLINK
 
     ||| State that requirement `a` has a direct impact upon
     ||| requirement `b` by `c` amount.
@@ -120,8 +125,35 @@ mutual
       Nil : RLinks Nil
       (::) : Problem e FLINK -> RLinks es -> RLinks (e::es)
 
--- ------------------------------------------------------------- [ Eq Instance ]
+mutual
+  showReqs : Reqs es -> List String
+  showReqs Nil     = [""]
+  showReqs (x::xs) = show x :: showReqs xs
 
+  instance Show (Reqs es) where
+    show xs = "[" ++ concat (intersperse "," (showReqs xs)) ++ "]"
+
+  showRLinks : RLinks es -> List String
+  showRLinks Nil     = [""]
+  showRLinks (x::xs) = show x :: showRLinks xs
+
+  instance Show (RLinks es) where
+    show xs = "[" ++ concat (intersperse "," (showRLinks xs)) ++ "]"
+
+
+  instance Show (Problem x ty) where
+    show (MkProblem d es ls) = unwords ["[Problem ", show d, show es, show ls,"]\n"]
+    show (EffectsUpon a c b) = unwords ["[Effect", show a, show c, show b, "]\n"]
+    show (ImpactsUpon a c b) = unwords ["[Impact", show a, show c, show b, "]\n"]
+    show (HasSubReq dty a b) = unwords ["[SubReq", show dty, show a, show b, "]\n"]
+    show (Functional n)      = unwords ["[Functional", show n, "]\n"]
+    show (Usability n)       = unwords ["[Usability", show n, "]\n"]
+    show (Reliability n)     = unwords ["[Reliability", show n, "]\n"]
+    show (Performance n)     = unwords ["[Performance", show n, "]\n"]
+    show (Supportability n)  = unwords ["[Supportability", show n, "]\n"]
+
+-- ------------------------------------------------------------- [ Eq Instance ]
+mutual
   forceEq : Problem a FORCE -> Problem b FORCE -> Bool
   forceEq (Functional x)         (Functional y)         = x == y
   forceEq (Usability x)          (Usability y)          = x == y
