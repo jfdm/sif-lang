@@ -7,5 +7,5 @@ modules = Sif.Pattern.Problem
         , Sif.Pattern
 
         , Sif.PLangSpec.Definition
---        , Sif.PLangSpec.Compiler
+        , Sif.PLangSpec.Compiler
         , Sif.PLangSpec

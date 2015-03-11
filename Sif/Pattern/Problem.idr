@@ -166,6 +166,10 @@ mutual
   reqEq (x::xs) (y::ys) = if forceEq x y then reqEq xs ys else False
   reqEq _       _       = False
 
+-- TODO do properly
+problemEq : Problem a PSPEC -> Problem b PSPEC -> Bool
+problemEq (MkProblem x xs xxs) (MkProblem y ys yys) = x == y
+
 -- ----------------------------------------------- [ Force Deciadable Equality ]
 -- @TODO make deeply decidable...
 forceDecEq : (x : Problem a FORCE) -> (y : Problem b FORCE) -> Dec (x = y)
@@ -317,5 +321,22 @@ instance DecEq (Problem m FORCE) where
 -}
 -- data ContainsForce : Problem m FORCE -> Problem g PSPEC -> Type where
 --   IsThere :
--- --------------------------------------------------------------------- [ EOF ]
+
 -}
+
+getReqName : Problem e FORCE -> Maybe String
+getReqName (Functional name) = name
+getReqName (Usability name) = name
+getReqName (Reliability name) = name
+getReqName (Performance name) = name
+getReqName (Supportability name) = name
+
+findReq : String
+       -> Reqs rs
+       -> Maybe (e : GModel ELEM ** Problem e FORCE)
+findReq _ Nil     = Nothing
+findReq n (x::xs) = case (getReqName x) of
+  (Just m) => if n == m then Just (_ ** x) else findReq n xs
+  Nothing  => findReq n xs
+
+-- --------------------------------------------------------------------- [ EOF ]
