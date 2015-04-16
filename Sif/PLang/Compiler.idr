@@ -5,6 +5,7 @@ import public Effect.State
 import public Effect.Exception
 
 import GRL.Model
+import GRL.Utils
 
 import Sif.PLang.Common
 import Sif.PLang.Definition

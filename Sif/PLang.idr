@@ -6,7 +6,7 @@
 ||| Evaluating languages must make use of the deep version.
 module Sif.PLang
 
-import public GRL
+import public GRL.Model
 
 import public Sif.PLang.Common
 import public Sif.PLang.Definition
