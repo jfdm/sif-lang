@@ -6,6 +6,8 @@ modules = Sif.Pattern.Problem
         , Sif.Pattern.Solution
         , Sif.Pattern
 
-        , Sif.PLangSpec.Definition
-        , Sif.PLangSpec.Compiler
-        , Sif.PLangSpec
+        -- , Sif.PLang.Common
+        -- , Sif.PLang.Definition
+        -- , Sif.PLang.Model
+        -- , Sif.PLang.Compiler
+        -- , Sif.PLang

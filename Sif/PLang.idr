@@ -4,9 +4,13 @@
 ||| specified and their combinations controlled through typing.  This
 ||| language is intended to be used for specifying languages only.
 ||| Evaluating languages must make use of the deep version.
-module Sif.PLangSpec
+module Sif.PLang
 
-import public Sif.PLangSpec.Definition
-import public Sif.PLangSpec.Compiler
+import public GRL
+
+import public Sif.PLang.Common
+import public Sif.PLang.Definition
+import public Sif.PLang.Model
+--import public Sif.PLang.Compiler
 
 -- --------------------------------------------------------------------- [ EOF ]

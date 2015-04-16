@@ -1,12 +1,13 @@
-module Sif.PLangSpec.Compiler
+module Sif.PLang.Compiler
 
 import public Effects
 import public Effect.State
 import public Effect.Exception
 
-import public GRL
+import GRL.Model
 
-import Sif.PLangSpec.Definition
+import Sif.PLang.Common
+import Sif.PLang.Definition
 
 interpTy : LTy -> Type
 interpTy (PATTERN _) = GModel ELEM
