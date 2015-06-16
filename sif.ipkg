@@ -2,12 +2,12 @@ package sif
 
 opts = "-p effects -p containers -p grl"
 
-modules = Sif.Problem
+modules = Sif.Pattern.Problem
+        , Sif.Pattern.Solution
         , Sif.Pattern
 
-        , Sif.PLangSpec
-        , Sif.PLangSpec.Definition
-        , Sif.PLangSpec.Compiler
-
-        , Sif.Examples.InfoSec
-        , Sif.Examples.Tropyc
+        -- , Sif.PLang.Common
+        -- , Sif.PLang.Definition
+        -- , Sif.PLang.Model
+        -- , Sif.PLang.Compiler
+        -- , Sif.PLang

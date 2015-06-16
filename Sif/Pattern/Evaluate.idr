@@ -4,7 +4,8 @@ import public Effects
 import public Effect.State
 import public Effect.Exception
 
-import Sif.Model
+import Sif.Pattern.Problem
+import Sif.Pattern.Solution
 
 mutual
   evalList : List (Sif ty) -> {[STATE (List (Sif FORCE))]} Eff ()

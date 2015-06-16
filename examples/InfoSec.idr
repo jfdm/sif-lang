@@ -1,4 +1,5 @@
-module Sif.Examples.Tropyc
+||| Deep modelling of the Infosec pattern
+module InfoSec
 
 import Sif.Pattern
 

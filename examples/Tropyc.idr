@@ -1,10 +1,10 @@
-module Sif.Examples.Tropyc
+||| Modelling of the Tropyc Pattern Language.
+module Tropyc
 
 import Sif.PLangSpec
 
-
-tropyc : Stmt []
-tropyc = sif (do
+tropyc : Stmt g
+tropyc = with List (sif (do
   let metapattern = Generic "Cryptographic MetaPattern"
   let mauth = Component "Message Authentication"
   let infosec = Component "Information Secrecy"
