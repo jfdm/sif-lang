@@ -96,3 +96,7 @@ huh = proof search
 
 
 -- --------------------------------------------------------------------- [ EOF ]
+
+-- Local Variables:
+-- idris-packages: ("xml" "uml" "rts" "read" "prelude" "lightyear" "jsrts" "idrisdoc" "grl" "effects" "edda" "contrib" "config" " "base" "argparse" "sif" "containers")
+-- End:

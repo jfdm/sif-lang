@@ -9,5 +9,5 @@ modules = Sif.Pattern.Problem
         , Sif.PLang.Common
         , Sif.PLang.Definition
         , Sif.PLang.Model
-        --, Sif.PLang.Compiler
+--        , Sif.PLang.Compiler
         , Sif.PLang

@@ -6,7 +6,6 @@ import GRL.Model
 
 import Sif.PLang.Common
 
-
 data PLang : GModel ty -> LTy -> Type where
 
   Functional     : (s : Maybe String) -> PLang (Goal s UNKNOWN) REQUIREMENT
@@ -22,14 +21,34 @@ data PLang : GModel ty -> LTy -> Type where
   Admin     : String -> PLang (Task s UNKNOWN) (PATTERN ADMIN)
   Code      : String -> PLang (Task s UNKNOWN) (PATTERN CODE)
 
-  Provides : PLang a (PATTERN ty) -> (c : Contrib) -> PLang b REQUIREMENT -> PLang (Impacts c a b) AFFECT
-  Affects  : PLang a (PATTERN ty) -> (c : Contrib) -> PLang b REQUIREMENT -> PLang (Effects c a b) AFFECT
+  Provides : PLang a (PATTERN ty)
+          -> (c : Contrib)
+          -> PLang b REQUIREMENT
+          -> PLang (Impacts c a b) AFFECT
 
-  LinkedTo    : PLang a (PATTERN x) -> PLang b (PATTERN y) -> PLang (Impacts ZERO a b) RELATION
-  Implements  : PLang a (PATTERN x) -> PLang b (PATTERN y) -> {auto prf : ValidR x y} -> PLang (AND a [b]) RELATION
-  Uses        : PLang a (PATTERN x) -> PLang b (PATTERN y) -> {auto prf : ValidU x y} -> PLang (AND a [b]) RELATION
-  Specialises : PLang a (PATTERN x) -> PLang b (PATTERN y) -> {auto prf : ValidI x y} -> PLang (AND a [b]) RELATION
+  Affects  : PLang a (PATTERN ty)
+          -> (c : Contrib)
+          -> PLang b REQUIREMENT
+          -> PLang (Effects c a b) AFFECT
 
+  LinkedTo : PLang a (PATTERN x)
+          -> PLang b (PATTERN y)
+          -> PLang (Impacts ZERO a b) RELATION
+
+  Implements : PLang a (PATTERN x)
+            -> PLang b (PATTERN y)
+            -> {auto prf : ValidR x y}
+            -> PLang (AND a [b]) RELATION
+
+  Uses : PLang a (PATTERN x)
+      -> PLang b (PATTERN y)
+      -> {auto prf : ValidU x y}
+      -> PLang (AND a [b]) RELATION
+
+  Specialises : PLang a (PATTERN x)
+             -> PLang b (PATTERN y)
+             -> {auto prf : ValidI x y}
+             -> PLang (AND a [b]) RELATION
 
   MkPLang : (reqs  : SigmaList (GModel ELEM) (\x => PLang x REQUIREMENT) fs)
          -> (patts : SigmaList (GModel ELEM) (\x => PLang x (PATTERN y)) ps)

@@ -14,12 +14,13 @@ import public GRL.Utils
 import public Sif.Pattern.Problem
 
 ||| Within the 'Solution' EDSL there are several types of element.
-data STy = ACTION | RELATION | PROPERTY | SPEC
+data STy = ACTION | RELATION | PROPERTY | SPEC | EMPTY
 
 using (m : GModel MODEL, p : Problem m PSPEC)
   ||| A design pattern is indexed over a problem specification, a
   ||| corresponding GRL model and a type.
   data Pattern : Problem m PSPEC -> GModel ty -> STy -> Type where
+    Empty : Pattern p Empty EMPTY
 
     ||| A thing that a property does to resolve a force.
     Action : (name : Maybe String)
@@ -79,7 +80,7 @@ findAction n (x::xs) = case (getActionName x) of
   (Just m) => if n == m then Just (_ ** x) else findAction n xs
   Nothing  => findAction n xs
 
-
+-- -------------------------------------------------------------------- [ Show ]
 showPattern : Pattern p e ty -> String
 showPattern (Action n eval)       = unwords ["[Action ", show n, show eval, "]\n"]
 showPattern (HasSubAction x ty y) = unwords ["[HasSubAction", showPattern x, show ty, showPattern y, "]\n"]
@@ -92,4 +93,24 @@ showPattern (MkPattern t p ps) = unwords ["[Pattern", show t, show p, showSigmaL
 instance Show (Pattern p e ty) where
   show = showPattern
 
+
+instance Semigroup (Pattern p e ty) where
+  (<+>) Empty Empty = Empty
+  (<+>)
+
+instance Monoid (Pattern p e ty) where
+  neutral = Empty
+{-
+
+instance Semigroup Doc where
+  (<+>) = beside
+
+||| Note that the neutral element is not a left and right unit with
+||| respect to propositional equality of the underlying Doc syntax
+||| tree, but rather with respect to the equality of the result of
+||| rendering. So it's "morally" a `Monoid`.
+instance Monoid Doc where
+  neutral = empty
+
+-}
 -- --------------------------------------------------------------------- [ EOF ]

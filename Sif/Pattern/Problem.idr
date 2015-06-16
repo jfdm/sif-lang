@@ -5,7 +5,7 @@
 ||| requirement.
 module Sif.Pattern.Problem
 
-import Data.SigmaList
+import public Data.SigmaList
 
 import GRL.Model
 
@@ -118,6 +118,10 @@ data Problem : GModel ty -> PTy -> Type where
             -> (es : SigmaList (GModel ELEM) (\x => Problem x FORCE) res)
             -> (ls : SigmaList (GModel LINK) (\x => Problem x FLINK) rls)
             -> Problem (GRLSpec res rls) PSPEC
+
+Reqs : List (GModel ELEM) -> Type
+Reqs rs = SigmaList (GModel ELEM) (\x => Problem x FORCE) rs
+
 
 -- -------------------------------------------------------------------- [ Show ]
 
