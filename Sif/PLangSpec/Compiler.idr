@@ -62,16 +62,17 @@ evalDecl env (LinkedTo    a b) = (env, AND (snd $ evalDecl env a) [(snd $ evalDe
 evalDecl env (Uses        a b) = (env, AND (snd $ evalDecl env a) [(snd $ evalDecl env b)])
 evalDecl env (Specialises a b) = (env, AND (snd $ evalDecl env a) [(snd $ evalDecl env b)])
 
+
 covering
 interp : Env gam -> Stmt gam -> {[STATE (GModel MODEL)]} Eff (Env gam)
 interp env (Dcl expr) = do
     let (env', x) = (evalDecl env expr)
-    updateM (\g => insertIntoGRL x g)
+    updateM (insertIntoGRL x)
     pure env'
 
 interp env (Let expr body) = do
   let (_, x) = evalDecl env expr
-  updateM (\g => insertIntoGRL x g)
+  updateM (insertIntoGRL x)
 
   let env' = alloc x env
   env'' <- interp env' body

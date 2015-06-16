@@ -3,8 +3,8 @@ module Sif.Examples.Tropyc
 import Sif.PLangSpec
 
 
-tropyc : Stmt g
-tropyc = with List (sif (do
+tropyc : Stmt []
+tropyc = sif (do
   let metapattern = Generic "Cryptographic MetaPattern"
   let mauth = Component "Message Authentication"
   let infosec = Component "Information Secrecy"
@@ -31,7 +31,7 @@ tropyc = with List (sif (do
   Dcl $ Uses swi infosec
   Dcl $ Uses swi msgintegrity
   Dcl $ Uses swswa sws
-  Dcl $ Uses swswa swapp))
+  Dcl $ Uses swswa swapp)
 
 -- main : IO ()
 -- main = print $ run $ compile tropyc
