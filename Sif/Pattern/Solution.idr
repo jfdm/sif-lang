@@ -7,36 +7,48 @@
 ||| to make this work.
 module Sif.Pattern.Solution
 
-import Data.SigmaList
+import Data.Sigma.DList
 
-import public GRL.Model
-import public GRL.Utils
+import public GRL.Lang.GLang
 import public Sif.Pattern.Problem
 
-||| Within the 'Solution' EDSL there are several types of element.
-data STy = ACTION | RELATION | PROPERTY | SPEC | EMPTY
+-- ----------------------------------------------------------------- [ Actions ]
 
-using (m : GModel MODEL, p : Problem m PSPEC)
-  ||| A design pattern is indexed over a problem specification, a
-  ||| corresponding GRL model and a type.
-  data Pattern : Problem m PSPEC -> GModel ty -> STy -> Type where
-    Empty : Pattern p Empty EMPTY
+data Action : GLang ELEM -> Type where
+  MkAction : (desc : String)
+          -> (sval : Maybe SValue)
+          -> Action (MkTask desc sval)
 
-    ||| A thing that a property does to resolve a force.
-    Action : (name : Maybe String)
-           -> (evalue : EvalVal)
-           -> Pattern p (Task name evalue) ACTION
+instance Show (Action x) where
+  show (MkAction d s) = "[Action " ++ show d ++ " " ++ show s ++ "]"
 
-    ||| Actions can have sub requirements.
-    HasSubAction : (x : Pattern p a ACTION)
-                -> (rty : DTy)
-                -> (y : Pattern p b ACTION)
-                -> Pattern p (genDComp rty a b) RELATION
+eqAction : Action x -> Action y -> Bool
+eqAction (MkAction xd xs) (MkAction yd ys) = xd == yd && xs == ys
 
+instance Eq (Action x) where
+  (==) = eqAction
+
+-- ------------------------------------------------------------- [ Sub Actions ]
+||| State that the action can be broken down into other actions
+data SubActLink : GLang STRUCT -> Type where
+  MkAndALink : Action x -> DList (GLang ELEM) (Action) ys -> SubActLink (x &= ys)
+  MkIorALink : Action x -> DList (GLang ELEM) (Action) ys -> SubActLink (x |= ys)
+  MkXorALink : Action x -> DList (GLang ELEM) (Action) ys -> SubActLink (x X= ys)
+
+instance Show (SubActLink s) where
+  show (MkAndALink a bs) = "[" ++ show a ++ showDList show bs ++ "]"
+  show (MkIorALink a bs) = "[" ++ show a ++ showDList show bs ++ "]"
+  show (MkXorALink a bs) = "[" ++ show a ++ showDList show bs ++ "]"
+
+eqSALink : SubActLink x -> SubActLink y -> Bool
+eqSALink {x} {y} _ _ = eqGLang x y
+
+-- ------------------------------------------------------------ [ Intent Links ]
+data Intention : Problem m  -> Type where
     ||| Actions will act upon requirements from the problem.
-    ActsOn : (a : Pattern p x ACTION)
-           -> (c : Contrib)
-           -> (f : Problem g FORCE)
+    ActsOn : (a : Action x)
+          -> (c : Contrib)
+          -> (f : Req y rty)
 --           -> {auto prf : usesForce f p = Yes prf'}
            -> Pattern p (Impacts c x g) RELATION
 
@@ -59,16 +71,8 @@ using (m : GModel MODEL, p : Problem m PSPEC)
               -> (props : SigmaList (GModel MODEL) (\x => Pattern p x PROPERTY) ps)
               -> Pattern p (foldGRLS m ps) SPEC
 
--- ------------------------------------------------------------ [ Type Aliases ]
-Actions : Problem {ty=MODEL} m PSPEC -> List (GModel ELEM) -> Type
-Actions p es = SigmaList (GModel ELEM) (\x => Pattern p x ACTION) es
 
-Relations : Problem {ty=MODEL} m PSPEC -> List (GModel LINK) -> Type
-Relations p es = SigmaList (GModel LINK) (\x => Pattern p x RELATION) es
-
-Properties : Problem {ty=MODEL} m PSPEC -> List (GModel MODEL) -> Type
-Properties p es = SigmaList (GModel MODEL) (\x => Pattern p x PROPERTY) es
-
+-- -------------------------------------------------------------------- [ Misc ]
 getActionName : Pattern p e ACTION -> Maybe String
 getActionName (Action name _) = name
 
@@ -80,37 +84,4 @@ findAction n (x::xs) = case (getActionName x) of
   (Just m) => if n == m then Just (_ ** x) else findAction n xs
   Nothing  => findAction n xs
 
--- -------------------------------------------------------------------- [ Show ]
-showPattern : Pattern p e ty -> String
-showPattern (Action n eval)       = unwords ["[Action ", show n, show eval, "]\n"]
-showPattern (HasSubAction x ty y) = unwords ["[HasSubAction", showPattern x, show ty, showPattern y, "]\n"]
-
-showPattern (ActsOn a c f) = unwords ["[ActsOn", showPattern a, show c, show f, "]\n"]
-showPattern (SideEffect a c b) = unwords ["[SideEffect", showPattern a, show c, showPattern b, "]\n"]
-showPattern (Property n as ls) = unwords ["[Property", show n, showSigmaList showPattern as, showSigmaList showPattern ls, "]\n"]
-showPattern (MkPattern t p ps) = unwords ["[Pattern", show t, show p, showSigmaList showPattern ps, "]\n"]
-
-instance Show (Pattern p e ty) where
-  show = showPattern
-
-
-instance Semigroup (Pattern p e ty) where
-  (<+>) Empty Empty = Empty
-  (<+>)
-
-instance Monoid (Pattern p e ty) where
-  neutral = Empty
-{-
-
-instance Semigroup Doc where
-  (<+>) = beside
-
-||| Note that the neutral element is not a left and right unit with
-||| respect to propositional equality of the underlying Doc syntax
-||| tree, but rather with respect to the equality of the result of
-||| rendering. So it's "morally" a `Monoid`.
-instance Monoid Doc where
-  neutral = empty
-
--}
 -- --------------------------------------------------------------------- [ EOF ]

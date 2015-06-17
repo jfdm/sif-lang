@@ -5,51 +5,50 @@
 ||| requirement.
 module Sif.Pattern.Problem
 
-import public Data.SigmaList
+import public Data.Sigma.DList
 
-import GRL.Model
+import GRL.Lang.GLang
 
 %access public
 
-||| Within the Problem EDSL there are three types of element.
-data PTy = FORCE | FLINK | PSPEC
-data DTy = ANDTy | XORTy | IORTy
+-- ------------------------------------------------------- [ Requirement Types ]
 
-instance Show DTy where
-  show ANDTy = "&&"
-  show XORTy = "XOR"
-  show IORTy = "||"
+||| Within the Problem EDSL there are five types of force.
+data FTy = FuncTy | UsabTy | ReliTy | PerfTy | SuppTy
 
-instance Eq DTy where
-  (==) ANDTy ANDTy = True
-  (==) XORTy XORTy = True
-  (==) IORTy IORTy = True
-  (==) _     _     = False
+instance Show FTy where
+  show FuncTy  = "FuncTy"
+  show UsabTy  = "UsabTy"
+  show ReliTy  = "ReliTy"
+  show PerfTy  = "PerfTy"
+  show SuppTy  = "SuppTy"
 
-genDComp : DTy -> GModel ELEM -> GModel ELEM -> GModel LINK
-genDComp ty x y with (ty)
-  | ANDTy = AND x [y]
-  | XORTy = XOR x [y]
-  | IORTy = IOR x [y]
+instance Eq FTy where
+  (==) FuncTy FuncTy = True
+  (==) UsabTy UsabTy = True
+  (==) ReliTy ReliTy = True
+  (==) PerfTy PerfTy = True
+  (==) SuppTy SuppTy = True
+  (==) _      _      = False
 
-||| A model for a problem in the context of a design patterns.
-||| The requirement types are taken from the FURPS methodology.
-data Problem : GModel ty -> PTy -> Type where
+-- --------------------------------------------------------- [ Requirement ADT ]
+private
+mkG : String -> GLang ELEM
+mkG s = MkGoal s Nothing
 
+data Req : GLang ELEM -> FTy -> Type where
   ||| Requirements relating to functionality and security.
   |||
   ||| Functionality - Capability (Size & Generality of Feature Set),
   ||| Reusability (Compatibility, Interoperability, Portability),
   ||| Security (Safety & Exploitability)
-  Functional : (name : Maybe String)
-             -> Problem (Goal name UNKNOWN) FORCE
+  MkFunctional : (desc : String) -> Req (mkG desc) FuncTy
 
   ||| Requirements relating to usability metters.
   |||
   ||| Usability (UX) - Human Factors, Aesthetics, Consistency,
   ||| Documentation, Responsiveness
-  Usability : (name : Maybe String)
-            -> Problem (Goal name UNKNOWN) FORCE
+  MkUsability : (desc : String) -> Req (mkG desc) UsabTy
 
   ||| Requirements relating to reliability matters.
   |||
@@ -57,16 +56,14 @@ data Problem : GModel ty -> PTy -> Type where
   ||| (Robustness/Durability/Resilience), Failure Extent &
   ||| Time-Length (Recoverability/Survivability)), Predictability
   ||| (Stability), Accuracy (Frequency/Severity of Error)
-  Reliability : (name : Maybe String)
-              -> Problem (Goal name UNKNOWN) FORCE
+  MkReliability : (desc : String) -> Req (mkG desc) ReliTy
 
   ||| Requirements relating to perf matters.
   |||
   ||| For example: Performance - Speed, Efficiency, Resource
   ||| Consumption (power, ram, cache, etc.), Throughput, Capacity,
   ||| Scalability
-  Performance : (name : Maybe String)
-              -> Problem (Goal name UNKNOWN) FORCE
+  MkPerformance : (desc : String) -> Req (mkG desc) PerfTy
 
   ||| Requirements relating to the maintenance of the problem.
   |||
@@ -74,139 +71,94 @@ data Problem : GModel ty -> PTy -> Type where
   ||| Sustainability, Repair Speed) - Testability, Flexibility
   ||| (Modifiability, Configurability, Adaptability, Extensibility,
   ||| Modularity), Installability, Localizability
-  Supportability : (name : Maybe String)
-                 -> Problem (Goal name UNKNOWN) FORCE
+  MkSupportability : (desc : String) -> Req (mkG desc) SuppTy
 
-  ||| State that the requirement can be broken down into other
-  ||| requirements. TODO Fix
-  |||
-  ||| @rty The type of breakdown.
-  ||| @a   The requirement being divided.
-  ||| @b   The requirements being linked to.
-  HasSubReq : (rty : DTy)
-            -> (a : Problem x FORCE)
-            -> (b : Problem y FORCE)
-            -> Problem (genDComp rty x y) FLINK
+instance Show (Req e ty) where
+  show (MkFunctional s) = "[Functional " ++ show s ++ "]"
+  show (MkUsability s) = "[Usability " ++ show s ++ "]"
+  show (MkReliability s) = "[Reliability " ++ show s ++ "]"
+  show (MkPerformance s) = "[Performance " ++ show s ++ "]"
+  show (MkSupportability s) = "[Supportability " ++ show s ++ "]"
 
-  ||| State that requirement `a` has a direct impact upon
-  ||| requirement `b` by `c` amount.
-  |||
-  ||| @a The requirement that provides the impact.
-  ||| @c The value of the impact.
-  ||| @b The requirement that will be impacted.
-  ImpactsUpon : (a : Problem x FORCE)
-              -> (c : Contrib)
-              -> (b : Problem y FORCE)
-              -> Problem (Impacts c x y) FLINK
+private
+eqRequire : Req ex xty -> Req ey yty -> Bool
+eqRequire (MkFunctional x)     (MkFunctional y)     = x == y
+eqRequire (MkUsability x)      (MkUsability y)      = x == y
+eqRequire (MkReliability x)    (MkReliability y)    = x == y
+eqRequire (MkPerformance x)    (MkPerformance y)    = x == y
+eqRequire (MkSupportability x) (MkSupportability y) = x == y
+eqRequire _                     _                    = False
 
-  ||| State that requirement `a` affects requirement `b` by `c` contribution.
-  |||
-  ||| @a The requirement that provides the effect.
-  ||| @c The value of the affect.
-  ||| @b The requirement that will be affected.
-  EffectsUpon : (a : Problem x FORCE)
-              -> (c : Contrib)
-              -> (b : Problem y FORCE)
-              -> Problem (Effects c x y) FLINK
+instance Eq (Req e ty) where
+  (==) = eqRequire
 
-  ||| Construct a problem definition.
-  |||
-  ||| @desc The problem description.
-  ||| @es   The list of problem requirements.
-  ||| @ls   The list of links between requirements.
-  MkProblem : (desc : Maybe String)
-            -> (es : SigmaList (GModel ELEM) (\x => Problem x FORCE) res)
-            -> (ls : SigmaList (GModel LINK) (\x => Problem x FLINK) rls)
-            -> Problem (GRLSpec res rls) PSPEC
+-- ----------------------------------------------------- [ Sub Requirement ADT ]
 
-Reqs : List (GModel ELEM) -> Type
-Reqs rs = SigmaList (GModel ELEM) (\x => Problem x FORCE) rs
+||| State that the requirement can be broken down into other
+||| requirements.
+|||
+data SubReqLink : GLang STRUCT -> Type where
+  MkAndLink : Req x xty -> DList (GLang ELEM) (\y => Req y yty) ys -> SubReqLink (x &= ys)
+  MkIorLink : Req x xty -> DList (GLang ELEM) (\y => Req y yty) ys -> SubReqLink (x |= ys)
+  MkXorLink : Req x xty -> DList (GLang ELEM) (\y => Req y yty) ys -> SubReqLink (x X= ys)
+
+instance Show (SubReqLink s) where
+  show (MkAndLink a bs) = "[" ++ show a ++ showDList show bs ++ "]"
+  show (MkIorLink a bs) = "[" ++ show a ++ showDList show bs ++ "]"
+  show (MkXorLink a bs) = "[" ++ show a ++ showDList show bs ++ "]"
+
+eqSRLink : SubReqLink x -> SubReqLink y -> Bool
+eqSRLink {x} {y} _ _ = eqGLang x y
+
+-- @TODO Add Eq instance
+-- eqSRLink (MkAndLink a as)  (MkAndLink b bs) = b == a && eqDList (\x,y => x == y) as bs
+-- eqSRLink (MkIorLink a as)  (MkIorLink b bs) = b == a && eqDList (\x,y => x == y) as bs
+-- eqSRLink (MkXorLink a as)  (MkXorLink b bs) = b == a && eqDList (\x,y => x == y) as bs
+-- eqSRLink _                 _                = False
 
 
--- -------------------------------------------------------------------- [ Show ]
+-- --------------------------------------------------------- [ IntentLink ADTs ]
 
-showProblem : Problem x ty -> String
-showProblem (MkProblem d es ls) = unwords ["[Problem ", show d, showSigmaList (showProblem) es, showSigmaList (showProblem) ls, "]\n"]
-showProblem (EffectsUpon a c b) = unwords ["[Effect", showProblem a, show c, showProblem b, "]\n"]
-showProblem (ImpactsUpon a c b) = unwords ["[Impact", showProblem a, show c, showProblem b, "]\n"]
-showProblem (HasSubReq dty a b) = unwords ["[SubReq", show dty, showProblem a, showProblem b, "]\n"]
-showProblem (Functional n)      = unwords ["[Functional", show n, "]\n"]
-showProblem (Usability n)       = unwords ["[Usability", show n, "]\n"]
-showProblem (Reliability n)     = unwords ["[Reliability", show n, "]\n"]
-showProblem (Performance n)     = unwords ["[Performance", show n, "]\n"]
-showProblem (Supportability n)  = unwords ["[Supportability", show n, "]\n"]
+||| State the impact or effect that a force has on another force.
+data IntentLink : GLang INTENT -> Type where
+  MkFImpact : (c : CValue) -> Req x xty -> Req y yty -> IntentLink (x ==> y | c)
+  MkFEffect : (c : CValue) -> Req x xty -> Req y yty -> IntentLink (x ~~> y | c)
 
-instance Show (Problem x ty) where
-  show = showProblem
-
--- ------------------------------------------------------------- [ Eq Instance ]
-
-eqProblem : Problem a aTy -> Problem b bTy -> Bool
-eqProblem (Functional x)         (Functional y)         = x == y
-eqProblem (Usability x)          (Usability y)          = x == y
-eqProblem (Reliability x)        (Reliability y)        = x == y
-eqProblem (Performance x)        (Performance y)        = x == y
-eqProblem (Supportability x)     (Supportability y)     = x == y
-
-eqProblem (EffectsUpon xa xc xb) (EffectsUpon ya yc yb) = eqProblem xa ya && xc == yc && eqProblem xb yb
-eqProblem (ImpactsUpon xa xc xb) (ImpactsUpon ya yc yb) = eqProblem xa ya && xc == yc && eqProblem xb yb
-eqProblem (HasSubReq xDty xa xb) (HasSubReq yDty ya yb) = eqProblem xa ya && xDty == yDty && eqProblem ya yb
-
-eqProblem (MkProblem x xs xxs)   (MkProblem y ys yys) = x == y && eqSigmaList eqProblem xs ys && eqSigmaList eqProblem xxs yys
+instance Show (IntentLink i) where
+  show (MkFImpact c a b) = "[Req Impacts " ++ show a ++ " " ++ show b ++ "]"
+  show (MkFEffect c a b) = "[Req Effects " ++ show a ++ " " ++ show b ++ "]"
 
 
--- ----------------------------------------------- [ Force Deciadable Equality ]
--- @TODO make deeply decidable...
-forceDecEq : (x : Problem a FORCE) -> (y : Problem b FORCE) -> Dec (x = y)
-forceDecEq x y = if eqProblem x y
-                   then Yes forcePrimEq
-                   else No forcePrimNotEq
-    where
-      forcePrimEq : x = y
-      forcePrimEq = believe_me (Refl {x})
-      postulate forcePrimNotEq : x = y -> Void
+-- @TODO Add Eq Instance
 
-data ExistsForce : (f : Problem m FORCE) -> SigmaList (GModel ELEM) (\x => Problem x FORCE) ms -> Type where
-  Here  : ExistsForce f (f::fs)
-  There : ExistsForce f fs -> ExistsForce f (f'::fs)
+eqIntentLink : IntentLink x -> IntentLink y -> Bool
+eqIntentLink (MkFImpact xc xa xb) (MkFImpact yc ya yb) = xc == yc && eqRequire xa ya && eqRequire xb yb
+eqIntentLink (MkFEffect xc xa xb) (MkFEffect yc ya yb) = xc == yc && eqRequire xa ya && eqRequire xb yb
+eqIntentLink _              _              = False
 
-instance Uninhabited (ExistsForce x Nil) where
-  uninhabited Here      impossible
-  uninhabited (There p) impossible
+-- ------------------------------------------------------------- [ Problem ADT ]
+||| Construct a problem.
+data Problem : GModel -> Type where
+  MkProblem : (desc : String)
+            -> (fs  : DList (GLang ELEM)   (\x => Req x xty) es)
+            -> (sfs : DList (GLang STRUCT) (SubReqLink)      ss)
+            -> (ifs : DList (GLang INTENT) (IntentLink)        is)
+            -> Problem (insertMany is $ insertMany ss $ insertMany es emptyModel)
 
+instance Show (Problem m) where
+  show (MkProblem d fs sfs ifs) = with List
+      unwords ["[Problem", show d,
+                           showDList show fs,
+                           showDList show sfs,
+                           showDList show ifs,"]"]
 
-data ContainsForce : Problem g FORCE -> Problem m PSPEC -> Type where
-  UsesForce : ExistsForce f fs -> ContainsForce f p
+eqProblem : Problem a -> Problem b -> Bool
+eqProblem (MkProblem x xfs xsfs xifs) (MkProblem y yfs ysfs yifs) =
+  x == y &&
+  showDList show xfs == showDList show yfs &&
+  eqDList eqSRLink  xsfs ysfs &&
+  eqDList eqIntentLink xifs yifs
 
--- @TODO Get rid of believe_me
-forceIsUsed : (f : Problem g FORCE) -> (ls : SigmaList (GModel ELEM) (\x => Problem x FORCE) fs) -> Dec (ExistsForce f ls)
-forceIsUsed x Nil        = No absurd
-forceIsUsed x (y :: xs) with (forceDecEq x y)
-  forceIsUsed x (x :: xs) | (Yes Refl) = Yes Here
-  forceIsUsed x (y :: xs) | (No contra) with (forceIsUsed x xs)
-    forceIsUsed x (y :: xs) | (No contra) | (Yes prf) = Yes (There prf)
-    forceIsUsed x (y :: xs) | (No contra) | (No f)    = No (believe_me)
-
--- @TODO Get rid of believe_me
-usesForce : (f : Problem g FORCE) -> (p : Problem m PSPEC) -> Dec (ContainsForce f p)
-usesForce f p with (p)
-  | (MkProblem d es ls) with (forceIsUsed f es)
-    | (Yes prf)    = Yes (UsesForce prf)
-    | (No  contra) = No (believe_me)
-
-getReqName : Problem e FORCE -> Maybe String
-getReqName (Functional name) = name
-getReqName (Usability name) = name
-getReqName (Reliability name) = name
-getReqName (Performance name) = name
-getReqName (Supportability name) = name
-
-findReq : String
-       -> SigmaList (GModel ELEM) (\x => Problem x FORCE) rs
-       -> Maybe (e : GModel ELEM ** Problem e FORCE)
-findReq _ Nil     = Nothing
-findReq n (x::xs) = case (getReqName x) of
-  (Just m) => if n == m then Just (_ ** x) else findReq n xs
-  Nothing  => findReq n xs
-
+getModelProblem : Problem m -> GModel
+getModelProblem {m} _ = m
 -- --------------------------------------------------------------------- [ EOF ]

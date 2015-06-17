@@ -7,7 +7,4 @@ modules = Sif.Pattern.Problem
         , Sif.Pattern
 
         , Sif.PLang.Common
-        , Sif.PLang.Definition
-        , Sif.PLang.Model
---        , Sif.PLang.Compiler
         , Sif.PLang

@@ -1,33 +1,32 @@
 module Sif.PLang.Common
 
 -- ------------------------------------------------------------------- [ Types ]
-data PTy = COMPONENT | SYSTEM | GENERIC | DEPLOY | ADMIN | CODE
+data PTy = CompTy | SysTy | GenTy | DeployTy | AdminTy | CodeTy
 
+data RTy = FuncTy | UsabTy | ReliTy | PerfTy | SuppTy
 -- -------------------------------------------------------------- [ Predicates ]
 
 data ValidR : PTy -> PTy -> Type where
-  RealCC : ValidR COMPONENT COMPONENT
-  RealCG : ValidR COMPONENT GENERIC
-  RealGG : ValidR GENERIC   GENERIC
-  RealIC : ValidR CODE      COMPONENT
-  RealIG : ValidR CODE      GENERIC
+  RealCC : ValidR CompTy CompTy
+  RealCG : ValidR CompTy GenTy
+  RealGG : ValidR GenTy   GenTy
+  RealIC : ValidR CodeTy      CompTy
+  RealIG : ValidR CodeTy      GenTy
 
 data ValidI : PTy -> PTy -> Type where
-  SpeciSS : ValidI SYSTEM    SYSTEM
-  SpeciDS : ValidI DEPLOY    SYSTEM
-  SpeciCC : ValidI COMPONENT COMPONENT
-  SpeciCG : ValidI COMPONENT GENERIC
-  SpeciGG : ValidI GENERIC   GENERIC
+  SpeciSS : ValidI SysTy    SysTy
+  SpeciDS : ValidI DeployTy    SysTy
+  SpeciCC : ValidI CompTy CompTy
+  SpeciCG : ValidI CompTy GenTy
+  SpeciGG : ValidI GenTy   GenTy
 
 data ValidU : PTy -> PTy -> Type where
-  UsesCC : ValidU COMPONENT COMPONENT
-  UsesCP : ValidU COMPONENT GENERIC
-  UsesSS : ValidU SYSTEM    SYSTEM
-  UsesSD : ValidU SYSTEM    DEPLOY
-  UsesSC : ValidU SYSTEM    COMPONENT
-  UsesSA : ValidU SYSTEM    ADMIN
-  UsesSP : ValidU SYSTEM    GENERIC
-  UsesII : ValidU CODE      CODE
-  UsesPP : ValidU GENERIC   GENERIC
-
-data LTy = PATTERN PTy | RELATION | AFFECT | REQUIREMENT | LANG
+  UsesCC : ValidU CompTy CompTy
+  UsesCP : ValidU CompTy GenTy
+  UsesSS : ValidU SysTy    SysTy
+  UsesSD : ValidU SysTy    DeployTy
+  UsesSC : ValidU SysTy    CompTy
+  UsesSA : ValidU SysTy    AdminTy
+  UsesSP : ValidU SysTy    GenTy
+  UsesII : ValidU CodeTy      CodeTy
+  UsesPP : ValidU GenTy   GenTy
