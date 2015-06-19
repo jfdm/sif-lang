@@ -12,7 +12,19 @@ import Data.Sigma.DList
 import public GRL.Lang.GLang
 import public Sif.Pattern.Problem
 
+{-
+A Pattern is:
+
++ Problem
++ Original Context
++ Forces
++ Solution
++ Resulting Context.
+
+-}
+
 -- ----------------------------------------------------------------- [ Actions ]
+
 
 data Action : GLang ELEM -> Type where
   MkAction : (desc : String)
@@ -27,6 +39,9 @@ eqAction (MkAction xd xs) (MkAction yd ys) = xd == yd && xs == ys
 
 instance Eq (Action x) where
   (==) = eqAction
+
+getActionName : Action e -> String
+getActionName (MkAction d _) = d
 
 -- ------------------------------------------------------------- [ Sub Actions ]
 ||| State that the action can be broken down into other actions
@@ -43,36 +58,36 @@ instance Show (SubActLink s) where
 eqSALink : SubActLink x -> SubActLink y -> Bool
 eqSALink {x} {y} _ _ = eqGLang x y
 
--- ------------------------------------------------------------ [ Intent Links ]
-data Intention : Problem m  -> Type where
-    ||| Actions will act upon requirements from the problem.
-    ActsOn : (a : Action x)
-          -> (c : Contrib)
-          -> (f : Req y rty)
---           -> {auto prf : usesForce f p = Yes prf'}
-           -> Pattern p (Impacts c x g) RELATION
+data Intention : GLang INTENT -> Type where
+  AffectReq : (c : CValue)
+           -> (a : Action x)
+           -> (r : Req y rty)
+           -> Intention (x ==> y | c)
+  AffectAct : (c : CValue)
+           -> (a : Action x)
+           -> (b : Action y)
+           -> Intention (x ==> y | c)
 
-    ||| Use of acts will affect other acts.
-    SideEffect : (a : Pattern p x ACTION)
-              -> (c : Contrib)
-              -> (b : Pattern p y ACTION)
-              -> Pattern p (Effects c x y) RELATION
+data Property : DList GTy GLang gs -> Type where
+  MkProperty : (desc : String)
+            -> (as  : DList (GLang ELEM)   (Action)     es)
+            -> (sas : DList (GLang STRUCT) (SubActLink) ss)
+            -> (ias : DList (GLang INTENT) (Intention)  is)
+            -> Property ((getProof $ fromList es) ++
+                         (getProof $ fromList ss) ++
+                         (getProof $ fromList is))
 
-    ||| Properties are aspects of a solution that will affect
-    ||| several forces in the problem.
-    Property : (name : Maybe String)
-            -> (actions : SigmaList (GModel ELEM) (\x => Pattern p x ACTION) gas)
-            -> (links   : SigmaList (GModel LINK) (\x => Pattern p x RELATION) ges)
-            -> Pattern p (GRLSpec gas ges) PROPERTY
+data Properties : DList GTy GLang gs -> Type where
+  Nil  : Properties Nil
+  (::) : Property gs -> Properties ggs -> Properties (gs ++ ggs)
 
-    ||| Construct a pattern.
-    MkPattern : (title : Maybe String)
-              -> (p : Problem m PSPEC)
-              -> (props : SigmaList (GModel MODEL) (\x => Pattern p x PROPERTY) ps)
-              -> Pattern p (foldGRLS m ps) SPEC
-
+data Solution : DList GTy GLang gs -> Type where
+  MkSolution : (title : String)
+            -> (ps : Properties ggs)
+            -> Solution ggs
 
 -- -------------------------------------------------------------------- [ Misc ]
+{-
 getActionName : Pattern p e ACTION -> Maybe String
 getActionName (Action name _) = name
 
@@ -83,5 +98,5 @@ findAction _ Nil     = Nothing
 findAction n (x::xs) = case (getActionName x) of
   (Just m) => if n == m then Just (_ ** x) else findAction n xs
   Nothing  => findAction n xs
-
+-}
 -- --------------------------------------------------------------------- [ EOF ]
