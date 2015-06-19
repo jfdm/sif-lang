@@ -12,19 +12,10 @@ import Data.Sigma.DList
 import public GRL.Lang.GLang
 import public Sif.Pattern.Problem
 
-{-
-A Pattern is:
-
-+ Problem
-+ Original Context
-+ Forces
-+ Solution
-+ Resulting Context.
-
--}
+%access public
+%default total
 
 -- ----------------------------------------------------------------- [ Actions ]
-
 
 data Action : GLang ELEM -> Type where
   MkAction : (desc : String)
@@ -56,7 +47,7 @@ instance Show (SubActLink s) where
   show (MkXorALink a bs) = "[" ++ show a ++ showDList show bs ++ "]"
 
 eqSALink : SubActLink x -> SubActLink y -> Bool
-eqSALink {x} {y} _ _ = eqGLang x y
+eqSALink {x} {y} _ _ = x == y
 
 data Intention : GLang INTENT -> Type where
   AffectReq : (c : CValue)

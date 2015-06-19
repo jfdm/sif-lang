@@ -10,6 +10,7 @@ import public Data.Sigma.DList
 import GRL.Lang.GLang
 
 %access public
+%default total
 
 -- ------------------------------------------------------- [ Requirement Types ]
 
@@ -108,14 +109,14 @@ instance Show (SubReqLink s) where
   show (MkXorLink a bs) = "[" ++ show a ++ showDList show bs ++ "]"
 
 eqSRLink : SubReqLink x -> SubReqLink y -> Bool
-eqSRLink {x} {y} _ _ = eqGLang x y
+eqSRLink {x} {y} _ _ = x == y
 
 -- @TODO Add Eq instance
--- eqSRLink (MkAndLink a as)  (MkAndLink b bs) = b == a && eqDList (\x,y => x == y) as bs
--- eqSRLink (MkIorLink a as)  (MkIorLink b bs) = b == a && eqDList (\x,y => x == y) as bs
--- eqSRLink (MkXorLink a as)  (MkXorLink b bs) = b == a && eqDList (\x,y => x == y) as bs
+-- eqSRLink : SubReqLink x -> SubReqLink y -> Bool
+-- eqSRLink (MkAndLink a as)  (MkAndLink b bs) = b == a && eqDList (\x,y => eqRequire x y) as bs
+-- eqSRLink (MkIorLink a as)  (MkIorLink b bs) = b == a && eqDList (\x,y => eqRequire x y) as bs
+-- eqSRLink (MkXorLink a as)  (MkXorLink b bs) = b == a && eqDList (\x,y => eqRequire x y) as bs
 -- eqSRLink _                 _                = False
-
 
 -- --------------------------------------------------------- [ IntentLink ADTs ]
 
@@ -134,7 +135,7 @@ instance Show (IntentLink i) where
 eqIntentLink : IntentLink x -> IntentLink y -> Bool
 eqIntentLink (MkFImpact xc xa xb) (MkFImpact yc ya yb) = xc == yc && eqRequire xa ya && eqRequire xb yb
 eqIntentLink (MkFEffect xc xa xb) (MkFEffect yc ya yb) = xc == yc && eqRequire xa ya && eqRequire xb yb
-eqIntentLink _              _              = False
+eqIntentLink _              _                          = False
 
 -- ------------------------------------------------------------- [ Problem ADT ]
 ||| Construct a problem.
@@ -158,6 +159,7 @@ eqProblem (MkProblem x xfs xsfs xifs) (MkProblem y yfs ysfs yifs) =
   showDList show xfs == showDList show yfs &&
   eqDList eqSRLink  xsfs ysfs &&
   eqDList eqIntentLink xifs yifs
+eqProblem _ _ = False
 
 getModelProblem : Problem m -> GModel
 getModelProblem {m} _ = m

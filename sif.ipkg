@@ -1,6 +1,6 @@
 package sif
 
-opts = "-p effects -p containers -p grl"
+opts = "-p effects -p containers -p grl --warnpartial --warnreach --total"
 
 modules = Sif.Pattern.Problem
         , Sif.Pattern.Solution

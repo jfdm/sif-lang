@@ -2,15 +2,14 @@
 
 IDRIS := idris
 LIB   := sif
-OPTS  :=
 
 .PHONY: doc clobber check clean lib install
 
 install:
-	${IDRIS} ${OPTS} --install ${LIB}.ipkg
+	${IDRIS} --install ${LIB}.ipkg
 
 lib:
-	${IDRIS} ${OPTS} --build ${LIB}.ipkg
+	${IDRIS} --build ${LIB}.ipkg
 
 clean:
 	${IDRIS} --clean ${LIB}.ipkg

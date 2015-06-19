@@ -13,6 +13,8 @@ import public GRL.Builder
 import public GRL.Pretty
 import public Sif.PLang.Common
 
+%access public
+%default total
 
 data LTy = PATTERN PTy | HASREQ | RELATION | AFFECT | REQUIREMENT RTy | LANG
 

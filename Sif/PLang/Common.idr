@@ -1,5 +1,8 @@
 module Sif.PLang.Common
 
+%access public
+%default total
+
 -- ------------------------------------------------------------------- [ Types ]
 data PTy = CompTy | SysTy | GenTy | DeployTy | AdminTy | CodeTy
 
@@ -30,3 +33,5 @@ data ValidU : PTy -> PTy -> Type where
   UsesSP : ValidU SysTy    GenTy
   UsesII : ValidU CodeTy      CodeTy
   UsesPP : ValidU GenTy   GenTy
+
+-- --------------------------------------------------------------------- [ EOF ]
