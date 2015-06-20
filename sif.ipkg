@@ -6,5 +6,4 @@ modules = Sif.Pattern.Problem
         , Sif.Pattern.Solution
         , Sif.Pattern
 
-        , Sif.PLang.Common
         , Sif.PLang

@@ -11,12 +11,46 @@ import public GRL.IR
 import public GRL.Model
 import public GRL.Builder
 import public GRL.Pretty
-import public Sif.PLang.Common
 
 %access public
 %default total
 
+-- ------------------------------------------------------------------- [ Types ]
+
+data PTy = CompTy | SysTy | GenTy | DeployTy | AdminTy | CodeTy
+
+data RTy = FuncTy | UsabTy | ReliTy | PerfTy | SuppTy
+
 data LTy = PATTERN PTy | HASREQ | RELATION | AFFECT | REQUIREMENT RTy | LANG
+
+-- -------------------------------------------------------------- [ Predicates ]
+
+data ValidR : PTy -> PTy -> Type where
+  RealCC : ValidR CompTy CompTy
+  RealCG : ValidR CompTy GenTy
+  RealGG : ValidR GenTy  GenTy
+  RealIC : ValidR CodeTy CompTy
+  RealIG : ValidR CodeTy GenTy
+
+data ValidI : PTy -> PTy -> Type where
+  SpeciSS : ValidI SysTy    SysTy
+  SpeciDS : ValidI DeployTy SysTy
+  SpeciCC : ValidI CompTy   CompTy
+  SpeciCG : ValidI CompTy   GenTy
+  SpeciGG : ValidI GenTy    GenTy
+
+data ValidU : PTy -> PTy -> Type where
+  UsesCC : ValidU CompTy CompTy
+  UsesCP : ValidU CompTy GenTy
+  UsesSS : ValidU SysTy  SysTy
+  UsesSD : ValidU SysTy  DeployTy
+  UsesSC : ValidU SysTy  CompTy
+  UsesSA : ValidU SysTy  AdminTy
+  UsesSP : ValidU SysTy  GenTy
+  UsesII : ValidU CodeTy CodeTy
+  UsesPP : ValidU GenTy  GenTy
+
+-- -------------------------------------------------------------- [ Definition ]
 
 data PLang : LTy -> GTy -> Type where
 
@@ -60,7 +94,7 @@ data PLang : LTy -> GTy -> Type where
   Specialises : PLang (PATTERN x) ELEM
              -> PLang (PATTERN y) ELEM
              -> {auto prf : ValidI x y}
-             -> PLang RELATION    INTENT
+             -> PLang RELATION    STRUCT
 
 FUNCTIONAL : Type
 FUNCTIONAL = PLang (REQUIREMENT FuncTy) ELEM
@@ -76,7 +110,6 @@ PERFORMANCE = PLang (REQUIREMENT PerfTy) ELEM
 
 SUPPORTABILITY : Type
 SUPPORTABILITY = PLang (REQUIREMENT SuppTy) ELEM
-
 
 COMPONENT : Type
 COMPONENT = PLang (PATTERN CompTy) ELEM
@@ -112,20 +145,20 @@ instance GRL (\x => PLang ty x) where
   mkGoal (Performance    s) = Elem GOALty s Nothing
   mkGoal (Supportability s) = Elem GOALty s Nothing
 
-  mkGoal (Component s) = Elem GOALty s Nothing
-  mkGoal (System    s) = Elem GOALty s Nothing
-  mkGoal (Generic   s) = Elem GOALty s Nothing
-  mkGoal (Deploy    s) = Elem GOALty s Nothing
-  mkGoal (Admin     s) = Elem GOALty s Nothing
-  mkGoal (Code      s) = Elem GOALty s Nothing
+  mkGoal (Component t) = Elem TASKty t Nothing  -- Values populated using strategies
+  mkGoal (System    t) = Elem TASKty t Nothing
+  mkGoal (Generic   t) = Elem TASKty t Nothing
+  mkGoal (Deploy    t) = Elem TASKty t Nothing
+  mkGoal (Admin     t) = Elem TASKty t Nothing
+  mkGoal (Code      t) = Elem TASKty t Nothing
 
   mkIntent (Provides c a b) = ILink IMPACTSty c (mkGoal a) (mkGoal b)
   mkIntent (Affects  c a b) = ILink AFFECTSty c (mkGoal a) (mkGoal b)
 
-  mkIntent (LinkedTo a b) = ILink AFFECTSty UNKNOWN (mkGoal a) (mkGoal b)
-  mkIntent (Implements a b) = ILink IMPACTSty HELPS (mkGoal b) (mkGoal a) -- Swap intentional
-  mkIntent (Specialises a b) = ILink IMPACTSty HELPS (mkGoal b) (mkGoal a)
-  mkStruct (Uses a b) = SLink ANDty (mkGoal a) [mkGoal b]
+  mkIntent (LinkedTo a b)    = ILink AFFECTSty UNKNOWN (mkGoal a) (mkGoal b)
+  mkIntent (Implements a b)  = ILink IMPACTSty HELPS (mkGoal b) (mkGoal a) -- Swap intentional
+  mkStruct (Specialises a b) = SLink ANDty (mkGoal a) [mkGoal b]
+  mkStruct (Uses a b)        = SLink ANDty (mkGoal a) [mkGoal b]
 
 
 -- --------------------------------------------------------------------- [ EOF ]
