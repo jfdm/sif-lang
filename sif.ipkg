@@ -7,3 +7,5 @@ modules = Sif.Pattern.Problem
         , Sif.Pattern
 
         , Sif.PLang
+
+        , Examples.Tropyc

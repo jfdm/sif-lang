@@ -1,37 +1,51 @@
-||| Modelling of the Tropyc Pattern Language.
-module Tropyc
+-- -------------------------------------------------------------- [ Tropyc.idr ]
+-- Module    : Tropyc.idr
+-- Copyright : (c) Jan de Muijnck-Hughes
+-- License   : see LICENSE
+-- --------------------------------------------------------------------- [ EOH ]
+module Example.Tropyc
 
-import Sif.PLangSpec
+import Sif.PLang
 
-tropyc : Stmt g
-tropyc = with List (sif (do
-  let metapattern = Generic "Cryptographic MetaPattern"
-  let mauth = Component "Message Authentication"
-  let infosec = Component "Information Secrecy"
-  let senderauth = Component "Sender Authentication"
-  let msgintegrity = Component "Message Integrity"
+namespace Aim
+  conf : FUNCTIONAL
+  conf = MkFunctional "Confidentiality"
 
-  let swa = System "Secrecy with Authentication"
-  let sws = System "Secrecy with Signature"
-  let swapp = System "Signature with Appendix"
-  let swi = System "Secrecy with Integrity"
+  mint : FUNCTIONAL
+  mint = MkFunctional "Message Integrity"
 
-  let swswa = System "Secrecy with Signature with Appendix"
+  mauth : FUNCTIONAL
+  mauth = MkFunctional "Message Authenticity"
 
-  Dcl $ Specialises mauth metapattern
-  Dcl $ Specialises infosec metapattern
-  Dcl $ Specialises senderauth metapattern
-  Dcl $ Specialises msgintegrity metapattern
-  Dcl $ Uses swa mauth
-  Dcl $ Uses swa infosec
-  Dcl $ Uses sws infosec
-  Dcl $ Uses sws senderauth
-  Dcl $ Uses swapp senderauth
-  Dcl $ Uses swapp msgintegrity
-  Dcl $ Uses swi infosec
-  Dcl $ Uses swi msgintegrity
-  Dcl $ Uses swswa sws
-  Dcl $ Uses swswa swapp)
+  avail : FUNCTIONAL
+  avail = MkFunctional "Availability"
 
--- main : IO ()
--- main = print $ run $ compile tropyc
+aims : List (FUNCTIONAL)
+aims = [conf, mint, mauth, avail]
+
+namespace Pattern
+
+  isec : COMPONENT
+  isec = MkComponent "Information Secrecy"
+
+  mauth : COMPONENT
+  mauth = MkComponent "Message Authentication"
+
+  sauth : COMPONENT
+  sauth = MkComponent "Sender Authentication"
+
+  mint : COMPONENT
+  mint = MkComponent "Message Integrity"
+
+ps : List (COMPONENT)
+ps = [isec, mauth, sauth,mint]
+
+
+tropyc : GModel
+tropyc = (insertMany ps (insertMany aims emptyModel))
+  \= (Pattern.isec o=> Aim.conf | MAKES)
+
+-- Local Variables:
+-- idris-packages: ("sif" "effects")
+-- End:
+-- --------------------------------------------------------------------- [ EOF ]

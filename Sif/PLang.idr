@@ -54,18 +54,18 @@ data ValidU : PTy -> PTy -> Type where
 
 data PLang : LTy -> GTy -> Type where
 
-  Functional     : String -> PLang (REQUIREMENT FuncTy) ELEM
-  Usability      : String -> PLang (REQUIREMENT UsabTy) ELEM
-  Reliability    : String -> PLang (REQUIREMENT ReliTy) ELEM
-  Performance    : String -> PLang (REQUIREMENT PerfTy) ELEM
-  Supportability : String -> PLang (REQUIREMENT SuppTy) ELEM
+  MkFunctional     : String -> PLang (REQUIREMENT FuncTy) ELEM
+  MkUsability      : String -> PLang (REQUIREMENT UsabTy) ELEM
+  MkReliability    : String -> PLang (REQUIREMENT ReliTy) ELEM
+  MkPerformance    : String -> PLang (REQUIREMENT PerfTy) ELEM
+  MkSupportability : String -> PLang (REQUIREMENT SuppTy) ELEM
 
-  Component : String -> PLang (PATTERN CompTy)   ELEM
-  System    : String -> PLang (PATTERN SysTy)    ELEM
-  Generic   : String -> PLang (PATTERN GenTy)    ELEM
-  Deploy    : String -> PLang (PATTERN DeployTy) ELEM
-  Admin     : String -> PLang (PATTERN AdminTy)  ELEM
-  Code      : String -> PLang (PATTERN CodeTy)   ELEM
+  MkComponent : String -> PLang (PATTERN CompTy)   ELEM
+  MkSystem    : String -> PLang (PATTERN SysTy)    ELEM
+  MkGeneric   : String -> PLang (PATTERN GenTy)    ELEM
+  MkDeploy    : String -> PLang (PATTERN DeployTy) ELEM
+  MkAdmin     : String -> PLang (PATTERN AdminTy)  ELEM
+  MkCode      : String -> PLang (PATTERN CodeTy)   ELEM
 
   Provides : CValue
           -> PLang (PATTERN pty)     ELEM
@@ -130,7 +130,7 @@ CODE : Type
 CODE = PLang (PATTERN CodeTy) ELEM
 
 
-syntax [a] "o->" [b] "|" [c] = Provides c a b
+syntax [a] "o=>" [b] "|" [c] = Provides c a b
 syntax [a] "o~>" [b] "|" [c] = Affects  c a b
 
 syntax [a] "==>" [b] = LinkedTo    a b
@@ -139,18 +139,18 @@ syntax [a] "]=>" [b] = Uses        a b
 syntax [a] "==<" [b] = Specialises a b
 
 instance GRL (\x => PLang ty x) where
-  mkGoal (Functional     s) = Elem GOALty s Nothing
-  mkGoal (Usability      s) = Elem GOALty s Nothing
-  mkGoal (Reliability    s) = Elem GOALty s Nothing
-  mkGoal (Performance    s) = Elem GOALty s Nothing
-  mkGoal (Supportability s) = Elem GOALty s Nothing
+  mkGoal (MkFunctional     s) = Elem GOALty s Nothing
+  mkGoal (MkUsability      s) = Elem GOALty s Nothing
+  mkGoal (MkReliability    s) = Elem GOALty s Nothing
+  mkGoal (MkPerformance    s) = Elem GOALty s Nothing
+  mkGoal (MkSupportability s) = Elem GOALty s Nothing
 
-  mkGoal (Component t) = Elem TASKty t Nothing  -- Values populated using strategies
-  mkGoal (System    t) = Elem TASKty t Nothing
-  mkGoal (Generic   t) = Elem TASKty t Nothing
-  mkGoal (Deploy    t) = Elem TASKty t Nothing
-  mkGoal (Admin     t) = Elem TASKty t Nothing
-  mkGoal (Code      t) = Elem TASKty t Nothing
+  mkGoal (MkComponent t) = Elem TASKty t Nothing  -- Values populated using strategies
+  mkGoal (MkSystem    t) = Elem TASKty t Nothing
+  mkGoal (MkGeneric   t) = Elem TASKty t Nothing
+  mkGoal (MkDeploy    t) = Elem TASKty t Nothing
+  mkGoal (MkAdmin     t) = Elem TASKty t Nothing
+  mkGoal (MkCode      t) = Elem TASKty t Nothing
 
   mkIntent (Provides c a b) = ILink IMPACTSty c (mkGoal a) (mkGoal b)
   mkIntent (Affects  c a b) = ILink AFFECTSty c (mkGoal a) (mkGoal b)
