@@ -1,10 +1,5 @@
-||| An EDSL for shallow specification of pattern languages.
-|||
-||| A shallow specification is one in which only problems are
-||| specified and their combinations controlled through typing.  This
-||| language is intended to be used for specifying languages only.
-||| Evaluating languages must make use of the deep version.
-module Sif.PLang
+||| Old and Deprecated
+module Sif.PLang.Old
 
 import public GRL.Common
 import public GRL.IR
@@ -21,7 +16,11 @@ data PTy = CompTy | SysTy | GenTy | DeployTy | AdminTy | CodeTy
 
 data RTy = FuncTy | UsabTy | ReliTy | PerfTy | SuppTy
 
-data LTy = PATTERN PTy | HASREQ | RELATION | AFFECT | REQUIREMENT RTy | LANG
+data LTy = UsesTy | LinkTy | SpecialTy | ImpTy
+
+data PLTy = PATTERN PTy | HASREQ | RELATION | AFFECT
+          | REQUIREMENT RTy
+          | LinkEnd LTy PTy
 
 -- -------------------------------------------------------------- [ Predicates ]
 
@@ -32,6 +31,7 @@ data ValidR : PTy -> PTy -> Type where
   RealIC : ValidR CodeTy CompTy
   RealIG : ValidR CodeTy GenTy
 
+
 data ValidI : PTy -> PTy -> Type where
   SpeciSS : ValidI SysTy    SysTy
   SpeciDS : ValidI DeployTy SysTy
@@ -39,20 +39,26 @@ data ValidI : PTy -> PTy -> Type where
   SpeciCG : ValidI CompTy   GenTy
   SpeciGG : ValidI GenTy    GenTy
 
-data ValidU : PTy -> PTy -> Type where
-  UsesCC : ValidU CompTy CompTy
-  UsesCP : ValidU CompTy GenTy
-  UsesSS : ValidU SysTy  SysTy
-  UsesSD : ValidU SysTy  DeployTy
-  UsesSC : ValidU SysTy  CompTy
-  UsesSA : ValidU SysTy  AdminTy
-  UsesSP : ValidU SysTy  GenTy
-  UsesII : ValidU CodeTy CodeTy
-  UsesPP : ValidU GenTy  GenTy
+namespace Uses
+
+  data ValidU : PTy -> PTy -> Type where
+    UsesCC : ValidU CompTy CompTy
+    UsesCP : ValidU CompTy GenTy
+    UsesSS : ValidU SysTy  SysTy
+    UsesSD : ValidU SysTy  DeployTy
+    UsesSC : ValidU SysTy  CompTy
+    UsesSA : ValidU SysTy  AdminTy
+    UsesSP : ValidU SysTy  GenTy
+    UsesII : ValidU CodeTy CodeTy
+    UsesPP : ValidU GenTy  GenTy
+
+  data ValidUs : PTy -> List PTy -> Type where
+    Nil  : ValidUs x Nil
+    (::) : (x : PTy) -> (y : PTy) -> {auto prf : ValidU x y} -> ValidUs x ys -> ValidUs x (y::ys)
 
 -- -------------------------------------------------------------- [ Definition ]
 
-data PLang : LTy -> GTy -> Type where
+data PLang : PLTy -> GTy -> Type where
 
   MkFunctional     : String -> PLang (REQUIREMENT FuncTy) ELEM
   MkUsability      : String -> PLang (REQUIREMENT UsabTy) ELEM
@@ -77,7 +83,8 @@ data PLang : LTy -> GTy -> Type where
           -> PLang (REQUIREMENT rty) ELEM
           -> PLang AFFECT            INTENT
 
-  LinkedTo : PLang (PATTERN x) ELEM
+  LinkedTo : Maybe String
+          -> PLang (PATTERN x) ELEM
           -> PLang (PATTERN y) ELEM
           -> PLang RELATION    INTENT
 
@@ -91,10 +98,15 @@ data PLang : LTy -> GTy -> Type where
       -> {auto prf : ValidU x y}
       -> PLang RELATION    STRUCT
 
-  Specialises : PLang (PATTERN x) ELEM
-             -> PLang (PATTERN y) ELEM
-             -> {auto prf : ValidI x y}
-             -> PLang RELATION    STRUCT
+  UsesMany : PLang (PATTERN x) ELEM
+          -> DList PTy (\y => PLang (PATTERN y) ELEM) ys
+          -> {auto prf : ValidUs x ys}
+          -> PLang RELATION STRUCT
+
+  Special : PLang (PATTERN x) ELEM
+         -> PLang (PATTERN y) ELEM
+         -> {auto prf : ValidI x y}
+         -> PLang RELATION    STRUCT
 
 FUNCTIONAL : Type
 FUNCTIONAL = PLang (REQUIREMENT FuncTy) ELEM
@@ -133,10 +145,14 @@ CODE = PLang (PATTERN CodeTy) ELEM
 syntax [a] "o=>" [b] "|" [c] = Provides c a b
 syntax [a] "o~>" [b] "|" [c] = Affects  c a b
 
-syntax [a] "==>" [b] = LinkedTo    a b
+syntax [a] "==>" [b] "|" [c] = LinkedTo (Just c) a b
+syntax [a] "==>" [b]         = LinkedTo Nothing  a b
 syntax [a] "~~>" [b] = Implements  a b
-syntax [a] "]=>" [b] = Uses        a b
-syntax [a] "==<" [b] = Specialises a b
+
+syntax [a] "]=>"  [b]  = Uses     a b
+syntax [a] "]=>*" [bs] = UsesMany a bs
+
+syntax [a] "==<"  [b]  = Special     a b
 
 instance GRL (\x => PLang ty x) where
   mkGoal (MkFunctional     s) = Elem GOALty s Nothing
@@ -155,10 +171,12 @@ instance GRL (\x => PLang ty x) where
   mkIntent (Provides c a b) = ILink IMPACTSty c (mkGoal a) (mkGoal b)
   mkIntent (Affects  c a b) = ILink AFFECTSty c (mkGoal a) (mkGoal b)
 
-  mkIntent (LinkedTo a b)    = ILink AFFECTSty UNKNOWN (mkGoal a) (mkGoal b)
+  mkIntent (LinkedTo _ a b)    = ILink AFFECTSty UNKNOWN (mkGoal a) (mkGoal b)
   mkIntent (Implements a b)  = ILink IMPACTSty HELPS (mkGoal b) (mkGoal a) -- Swap intentional
-  mkStruct (Specialises a b) = SLink ANDty (mkGoal a) [mkGoal b]
-  mkStruct (Uses a b)        = SLink ANDty (mkGoal a) [mkGoal b]
 
+  mkStruct (Special a b)      = SLink ANDty (mkGoal a) [mkGoal b]
+
+  mkStruct (Uses a b)      = SLink ANDty (mkGoal a) [mkGoal b]
+  mkStruct (UsesMany a bs) = SLink ANDty (mkGoal a) (mapDList mkGoal bs)
 
 -- --------------------------------------------------------------------- [ EOF ]
