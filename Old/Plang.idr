@@ -1,5 +1,4 @@
-||| Old and Deprecated
-module Sif.PLang.Old
+module Sif.PLang
 
 import public GRL.Common
 import public GRL.IR
@@ -10,17 +9,40 @@ import public GRL.Pretty
 %access public
 %default total
 
+private
+convElem : SValue -> GLang ELEM -> GLang ELEM
+convElem s (MkGoal t _) = MkTask t (Just s)
+convElem s (MkSoft t _) = MkTask t (Just s)
+convElem s (MkTask t _) = MkTask t (Just s)
+convElem s (MkRes  t _) = MkTask t (Just s)
+
+
+convToLangReq : (s : SValue) -> Req e ty -> Req (convElem s e) ty
+convToLangReq _ (MkFunctional       s) = (MkFunctional       s)
+convToLangReq _ (MkUsability        s) = (MkUsability        s)
+convToLangReq _ (MkReliability      s) = (MkReliability      s)
+convToLangReq _ (MkPerformance      s) = (MkPerformance      s)
+convToLangReq _ (MkSupportability   s) = (MkSupportability   s)
+
 -- ------------------------------------------------------------------- [ Types ]
 
 data PTy = CompTy | SysTy | GenTy | DeployTy | AdminTy | CodeTy
 
-data RTy = FuncTy | UsabTy | ReliTy | PerfTy | SuppTy
-
 data LTy = UsesTy | LinkTy | SpecialTy | ImpTy
 
-data PLTy = PATTERN PTy | HASREQ | RELATION | AFFECT
-          | REQUIREMENT RTy
-          | LinkEnd LTy PTy
+
+MkProblem : (desc : String)
+         -> (fs  : DList (GLang ELEM)   (\x => Req x xty) es)
+         -> (sfs : DList (GLang STRUCT) (SubReqLink)      ss)
+         -> (ifs : DList (GLang INTENT) (IntentLink)      is)
+
+data Pattern : PTy -> GModel -> Type where
+  MkComponent : Problem m -> Pattern CompTy    m
+  MkSystem    : Problem m -> Pattern SysTy     m
+  MkGeneric   : Problem m -> Pattern GenTy     m
+  MkDeploy    : Problem m -> Pattern DeployTy  m
+  MkAdmin     : Problem m -> Pattern AdminTy   m
+  MkCode      : Problem m -> Pattern CodeTy    m
 
 -- -------------------------------------------------------------- [ Predicates ]
 
@@ -56,7 +78,16 @@ namespace Uses
     Nil  : ValidUs x Nil
     (::) : (x : PTy) -> (y : PTy) -> {auto prf : ValidU x y} -> ValidUs x ys -> ValidUs x (y::ys)
 
+data PLang : GModel -> Type where
+  MkPLang : DList (GLang ELEM) (\x => Req x ty) es
+         -> DList (GModel)     (\x => Pattern x m)
+
+
+
+{-
 -- -------------------------------------------------------------- [ Definition ]
+
+data Req
 
 data PLang : PLTy -> GTy -> Type where
 
@@ -178,5 +209,5 @@ instance GRL (\x => PLang ty x) where
 
   mkStruct (Uses a b)      = SLink ANDty (mkGoal a) [mkGoal b]
   mkStruct (UsesMany a bs) = SLink ANDty (mkGoal a) (mapDList mkGoal bs)
-
+-}
 -- --------------------------------------------------------------------- [ EOF ]
