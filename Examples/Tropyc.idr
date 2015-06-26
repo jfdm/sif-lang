@@ -5,47 +5,90 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Example.Tropyc
 
+{-
 import Sif.PLang
 
 namespace Aim
-  conf : FUNCTIONAL
-  conf = MkFunctional "Confidentiality"
+  confidentiality : FUNCTIONAL
+  confidentiality = mkFunctional "Confidentiality"
 
-  mint : FUNCTIONAL
-  mint = MkFunctional "Message Integrity"
+  msgIntegrity : FUNCTIONAL
+  msgIntegrity = mkFunctional "Message Integrity"
 
-  mauth : FUNCTIONAL
-  mauth = MkFunctional "Message Authenticity"
+  seshIntegrity : FUNCTIONAL
+  seshIntegrity = mkFunctional "Session Integrity"
 
-  avail : FUNCTIONAL
-  avail = MkFunctional "Availability"
+  dataAuthenticity : FUNCTIONAL
+  dataAuthenticity = mkFunctional "Data Authenticity"
+
+  subjectAuthenticity : FUNCTIONAL
+  subjectAuthenticity = mkFunctional "Subject Authenticity"
+
+  originNonRepudiation : FUNCTIONAL
+  originNonRepudiation = mkFunctional "Non-Repudiation of Origin"
+
+  receiptNonRepudiation : FUNCTIONAL
+  receiptNonRepudiation = mkFunctional "Non-Repudiation of Receipt"
+
+  transNonRepudiation : FUNCTIONAL
+  transNonRepudiation = mkFunctional "Non-Repudiation of Transmission"
 
 aims : List (FUNCTIONAL)
-aims = [conf, mint, mauth, avail]
+aims = [confidentiality,
+        msgIntegrity, seshIntegrity,
+        dataAuthenticity, subjectAuthenticity,
+        originNonRepudiation, receiptNonRepudiation, transNonRepudiation]
 
 namespace Pattern
+  mpatt : GENERIC
+  mpatt = mkGeneric "Cryptographic MetaPattern"
 
-  isec : COMPONENT
-  isec = MkComponent "Information Secrecy"
+  infosec : COMPONENT
+  infosec = mkComponent "Information Secrecy"
 
   mauth : COMPONENT
-  mauth = MkComponent "Message Authentication"
+  mauth = mkComponent "Message Authentication"
 
   sauth : COMPONENT
-  sauth = MkComponent "Sender Authentication"
+  sauth = mkComponent "Sender Authentication"
 
   mint : COMPONENT
-  mint = MkComponent "Message Integrity"
+  mint = mkComponent "Message Integrity"
+
+  secWithAuth : SYSTEM
+  secWithAuth = mkSystem "Secrecy with Authentication"
+
+  secWithSig : SYSTEM
+  secWithSig = mkSystem "Secrecy with Signature"
+
+  sigWithApp : SYSTEM
+  sigWithApp = mkSystem "Signature with Appendix"
+
+  secWithInt : SYSTEM
+  secWithInt = mkSystem "Secrecy with Integrity"
+
+  secWithSigWithApp : SYSTEM
+  secWithSigWithApp = mkSystem "Secrecy with Signature with Appendix"
 
 ps : List (COMPONENT)
-ps = [isec, mauth, sauth,mint]
+ps = [infosec, mauth, sauth, mint]
 
+ps' : List (SYSTEM)
+ps' = [secWithAuth, secWithSig, sigWithApp, secWithInt, secWithSigWithApp]
 
 tropyc : GModel
-tropyc = (insertMany ps (insertMany aims emptyModel))
-  \= (Pattern.isec o=> Aim.conf | MAKES)
+tropyc = (insertMany ps' (insertMany ps (insertMany aims emptyModel)))
+  \= mpatt
+  \= (infosec ==< mpatt)
+  \= (mint    ==< mpatt)
+  \= (mauth   ==< mpatt)
+  \= (sauth   ==< mpatt)
 
--- Local Variables:
--- idris-packages: ("sif" "effects")
--- End:
+  \= (infosec o=> confidentiality      | MAKES)
+  \= (mint    o=> msgIntegrity         | MAKES)
+  \= (mauth   o=> subjectAuthenticity  | MAKES)
+  \= (sauth   o=> originNonRepudiation | MAKES)
+
+  \= (secWithAuth ]=>* [mauth, infosec])
+-}
 -- --------------------------------------------------------------------- [ EOF ]
