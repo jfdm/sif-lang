@@ -114,6 +114,7 @@ syntax [a] "X=" [bs] = MkSub XORty a bs
 syntax [a] "|=" [bs] = MkSub IORty a bs
 
 -- ------------------------------------------------------------- [ Interpreter ]
+
 instance GRL (\ty => PModel x ty) where
   mkGoal (MkReq ty  t)        = Elem GOALty t Nothing
   mkGoal (MkAction ty t sval) = Elem TASKty t sval
