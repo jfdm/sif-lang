@@ -18,21 +18,26 @@ data RTy = FUNC | USAB | RELI | PERF | SUPP
 data TTy = ADV  | DIS
 data STy = ABSTRACT | CONCRETE
 
-data SifTy = tyREQ | tyTRAIT | tyPROPERTY | tySOLUTION | tyPROBLEM | tyPATTERN
+data SifTy = tyREQ | tyTRAIT | tyPROPERTY | tySOLUTION | tyPROBLEM | tyPATTERN | tyTRAITend
 
 -- ------------------------------------------------------------ [ Requirements ]
 private
 data InterpRes : SifTy -> Type where
-  IReq   : GLang ELEM                       -> InterpRes tyREQ
-  IProb  : GLang ELEM -> GModel             -> InterpRes tyPROBLEM
-  ITrait : (GLang ELEM, GLang INTENT)       -> InterpRes tyTRAIT
-  IProp  : GLang ELEM -> DList GTy GLang es -> InterpRes tyPROPERTY
-  ISolt  : GLang ELEM -> DList GTy GLang ss -> InterpRes tySOLUTION
-  IPatt  : GModel                           -> InterpRes tyPATTERN
+  IReq    : GLang ELEM -> Maybe (GLang STRUCT) -> InterpRes tyREQ
+  IProb   : GLang ELEM -> GModel               -> InterpRes tyPROBLEM
+  ITraitL : GLang ELEM -> CValue               -> InterpRes tyTRAITend
+  ITrait  : GLang ELEM -> List (GLang INTENT)  -> InterpRes tyTRAIT
+  IProp   : GLang ELEM -> DList GTy GLang es   -> InterpRes tyPROPERTY
+  ISolt   : GLang ELEM -> DList GTy GLang ss   -> InterpRes tySOLUTION
+  IPatt   : GModel                             -> InterpRes tyPATTERN
 
 private
-interpReq : String -> InterpRes tyREQ
-interpReq s = IReq $ MkGoal s Nothing
+interpReq : String -> List (InterpRes tyREQ) -> InterpRes tyREQ
+interpReq s Nil = IReq (MkGoal s Nothing) Nothing
+interpReq s xs  = IReq root (Just $ root &= map (\(IReq x _) => x) xs)
+  where
+    root : GLang ELEM
+    root = MkGoal s Nothing
 
 private
 interpProb : String -> List (InterpRes tyREQ) -> InterpRes tyPROBLEM
@@ -42,21 +47,27 @@ interpProb s ps = IProb root model
     root = MkGoal s Nothing
 
     cs : List (GLang ELEM)
-    cs = map (\(IReq x) => x) ps
+    cs = map (\(IReq x _) => x) ps
 
     model : GModel
     model = insertMany cs (emptyModel \= root \= (root &= cs) )
 
 private
+interpTLink : CValue -> InterpRes tyREQ -> InterpRes tyTRAITend
+interpTLink c (IReq r _) = ITraitL r c
+
+private
 interpTrait : String
            -> Maybe SValue
-           -> CValue
-           -> InterpRes tyREQ
+           -> List (InterpRes tyTRAITend)
            -> InterpRes tyTRAIT
-interpTrait s m c (IReq e) = ITrait (node, node ==> e | c)
+interpTrait s m es = ITrait node cs
   where
     node : GLang ELEM
     node = MkTask s m
+
+    cs : List (GLang INTENT)
+    cs = map (\(ITraitL r c) => node ==> r | c) es
 
 private
 interpProp : String
@@ -71,14 +82,14 @@ interpProp s ts = IProp pelem ([pelem, newCS] ++ getProof newES ++ getProof newI
     updateIntent (MkImpacts c a b) = MkImpacts c pelem b
     updateIntent (MkEffects c a b) = MkEffects c pelem b
 
-    newTS : List (GLang ELEM, GLang INTENT)
-    newTS = map (\(ITrait (x, y)) => (x,updateIntent y)) ts
+    newTS : List (GLang ELEM, List (GLang INTENT))
+    newTS = map (\(ITrait x ys) => (x, map updateIntent ys)) ts
 
     newCS : GLang STRUCT
     newCS = (pelem &= map fst newTS)
 
     newIS : (is ** DList GTy GLang is)
-    newIS = fromList $ map snd newTS
+    newIS = fromList $ concat $ map snd newTS
 
     newES : (es ** DList GTy GLang es)
     newES = fromList $ map fst newTS
@@ -114,26 +125,32 @@ interpPatt s (IProb rP m) (ISolt rS is) = IPatt (model \= (root &= [rP,rS]))
     model : GModel
     model = DList.foldr (insert) m is
 
+
+
 -- ----------------------------------------- [ Private Internal Data Structure ]
 private
 data SifPriv : InterpRes ty -> SifTy -> Type where
   priv__mkReq : (ty   : RTy)
              -> (t    : String)
              -> (desc : Maybe String)
-             -> SifPriv (interpReq t) tyREQ
+             -> DList (InterpRes tyREQ) (\x => SifPriv x tyREQ) rs
+             -> SifPriv (interpReq t rs) tyREQ
 
   priv__mkProb : (title : String)
               -> (desc  : Maybe String)
               -> DList (InterpRes tyREQ) (\x => SifPriv x tyREQ) xs
               -> SifPriv (interpProb title xs) tyPROBLEM
 
+  priv__mkTLink : (cval : CValue)
+              -> SifPriv r tyREQ
+              -> SifPriv (interpTLink cval r) tyTRAITend
+
   priv__mkTrait : (ty : TTy)
                -> (title : String)
                -> (desc  : Maybe String)
                -> (sval  : Maybe SValue)
-               -> (cval  : CValue)
-               -> SifPriv r tyREQ
-               -> SifPriv (interpTrait title sval cval r) tyTRAIT
+               -> DList (InterpRes tyTRAITend) (\x => SifPriv x tyTRAITend) rs
+               -> SifPriv (interpTrait title sval rs) tyTRAIT
 
   priv__mkProp : (title : String)
               -> (desc : Maybe String)
@@ -195,6 +212,12 @@ TRAIT = SifExpr tyTRAIT
 TRAITS : Type
 TRAITS = List (SifExpr tyTRAIT)
 
+TLINK : Type
+TLINK = SifExpr tyTRAITend
+
+TLINKS : Type
+TLINKS = List (SifExpr tyTRAITend)
+
 PROPERTY : Type
 PROPERTY = SifExpr tyPROPERTY
 
@@ -214,40 +237,46 @@ conv : List (SifExpr ty)
     -> (xs ** DList (InterpRes ty) (\x => SifPriv x ty) xs)
 conv xs = fromLDP $ map (\(MkExpr x) => (_ ** x)) xs
 
+mkFunctional : String -> Maybe String -> REQUIREMENTS -> FUNCTIONAL
+mkFunctional s desc rs = MkExpr $ priv__mkReq FUNC s desc (getProof $ conv rs)
 
-mkFunc : String -> Maybe String -> FUNCTIONAL
-mkFunc s desc = MkExpr $ priv__mkReq FUNC s desc
+mkUsability : String -> Maybe String -> REQUIREMENTS -> USABILITY
+mkUsability s desc rs = MkExpr $ priv__mkReq USAB s desc (getProof $ conv rs)
 
-mkUsab : String -> Maybe String -> USABILITY
-mkUsab s desc = MkExpr $ priv__mkReq USAB s desc
+mkReliability : String -> Maybe String -> REQUIREMENTS -> RELIABILITY
+mkReliability s desc rs = MkExpr $ priv__mkReq RELI s desc (getProof $ conv rs)
 
-mkReli : String -> Maybe String -> RELIABILITY
-mkReli s desc = MkExpr $ priv__mkReq RELI s desc
+mkPerformance : String -> Maybe String -> REQUIREMENTS -> PERFORMANCE
+mkPerformance s desc rs = MkExpr $ priv__mkReq PERF s desc (getProof $ conv rs)
 
-mkPerf : String -> Maybe String -> PERFORMANCE
-mkPerf s desc = MkExpr $ priv__mkReq PERF s desc
+mkSupportability : String -> Maybe String -> REQUIREMENTS -> SUPPORTABILITY
+mkSupportability s desc rs = MkExpr $ priv__mkReq SUPP s desc (getProof $ conv rs)
 
-mkSupp : String -> Maybe String -> SUPPORTABILITY
-mkSupp s desc = MkExpr $ priv__mkReq SUPP s desc
+private
+convR : SifExpr tyREQ -> (r : InterpRes tyREQ ** SifPriv r tyREQ)
+convR (MkExpr res) = (_ ** res)
 
 mkProblem : String -> Maybe String -> List (SifExpr tyREQ) -> PROBLEM
 mkProblem s d rs = MkExpr $ priv__mkProb s d (getProof $ conv rs)
 
-mkAdv : String -> Maybe String -> Maybe SValue -> CValue -> REQUIREMENT -> ADVANTAGE
-mkAdv t d s c (MkExpr r) =
-    MkExpr $ priv__mkTrait ADV t d s c r
+mkLink : CValue -> REQUIREMENT -> TLINK
+mkLink c r = MkExpr $ priv__mkTLink c (getProof $ convR r)
 
-mkDis : String -> Maybe String -> Maybe SValue -> CValue -> REQUIREMENT -> DISADVANTAGE
-mkDis t d s c (MkExpr r) =
-    MkExpr $ priv__mkTrait DIS t d s c r
+mkAdvantage : String -> Maybe String -> Maybe SValue -> TLINKS -> ADVANTAGE
+mkAdvantage t d s rs =
+    MkExpr $ priv__mkTrait ADV t d s (getProof $ conv rs)
 
-mkProp : String -> Maybe String -> TRAITS -> PROPERTY
-mkProp t d ts = MkExpr $ priv__mkProp t d (getProof $ conv ts)
+mkDisadvantage : String -> Maybe String -> Maybe SValue -> TLINKS -> DISADVANTAGE
+mkDisadvantage t d s rs =
+    MkExpr $ priv__mkTrait DIS t d s (getProof $ conv rs)
 
-mkSol : String -> Maybe String -> PROPERTIES -> SOLUTION
-mkSol s d ps = MkExpr $ priv__mkSolt s d (getProof $ conv ps)
+mkProperty : String -> Maybe String -> TRAITS -> PROPERTY
+mkProperty t d ts = MkExpr $ priv__mkProp t d (getProof $ conv ts)
 
-mkPatt : String -> Maybe String -> PROBLEM -> SOLUTION -> PATTERN
-mkPatt t d (MkExpr p) (MkExpr s) = MkExpr $ priv__mkPatt t d p s
+mkSolution : String -> Maybe String -> PROPERTIES -> SOLUTION
+mkSolution s d ps = MkExpr $ priv__mkSolt s d (getProof $ conv ps)
+
+mkPattern : String -> Maybe String -> PROBLEM -> SOLUTION -> PATTERN
+mkPattern t d (MkExpr p) (MkExpr s) = MkExpr $ priv__mkPatt t d p s
 
 -- --------------------------------------------------------------------- [ EOF ]
