@@ -1,0 +1,30 @@
+
+
++ Problem has requirements :: Graph of goals
++ Solution has properties  :: Node decomposed into sub-graphs of tasks
++ Property has traits      :: Tasks
++ Traits affect requirements
+
+* Asymmetric Encryption
+
+** Solution Properties
++ Property :: Public Private Key Pairs
+  + Good Trait :: Different Keys
+  + Bad Trait  :: Key distribution
+  + Bad Trait  :: Different Keys
++ Property :: Mathematical Algorithm
+  + Good Trait :: Maths guarantee
+  + Bad Trait  :: Computationally Expensive.
+  + Good Trait :: Well Studied
++ Property :: Variable Security Paramqeter
+  + Good Trait :: Larger Parameter greater security
+  + Bad Trait  :: Selection of parameters
+  + Bad Trait  :: Larger Parameter greater computation.
+* Ideas
++ Describe parameters such that their inherent goodness shines through in model.
++ model consequences (good and bad aspects of actions/properties.)
+ + Model good traits bad traits.
++ solution trait implementation trait.
++ Info sec is the problem
++ Asym is the partial solution
++ RSA, DSA are the real solutions.

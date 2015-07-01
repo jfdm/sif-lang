@@ -2,10 +2,9 @@ package sif
 
 opts = "-p effects -p containers -p grl --warnpartial --warnreach --total"
 
-modules = Sif.Pattern.Problem
-        , Sif.Pattern.Solution
-        , Sif.Pattern
+modules = Sif.Pattern
+        , Sif.PModel
 
-        , Sif.PLang
-
-        , Examples.Tropyc
+        , Examples.InformationSecrecy
+        , Examples.InformationSecrecy.AsymCrypto
+        , Examples.InformationSecrecy.SymmCrypto
