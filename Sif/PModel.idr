@@ -1,3 +1,9 @@
+-- -------------------------------------------------------------- [ PModel.idr ]
+-- Module    : PModel.idr
+-- Copyright : (c) Jan de Muijnck-Hughes
+-- License   : see LICENSE
+-- --------------------------------------------------------------------- [ EOH ]
+
 module Sif.PModel
 
 import public GRL.Common

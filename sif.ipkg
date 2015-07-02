@@ -1,9 +1,15 @@
 package sif
 
-opts = "-p effects -p containers -p grl --warnpartial --warnreach --total"
+opts = "-p effects -p containers -p grl -p edda -p xml --warnpartial --warnreach --total"
 
 modules = Sif.Pattern
+        , Sif.Pattern.Model
+        , Sif.Pattern.API
+        , Sif.Pattern.Utils
+
         , Sif.PModel
+
+        , Sif.Pattern.Writer.Edda
 
         , Examples.InformationSecrecy
         , Examples.InformationSecrecy.AsymCrypto

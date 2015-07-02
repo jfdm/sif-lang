@@ -70,6 +70,7 @@ namespace Main
   main : IO ()
   main = do
     let m = getModel infoSecAsymCrypto
-    putStrLn $ prettyModel m
+    putStrLn $ show @{xml} $ toXML infoSecAsymCrypto
+
 
 -- --------------------------------------------------------------------- [ EOF ]
