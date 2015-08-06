@@ -5,10 +5,11 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| Modelling Information Secrecy using Symmetric Cryptography.
-module Examples.InformationSecrecy.SymCrypto
+module Pattern.Secrecy.SymCrypto
 
 import Sif.Pattern
-import Examples.InformationSecrecy
+
+import Problem.InformationSecrecy
 
 -- ---------------------------------------------- [ Asymmetric Crypto Solution ]
 

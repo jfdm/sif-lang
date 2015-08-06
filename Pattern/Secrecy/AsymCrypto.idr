@@ -1,14 +1,15 @@
--- -------------------------------------------------- [ InformationSecrecy.idr ]
--- Module    : InformationSecrecy.idr
+-- ---------------------------------------------------------- [ AsymCrypto.idr ]
+-- Module    : AsymCrypto.idr
 -- Copyright : (c) Jan de Muijnck-Hughes
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| Modelling Information Secrecy using Asymmetric Crypto.
-module Examples.InformationSecrecy.AsymCrypto
+module Pattern.Secrecy.AsymCrypto
 
 import Sif.Pattern
-import Examples.InformationSecrecy
+
+import Problem.InformationSecrecy
 
 -- ---------------------------------------------- [ Asymmetric Crypto Solution ]
 
@@ -67,6 +68,7 @@ infoSecAsymCrypto = mkPattern "Information Security using Asymmetric Crypto" Not
 -- -------------------------------------------------------------------- [ Main ]
 
 namespace Main
+  partial
   main : IO ()
   main = do
     let m = getModel infoSecAsymCrypto

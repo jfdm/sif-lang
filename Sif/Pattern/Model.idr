@@ -110,7 +110,7 @@ interpProp s ts = IProp pelem (Sigma.getProof elems)
     updateIntent (MkEffects c a b) = MkEffects c pelem b
 
     newTS : List (GLang ELEM, List (GLang INTENT))
-    newTS = map (\(ITrait x ys) => (x, map updateIntent ys)) ts
+    newTS = ts --map (\(ITrait x ys) => (x, map updateIntent ys)) ts
 
     newCS : GLang STRUCT
     newCS = (pelem &= map fst newTS)
@@ -153,11 +153,8 @@ interpPatt : String
           -> InterpRes tyPROBLEM
           -> InterpRes tySOLUTION
           -> InterpRes tyPATTERN
-interpPatt s (IProb rP m) (ISolt rS is) = IPatt ((model \= root) \= (root &= [rP,rS]))
+interpPatt s (IProb rP m) (ISolt rS is) = IPatt model
   where
-    root : GLang ELEM
-    root = MkGoal s Nothing
-
     model : GModel
     model = let (_ ** ds) = groupDecls is in
         DList.foldl (flip $ insert) m (trace (showDList show ds) ds)

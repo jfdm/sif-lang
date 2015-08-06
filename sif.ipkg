@@ -9,8 +9,13 @@ modules = Sif.Pattern
 
         , Sif.PModel
 
-        , Sif.Pattern.Writer.Edda
+        , Problem.AccessControl
+        , Problem.InformationSecrecy
+        , Problem.PolicyEnforcement
 
-        , Examples.InformationSecrecy
-        , Examples.InformationSecrecy.AsymCrypto
-        , Examples.InformationSecrecy.SymmCrypto
+        , Pattern.Secrecy.AsymCrypto
+        , Pattern.Secrecy.SymmCrypto
+
+        , Pattern.AccessControl.ReferenceMonitor
+        , Pattern.AccessControl.Authorisation
+        , Pattern.AccessControl.ABAC
