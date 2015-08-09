@@ -5,15 +5,14 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| Modelling Information Secrecy using Symmetric Cryptography.
-module Pattern.Secrecy.SymCrypto
+module Sif.Lib.Pattern.Secrecy.SymCrypto
 
 import Sif.Pattern
 
-import Problem.InformationSecrecy
+import Sif.Lib.Problem.InformationSecrecy
 
 import GRL.Eval
 
-%default partial
 -- ---------------------------------------------- [ Asymmetric Crypto Solution ]
 
 singleKey : PROPERTY
@@ -44,13 +43,5 @@ infosecSymmCrypto = mkPattern
     Nothing
     infosec
     symCrypto
-
--- -------------------------------------------------------------------- [ Main ]
-
-namespace Main
-  main : IO ()
-  main = do
-    let m = getModel infosecSymmCrypto
-    printLn $ evalModel m Nothing
 
 -- --------------------------------------------------------------------- [ EOF ]

@@ -2,17 +2,9 @@ package sifexe
 
 opts = "-p effects -p containers -p grl -p edda -p xml -p lightyear -p argparse -p graphviz -p sif --typeintype"
 
-modules = Main
-main = Main
-executable = sifc
+main = Sif.Viewer
 
-        -- , Problem.AccessControl
-        -- , Problem.InformationSecrecy
-        -- , Problem.PolicyEnforcement
+executable = sifModelViewer
 
-        -- , Pattern.Secrecy.AsymCrypto
-        -- , Pattern.Secrecy.SymmCrypto
 
-        -- , Pattern.AccessControl.ReferenceMonitor
-        -- , Pattern.AccessControl.Authorisation
-        -- , Pattern.AccessControl.ABAC
+modules = Sif.Viewer

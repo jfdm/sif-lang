@@ -7,7 +7,7 @@
 |||
 ||| This definition combines the problem definitions for
 ||| Authorisation, RBAC, MBAC.
-module Problem.AccessControl
+module Sif.Lib.Problem.AccessControl
 
 import Sif.Pattern
 

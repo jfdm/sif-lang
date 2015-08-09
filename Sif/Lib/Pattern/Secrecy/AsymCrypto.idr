@@ -5,12 +5,14 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| Modelling Information Secrecy using Asymmetric Crypto.
-module Pattern.Secrecy.AsymCrypto
+module Sif.Lib.Pattern.Secrecy.AsymCrypto
 
 import Sif.Pattern
 
-import Problem.InformationSecrecy
+import Sif.Lib.Problem.InformationSecrecy
+
 import GRL.Eval
+
 -- ---------------------------------------------- [ Asymmetric Crypto Solution ]
 
 keypairs : PROPERTY
@@ -64,17 +66,5 @@ asymCrypto = mkSolution "Asymmetric Crypto" Nothing
 
 infoSecAsymCrypto : PATTERN
 infoSecAsymCrypto = mkPattern "Information Security using Asymmetric Crypto" Nothing infosec asymCrypto
-
--- -------------------------------------------------------------------- [ Main ]
-
-namespace Main
-  partial
-  main : IO ()
-  main = do
-    let m = getModel infoSecAsymCrypto
-    printLn $ evalModel m Nothing
-    printLn $ grlToDot m
---    putStrLn $ show @{xml} $ toXML infoSecAsymCrypto
-
 
 -- --------------------------------------------------------------------- [ EOF ]
