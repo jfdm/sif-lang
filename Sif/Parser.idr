@@ -21,10 +21,11 @@ import public Sif.Parser.File
 import public Sif.Parser.State
 
 %default partial
+%access public
 
 problemFromFile : String
                -> Eff PROBLEM
-                      [FILE_IO (), EXCEPTION String, STATE SifState]
+                      [FILE_IO (), EXCEPTION String, 'bst ::: STATE BuildEnv]
 problemFromFile s = do
     past <- readSifFile problem s
     rval <- getProblemEff past
@@ -38,49 +39,49 @@ problemFromFile s = do
     conRQ SUPP s d = mkSupportability s d
 
     doRQ : ProbAST ReqTy
-        -> Eff REQUIREMENT [EXCEPTION String, STATE SifState]
+        -> Eff REQUIREMENT [EXCEPTION String, 'bst ::: STATE BuildEnv]
     doRQ (MkReq i ty t d) = do
-      st <- get
+      st <- 'bst :- get
       case lookup i (getRQs st) of
         Just x  => raise "Identifier already Exists"
         Nothing => do
           let r = conRQ ty t d
-          put (record { getRQs = (i,r) :: (getRQs st)} st)
+          'bst :- put (record { getRQs = (i,r) :: (getRQs st)} st)
           pure r
 
     doRQs : List (ProbAST ReqTy)
          -> Eff (List REQUIREMENT)
-                [EXCEPTION String, STATE SifState]
+                [EXCEPTION String, 'bst ::: STATE BuildEnv]
     doRQs xs = do
       rval <- mapE (\x => doRQ x) xs
       pure rval
 
 
     getProblemEff : ProbAST ProbTy
-                 -> Eff PROBLEM [EXCEPTION String, STATE SifState]
+                 -> Eff PROBLEM [EXCEPTION String, 'bst ::: STATE BuildEnv]
     getProblemEff (MkProb i t d rs) = do
         rs' <- doRQs rs
         let p = mkProblem t d rs'
-        update (\st => record {getProb = (i, p)} st)
+        'bst :- update (\st => record {getProb = (i, p)} st)
         pure p
 
-solutionFromFile : String -> Eff SOLUTION [FILE_IO (), EXCEPTION String, STATE SifState]
+solutionFromFile : String -> Eff SOLUTION [FILE_IO (), EXCEPTION String, 'bst ::: STATE BuildEnv]
 solutionFromFile f = do
     (pt, sast) <- readSifFile solution f
-    update (\st => record {getPData = pt} st)
+    'bst :- update (\st => record {getPData = pt} st)
     sval <- buildSolution sast
     pure sval
   where
     buildAffect : SolAST AffectTy
-               -> Eff TLINK [FILE_IO (), EXCEPTION String, STATE SifState]
+               -> Eff TLINK [FILE_IO (), EXCEPTION String, 'bst ::: STATE BuildEnv]
     buildAffect (Affects c i) = do
-      st <- get
+      st <- 'bst :- get
       case lookup i (getRQs st) of
         Nothing => raise "Identifier missing"
         Just r  => pure $ mkLink c r
 
     buildTrait : SolAST TraitTy
-              -> Eff TRAIT [FILE_IO (), EXCEPTION String, STATE SifState]
+              -> Eff TRAIT [FILE_IO (), EXCEPTION String, 'bst ::: STATE BuildEnv]
     buildTrait (Trait ty t v d as) = do
       as' <- mapE (\x => buildAffect x) as
       case ty of
@@ -88,15 +89,15 @@ solutionFromFile f = do
         DIS => pure $ mkDisadvantage t d v as'
 
     buildProperty : SolAST PropTy
-              -> Eff PROPERTY [FILE_IO (), EXCEPTION String, STATE SifState]
+              -> Eff PROPERTY [FILE_IO (), EXCEPTION String, 'bst ::: STATE BuildEnv]
     buildProperty (Property t d ts) = do
       ts' <- mapE (\x => buildTrait x) ts
       pure $ mkProperty t d ts'
 
     buildSolution : SolAST SolTy
-                -> Eff SOLUTION [FILE_IO (), EXCEPTION String, STATE SifState]
+                -> Eff SOLUTION [FILE_IO (), EXCEPTION String, 'bst ::: STATE BuildEnv]
     buildSolution (Solution t pID d ps) = do
-      st <- get
+      st <- 'bst :- get
       let pID' = fst $ getProb st
       if not (pID' == pID)
         then raise "The paired problem doesn't exist."
@@ -106,14 +107,13 @@ solutionFromFile f = do
 
 buildPattern : String
             -> String
-            -> Eff PATTERN [FILE_IO (), EXCEPTION String, STATE SifState]
+            -> Eff PATTERN [FILE_IO (), EXCEPTION String, 'bst ::: STATE BuildEnv]
 buildPattern p s = do
-  put (mkDefState)
+  'bst :- put (mkDefState)
   p' <- problemFromFile p
   s' <- solutionFromFile s
-  st <- get
+  st <- 'bst :- get
   pure $ mkPattern (fst $ getPData st) (snd $ getPData st) p' s'
-
 
 
 -- --------------------------------------------------------------------- [ EOF ]

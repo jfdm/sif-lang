@@ -24,7 +24,7 @@ import XML.DOM
 import Sif.Pattern.Model
 import Sif.Pattern.Utils
 
-%default total
+%default partial
 %access public
 
 -- --------------------------------------------------- [ Public Data Structure ]
@@ -179,6 +179,9 @@ getModel (MkExpr p) = doGetModel p
     doGetModel : {i : InterpRes tyPATTERN} -> SifPriv i tyPATTERN -> GModel
     doGetModel {i} _ = extract i
 
+covering
+evalPattern : PATTERN -> EvalResult
+evalPattern p = evalModel (getModel p) Nothing
 
 -- ----------------------------------------------------------------- [ To Edda ]
 

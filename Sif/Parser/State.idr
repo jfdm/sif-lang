@@ -7,16 +7,16 @@ import Sif.Parser.Pattern
 import Effects
 import Effect.Default
 
-record SifState where
+record BuildEnv where
   constructor MkSState
   getProb : (String, PROBLEM)
   getRQs  : List (String, REQUIREMENT)
   getPData : (String, Maybe String)
 
-instance Default SifState where
+instance Default BuildEnv where
   default = MkSState ("", mkProblem "" Nothing Nil) Nil ("", Nothing)
 
-mkDefState : SifState
+mkDefState : BuildEnv
 mkDefState = MkSState ("", mkProblem "" Nothing Nil) Nil ("", Nothing)
 
 -- --------------------------------------------------------------------- [ EOF ]

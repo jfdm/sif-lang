@@ -15,6 +15,8 @@ import Data.GraphViz.SimpleDot
 
 import ArgParse
 
+-- ----------------------------------------------------------------- [ Options ]
+
 record SifOpts where
   constructor MkSOpts
   pSpec : Maybe String
@@ -27,6 +29,9 @@ record SifOpts where
 
 defOpts : SifOpts
 defOpts = MkSOpts Nothing Nothing False Nil False False Nothing
+
+instance Default SifOpts where
+  default = defOpts
 
 instance Eq SifOpts where
   (==) (MkSOpts a b c d e f g) (MkSOpts a' b' c' d' e' f' g') =
@@ -58,13 +63,23 @@ parseArgs as = do
   res <- parseArgsRec defOpts convOpts as
   pure res
 
+-- -------------------------------------------------------------------- [ Effs ]
+
+SifEffs : List EFFECT
+SifEffs = [ FILE_IO ()
+          , EXCEPTION String
+          , SYSTEM
+          , STDIO
+          , 'bst  ::: STATE BuildEnv
+          , 'opts ::: STATE SifOpts ]
+
 fromJustEff : Maybe a -> Eff a [EXCEPTION String]
 fromJustEff (Just x) = pure x
 fromJustEff Nothing = raise "it was nothing"
 
-doCheck : SifOpts
-       -> Eff () [FILE_IO (), EXCEPTION String, STATE SifState, SYSTEM, STDIO]
-doCheck opts =
+doCheck : Eff () SifEffs
+doCheck = do
+    opts <- 'opts :- get
     case (sSpec opts, pSpec opts) of
       (Just x, Just y) => do
         readSifFile solution x
@@ -78,10 +93,9 @@ doCheck opts =
         pure ()
       (Nothing, Nothing) => raise "Need Files to check."
 
-doConv : SifOpts
-      -> SifExpr tyPATTERN
-      -> Eff () [FILE_IO (), EXCEPTION String, STATE SifState, SYSTEM, STDIO]
-doConv opts p =
+doConv : SifExpr tyPATTERN -> Eff () SifEffs
+doConv p = do
+    opts <- 'opts :- get
     case (out opts) of
       Nothing => raise "No output"
       Just x  =>
@@ -100,29 +114,38 @@ doConv opts p =
             otherwise => raise "Unsupported out format"
 
 
-mainEff : Eff () [FILE_IO (), EXCEPTION String, STATE SifState, SYSTEM, STDIO]
+printResults : EvalResult -> Eff () SifEffs
+printResults BadModel  = raise "Bad Model"
+printResults (Result xs) = printList xs
+  where
+    printNode : GoalNode -> Eff () SifEffs
+    printNode x = putStrLn $ unwords [getNodeTitle x, "==>", show $ getSValue x]
+
+    printList : List GoalNode -> Eff () SifEffs
+    printList Nil     = pure ()
+    printList (x::xs) = do printNode x; printList xs
+
+doBuildEval : Maybe String
+           -> Maybe String
+           -> Eff () SifEffs
+doBuildEval (Just p) (Just s) = do
+    pat <- buildPattern p s
+    let res = evalPattern pat
+    printResults res
+doBuildEval _        _        = raise "Both problem and speficiation need to be given."
+
+mainEff : Eff () SifEffs
 mainEff = do
   as <- getArgs
   printLn as
   if isNil as
     then raise "No Arguments"
     else do
-      opts <- parseArgs as
-      if check opts
-        then doCheck opts
-        else do
-          if isJust (sSpec opts) && isJust (pSpec opts)
-            then do
-              pro <- fromJustEff (pSpec opts)
-              sol <- fromJustEff (sSpec opts)
-              p <- buildPattern pro sol
-              if (eval opts)
-                then do
-                  let m = getModel p
-                  let res = evalModel m Nothing
-                  printLn res
-                else doConv opts p
-            else raise "Both problem and speficiation need to be given."
+      os <- parseArgs as
+      'opts :- put os
+      if (check os)
+        then doCheck
+        else doBuildEval (pSpec os) (sSpec os)
 
 main : IO ()
 main = run mainEff

@@ -12,7 +12,7 @@ install:
 lib:
 	${IDRIS} --build ${LIB}.ipkg
 
-exe: lib
+exe: install
 	${IDRIS} --build ${EXE}.ipkg
 
 clean:
