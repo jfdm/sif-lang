@@ -1,0 +1,11 @@
+sif problem infosec as "Information Secrecy"
+
+Description {
+How to send a message between two recipients such that only the intended recipient of the message can obtain the information.
+}
+
+
+dataConf <- Functional "Data Confidentiality"
+recipConf <- Functional "Recipient Confidentiality"
+multiSecLevels <- Performance "Suitable Security Level"
+mechPerf <- Performance "Suitable performance"

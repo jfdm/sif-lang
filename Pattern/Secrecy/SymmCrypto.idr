@@ -11,13 +11,16 @@ import Sif.Pattern
 
 import Problem.InformationSecrecy
 
+import GRL.Eval
+
+%default partial
 -- ---------------------------------------------- [ Asymmetric Crypto Solution ]
 
 singleKey : PROPERTY
 singleKey = mkProperty "Single Key" Nothing [t1,t2]
   where
-    t1 : ADVANTAGE
-    t1 = mkAdvantage "Use of a single key" Nothing SATISFIED
+    t1 : DISADVANTAGE
+    t1 = mkDisadvantage "Use of a single key" Nothing SATISFIED
             [mkLink BREAK recipient_confidentiality]
 
     t2 : DISADVANTAGE
@@ -48,6 +51,6 @@ namespace Main
   main : IO ()
   main = do
     let m = getModel infosecSymmCrypto
-    putStrLn $ prettyModel m
+    printLn $ evalModel m Nothing
 
 -- --------------------------------------------------------------------- [ EOF ]

@@ -2,6 +2,7 @@
 
 IDRIS := idris
 LIB   := sif
+EXE   := sifexe
 
 .PHONY: doc clobber check clean lib install
 
@@ -11,9 +12,13 @@ install:
 lib:
 	${IDRIS} --build ${LIB}.ipkg
 
+exe: lib
+	${IDRIS} --build ${EXE}.ipkg
+
 clean:
 	${IDRIS} --clean ${LIB}.ipkg
 	find . -name "*~" -delete
+	${IDRIS} --clean ${EXE}.ipkg
 
 check: clobber
 	${IDRIS} --checkpkg ${LIB}.ipkg

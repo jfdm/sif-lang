@@ -10,9 +10,11 @@ import Effects
 import Effect.State
 
 import Data.Sigma.DList
-
 import Data.AVL.Dict
+import Data.GraphViz.SimpleDot
+
 import GRL.Lang.GLang
+import GRL.Eval
 
 import Edda
 import Edda.Reader.Org
@@ -20,6 +22,7 @@ import Edda.Reader.Org
 import XML.DOM
 
 import Sif.Pattern.Model
+import Sif.Pattern.Utils
 
 %default total
 %access public
@@ -38,24 +41,6 @@ showSifExpr (MkExpr e) = toOrg e
 
 instance Show (SifExpr ty) where
   show x = showSifExpr x
-
--- ----------------------------------------------------------------- [ To Edda ]
-
-partial
-toEdda : SifExpr tyPATTERN -> Maybe $ Edda PRIME MODEL
-toEdda expr =
-    case parse parseOrg (showSifExpr expr) of
-      Left  err => Nothing
-      Right doc => Just (refineEdda doc)
-
-partial
-toXML : SifExpr tyPATTERN -> Document DOCUMENT
-toXML (MkExpr x) = setRoot root $ mkDocument (mkQName "pattern") Nothing
-  where
-    partial
-    root : Document ELEMENT
-    root = runPureInit [(Z,Dict.empty)] (Model.toXML x)
-
 
 -- ----------------------------------------------------------- [ Type Synonyms ]
 
@@ -139,10 +124,11 @@ private
 convR : SifExpr tyREQ -> (r : InterpRes tyREQ ** SifPriv r tyREQ)
 convR (MkExpr res) = (_ ** res)
 
+partial
 mkProblem : String
          -> Maybe String
          -> (ls : List (SifExpr tyREQ))
-         -> {auto prf : NonEmpty ls}
+  --       -> {auto prf : NonEmpty ls}
          -> PROBLEM
 mkProblem s d rs = MkExpr $ priv__mkProb s d (Sigma.getProof $ conv rs)
 
@@ -153,7 +139,7 @@ mkAdvantage : String
            -> Maybe String
            -> SValue
            -> (ts : TLINKS)
-           -> {auto prf : NonEmpty ts}
+ --          -> {auto prf : NonEmpty ts}
            -> ADVANTAGE
 mkAdvantage t d s rs =
     MkExpr $ priv__mkTrait ADV t d s (Sigma.getProof $ conv rs)
@@ -162,7 +148,7 @@ mkDisadvantage : String
               -> Maybe String
               -> SValue
               -> (ts : TLINKS)
-              -> {auto prf : NonEmpty ts}
+--              -> {auto prf : NonEmpty ts}
               -> DISADVANTAGE
 mkDisadvantage t d s rs =
     MkExpr $ priv__mkTrait DIS t d s (Sigma.getProof $ conv rs)
@@ -170,14 +156,14 @@ mkDisadvantage t d s rs =
 mkProperty : String
           -> Maybe String
           -> (ts : TRAITS)
-          -> {auto prf : NonEmpty ts}
+--          -> {auto prf : NonEmpty ts}
           -> PROPERTY
 mkProperty t d ts = MkExpr $ priv__mkProp t d (Sigma.getProof $ conv ts)
 
 mkSolution : String
           -> Maybe String
           -> (ps : PROPERTIES)
-          -> {auto prf : NonEmpty ps}
+ --         -> {auto prf : NonEmpty ps}
           -> SOLUTION
 mkSolution s d ps = MkExpr $ priv__mkSolt s d (Sigma.getProof $ conv ps)
 
@@ -192,5 +178,26 @@ getModel (MkExpr p) = doGetModel p
 
     doGetModel : {i : InterpRes tyPATTERN} -> SifPriv i tyPATTERN -> GModel
     doGetModel {i} _ = extract i
+
+
+-- ----------------------------------------------------------------- [ To Edda ]
+
+partial
+toEdda : SifExpr tyPATTERN -> Maybe $ Edda PRIME MODEL
+toEdda expr =
+    case parse parseOrg (showSifExpr expr) of
+      Left  err => Nothing
+      Right doc => Just (refineEdda doc)
+
+partial
+toXML : SifExpr tyPATTERN -> Document DOCUMENT
+toXML (MkExpr x) = setRoot root $ mkDocument (mkQName "pattern") Nothing
+  where
+    partial
+    root : Document ELEMENT
+    root = runPureInit [(Z,Dict.empty)] (Model.toXML x)
+
+toDot : SifExpr tyPATTERN -> SimpleDot GRAPH
+toDot p = grlToDot $ getModel p
 
 -- --------------------------------------------------------------------- [ EOF ]

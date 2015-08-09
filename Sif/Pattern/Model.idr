@@ -65,13 +65,13 @@ interpReq : String -> InterpRes tyREQ
 interpReq s = IReq root
   where
     root : GLang ELEM
-    root = MkGoal s Nothing
+    root = mkGoal s
 
 interpProb : String -> List (InterpRes tyREQ) -> InterpRes tyPROBLEM
 interpProb s ps = IProb root (model' \= (root &= cs))
   where
     root : GLang ELEM
-    root = MkGoal s Nothing
+    root = mkGoal s
 
     cs : List (GLang ELEM)
     cs = map (\(IReq x) => x) ps
@@ -88,11 +88,17 @@ interpTLink c (IReq r) = ITraitL r c
 interpTrait : String
            -> SValue
            -> List (InterpRes tyTRAITend)
+           -> TTy
            -> InterpRes tyTRAIT
-interpTrait s m es = ITrait node cs
+interpTrait s m es ty = ITrait node cs
   where
+    sVal : SValue -> SValue
+    sVal v = case ty of
+               ADV => v
+               DIS => invertEval v
+
     node : GLang ELEM
-    node = MkTask s (Just m)
+    node = mkSatTask s (sVal m)
 
     cs : List (GLang INTENT)
     cs = map (\(ITraitL r c) => node ==> r | c) es
@@ -103,14 +109,14 @@ interpProp : String
 interpProp s ts = IProp pelem (Sigma.getProof elems)
   where
     pelem : GLang ELEM
-    pelem = MkTask s Nothing
+    pelem = mkTask s
 
-    updateIntent : GLang INTENT -> GLang INTENT
-    updateIntent (MkImpacts c a b) = MkImpacts c pelem b
-    updateIntent (MkEffects c a b) = MkEffects c pelem b
+    -- updateIntent : GLang INTENT -> GLang INTENT
+    -- updateIntent (MkImpacts c a b) = MkImpacts c pelem b
+    -- updateIntent (MkEffects c a b) = MkEffects c pelem b
 
     newTS : List (GLang ELEM, List (GLang INTENT))
-    newTS = ts --map (\(ITrait x ys) => (x, map updateIntent ys)) ts
+    newTS = map (\(ITrait x ys) => (x, ys)) ts
 
     newCS : GLang STRUCT
     newCS = (pelem &= map fst newTS)
@@ -133,7 +139,7 @@ interpSolt : String
 interpSolt s ps = ISolt root (Sigma.getProof elems)
   where
     root : GLang ELEM
-    root = MkTask s Nothing
+    root = mkTask s
 
     cs : GLang STRUCT
     cs = (root &= map (\(IProp x ys) => x) ps)
@@ -182,7 +188,7 @@ data SifPriv : InterpRes ty -> SifTy -> Type where
                -> (desc  : Maybe String)
                -> (sval  : SValue)
                -> DList (InterpRes tyTRAITend) (\x => SifPriv x tyTRAITend) rs
-               -> SifPriv (interpTrait title sval rs) tyTRAIT
+               -> SifPriv (interpTrait title sval rs ty) tyTRAIT
 
   priv__mkProp : (title : String)
               -> (desc : Maybe String)

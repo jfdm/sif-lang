@@ -122,13 +122,13 @@ syntax [a] "|=" [bs] = MkSub IORty a bs
 -- ------------------------------------------------------------- [ Interpreter ]
 
 instance GRL (\ty => PModel x ty) where
-  mkGoal (MkReq ty  t)        = Elem GOALty t Nothing
-  mkGoal (MkAction ty t sval) = Elem TASKty t sval
+  mkElem (MkReq ty  t)        = Elem GOALty t Nothing
+  mkElem (MkAction ty t sval) = Elem TASKty t sval
 
-  mkIntent (MkLink AffLink c a b) = ILink AFFECTSty c (mkGoal a) (mkGoal b)
-  mkIntent (MkLink ActLink c a b) = ILink IMPACTSty  c (mkGoal a) (mkGoal b)
+  mkIntent (MkLink AffLink c a b) = ILink AFFECTSty c (mkElem a) (mkElem b)
+  mkIntent (MkLink ActLink c a b) = ILink IMPACTSty  c (mkElem a) (mkElem b)
 
-  mkStruct (MkSub ty x ys) = SLink ty (mkGoal x) (mapDList (mkGoal) ys)
+  mkStruct (MkSub ty x ys) = SLink ty (mkElem x) (mapDList (mkElem) ys)
 
 
 -- --------------------------------------------------------------------- [ EOF ]

@@ -35,6 +35,7 @@ mech_perf = mkPerformance "Suitable performance" (Just desc)
     desc : String
     desc = """The mechanism that enables the confidentiality of data should not hinder upon use of the mechanism."""
 
+partial
 infosec : PROBLEM
 infosec = mkProblem "Information Secrecy" (Just desc) reqs
   where

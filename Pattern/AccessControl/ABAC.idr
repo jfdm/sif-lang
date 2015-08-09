@@ -123,12 +123,12 @@ tions. Subjects can be roles as well as users or processes.
 -}
 
 
-abac : PATTERN
-abac = mkPattern "Access Control using Attribute Based Access Control"
-                 (Just desc) accessControl solution
-  where
-    desc : String
-    desc = """This pattern presents the provision of access control based upon the analysis of attributes """
+-- abac : PATTERN
+-- abac = mkPattern "Access Control using Attribute Based Access Control"
+--                  (Just desc) accessControl solution
+--   where
+--     desc : String
+--     desc = """This pattern presents the provision of access control based upon the analysis of attributes """
 
 
 -- --------------------------------------------------------------------- [ EOF ]

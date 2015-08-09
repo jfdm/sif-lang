@@ -1,0 +1,60 @@
+sif solution
+
+solves infosec
+makes pattern "InfoSec through AsymCrypto"
+
+Solution "Asymmetric Cryptography" {
+
+  Property "Public Key Pairs" {
+    Advantage "Different Keys" is Satisfied {
+       Affects {
+          Makes recipConf
+       }
+    }
+	Disadvantage "PKI" is Satisfied {
+       Affects {
+         Hurts multiSecLevels
+       }
+    }
+    Advantage "Key Pair" is Satisfied {
+	   Affects {
+	     Helps dataConf
+	   }
+	}
+  }
+
+  Property "Maths Algorithms" {
+    Advantage "Maths Guarantee" is Satisfied {
+      Affects {
+        Makes dataConf
+      }
+    }
+    Disadvantage "Computationally Expensive" is WeakSatis {
+     Affects {
+       Hurts mechPerf
+     }
+    }
+    Advantage "Maths well studied" is Satisfied {
+	  Affects {
+	    Helps recipConf
+	  }
+	}
+  }
+  Property "Variable Security Parameter" {
+    Advantage "Greater Security" is Satisfied {
+	    Affects {
+	      Makes multiSecLevels
+		}
+	}
+   Disadvantage "Parameter Selection" is Satisfied {
+        Affects {
+		  Hurts multiSecLevels
+		}
+   }
+   Disadvantage "Parameter Computation" is Satisfied {
+       Affects {
+	     Hurts mechPerf
+	   }
+   }
+  }
+}

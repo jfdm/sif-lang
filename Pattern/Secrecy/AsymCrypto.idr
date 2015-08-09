@@ -10,7 +10,7 @@ module Pattern.Secrecy.AsymCrypto
 import Sif.Pattern
 
 import Problem.InformationSecrecy
-
+import GRL.Eval
 -- ---------------------------------------------- [ Asymmetric Crypto Solution ]
 
 keypairs : PROPERTY
@@ -36,7 +36,7 @@ maths = mkProperty "Maths Algorithm" Nothing [t1,t2,t3]
             [mkLink MAKES data_confidentiality]
 
     t2 : DISADVANTAGE
-    t2 = mkDisadvantage "Computationally Expensive" Nothing UNKNOWN
+    t2 = mkDisadvantage "Computationally Expensive" Nothing WEAKSATIS
             [mkLink HURTS mech_perf]
 
     t3 : ADVANTAGE
@@ -72,7 +72,9 @@ namespace Main
   main : IO ()
   main = do
     let m = getModel infoSecAsymCrypto
-    putStrLn $ show @{xml} $ toXML infoSecAsymCrypto
+    printLn $ evalModel m Nothing
+    printLn $ grlToDot m
+--    putStrLn $ show @{xml} $ toXML infoSecAsymCrypto
 
 
 -- --------------------------------------------------------------------- [ EOF ]

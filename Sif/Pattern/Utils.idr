@@ -8,6 +8,11 @@ module Sif.Pattern.Utils
 
 import XML.DOM
 
+import GRL.Lang.GLang
+
+import Data.GraphViz.SimpleDot
+
+
 mkNode : String -> Document ELEMENT
 mkNode = mkSimpleElement
 
@@ -64,5 +69,28 @@ mkDynamics = addScore $ mkNode "dynamics"
 mkRels : Document ELEMENT
 mkRels = addScore $ mkNode "relations"
     <++> (setAttribute "patternID" "TO BE DETERMINED" $ setAttribute "relationship" "specialises | implements | uses | linkedTo" (mkNode "link"))
+
+
+grlToDot : GModel -> SimpleDot GRAPH
+grlToDot g = Digraph (nodes (verticesID g)) (edges' (edges g))
+  where
+
+    f : NodeID -> String
+    f n = case getValueByID n g of
+        Nothing => ""
+        Just u  => getNodeTitle u
+
+    nodes : List NodeID -> List (SimpleDot NODE)
+    nodes vs = map (\x => Node x [("label", (f x))]) vs
+
+    convEdge : Edge GoalEdge -> SimpleDot EDGE
+    convEdge (x,y, Nothing)     = Edge y x Nil
+    convEdge (x,y, Just Decomp) = Edge y x [("label", "Decomp FIX")]
+    convEdge (x,y, Just (Contribution l)) = Edge x y [("label", "Impacts " ++ show l)]
+    convEdge (x,y, Just (Correlation  l)) = Edge x y [("label", "Affects " ++ show l)]
+
+    edges' : List (Edge GoalEdge) -> List (SimpleDot EDGE)
+    edges' es = map (convEdge) es
+
 
 -- --------------------------------------------------------------------- [ EOF ]

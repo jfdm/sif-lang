@@ -1,21 +1,28 @@
 package sif
 
-opts = "-p effects -p containers -p grl -p edda -p xml --warnpartial --warnreach --total"
+opts = "-p effects -p containers -p grl -p edda -p xml -p lightyear -p argparse -p graphviz --warnreach  --typeintype"
 
 modules = Sif.Pattern
         , Sif.Pattern.Model
         , Sif.Pattern.API
         , Sif.Pattern.Utils
 
+        , Sif.Parser.Utils
+        , Sif.Parser.Common
+        , Sif.Parser.Problem
+        , Sif.Parser.Pattern
+        , Sif.Parser.File
+        , Sif.Parser
+
         , Sif.PModel
 
-        , Problem.AccessControl
-        , Problem.InformationSecrecy
-        , Problem.PolicyEnforcement
+        -- , Problem.AccessControl
+        -- , Problem.InformationSecrecy
+        -- , Problem.PolicyEnforcement
 
-        , Pattern.Secrecy.AsymCrypto
-        , Pattern.Secrecy.SymmCrypto
+        -- , Pattern.Secrecy.AsymCrypto
+        -- , Pattern.Secrecy.SymmCrypto
 
-        , Pattern.AccessControl.ReferenceMonitor
-        , Pattern.AccessControl.Authorisation
-        , Pattern.AccessControl.ABAC
+        -- , Pattern.AccessControl.ReferenceMonitor
+        -- , Pattern.AccessControl.Authorisation
+        -- , Pattern.AccessControl.ABAC
