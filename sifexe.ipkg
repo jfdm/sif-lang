@@ -1,6 +1,6 @@
 package sifexe
 
-opts = "-p effects -p containers -p grl -p edda -p xml -p lightyear -p argparse -p graphviz -p sif --typeintype --warnreach"
+opts = "-p effects -p containers -p grl -p edda -p xml -p lightyear -p argparse -p graphviz -p sif --typeintype"
 
 modules = Main
 main = Main
