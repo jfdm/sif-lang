@@ -5,7 +5,7 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| Reference Monitor
-module Sif.Lib.Pattern.AccessControl.ReferenceMonitor
+module Sif.Lib.Solution.AccessControl.ReferenceMonitor
 
 import Sif.Pattern
 
@@ -16,7 +16,7 @@ import Sif.Lib.Problem.PolicyEnforcement
 namespace SinglePoint
 
    single_epoint : ADVANTAGE
-   single_epoint = mkAdvantage "Policy Enforcement" (Just desc) SATISFIED links
+   single_epoint = mkAdvantage "Enforces Policy" (Just desc) SATISFIED links
      where
        desc : String
        desc = """If all the requests are intercepted we can make sure that they comply with the rules"""
@@ -72,23 +72,13 @@ agnostic = mkProperty "Abstract Definition" (Just desc) ts
 
 -- ---------------------------------------------- [ Reference Monitor Solution ]
 
-solution: SOLUTION
-solution= mkSolution "Policy Enforcement Points" (Just desc) ps
+refmon : SOLUTION
+refmon = mkSolution "Policy Enforcement Points" (Just desc) ps
   where
     desc : String
     desc = """Define an abstract process that intercepts all requests for resources and checks them for compliance with authorisations."""
 
     ps : PROPERTIES
     ps = [single_point, agnostic]
-
--- ------------------------------------------------------ [ Pattern Definition ]
-
-referenceMonitor : PATTERN
-referenceMonitor = mkPattern "Policy Enforcement through Reference Monitoring" (Just desc)
-     policyEnforcement
-     solution
-   where
-     desc : String
-     desc = """In a computational environment in which users or processes make requests for data or resources, this pattern enforces declared access restrictions when an active entity requests resources. It describes how to define an abstract process that intercepts all requests for resources and checks them for compliance with authorisations."""
 
 -- --------------------------------------------------------------------- [ EOF ]

@@ -105,6 +105,8 @@ conv : List (SifExpr ty)
     -> (xs ** DList (InterpRes ty) (\x => SifPriv x ty) xs)
 conv xs = fromLDP $ map (\(MkExpr x) => (_ ** x)) xs
 
+-- ---------------------------------------------------------------- [ Problems ]
+
 mkFunctional : String -> Maybe String -> FUNCTIONAL
 mkFunctional s desc = MkExpr $ priv__mkReq FUNC s desc
 
@@ -131,6 +133,14 @@ mkProblem : String
   --       -> {auto prf : NonEmpty ls}
          -> PROBLEM
 mkProblem s d rs = MkExpr $ priv__mkProb s d (Sigma.getProof $ conv rs)
+
+getProblemTitle : PROBLEM -> String
+getProblemTitle (MkExpr p) = doGet p
+  where
+    doGet : {i : InterpRes tyPROBLEM} -> SifPriv i tyPROBLEM -> String
+    doGet (priv__mkProb t _ _) = t
+
+-- --------------------------------------------------------------- [ Solutions ]
 
 mkLink : CValue -> REQUIREMENT -> TLINK
 mkLink c r = MkExpr $ priv__mkTLink c (Sigma.getProof $ convR r)
@@ -167,6 +177,14 @@ mkSolution : String
           -> SOLUTION
 mkSolution s d ps = MkExpr $ priv__mkSolt s d (Sigma.getProof $ conv ps)
 
+getSolutionTitle : SOLUTION -> String
+getSolutionTitle (MkExpr p) = doGet p
+  where
+    doGet : {i : InterpRes tySOLUTION} -> SifPriv i tySOLUTION -> String
+    doGet (priv__mkSolt t _ _) = t
+
+-- ---------------------------------------------------------------- [ Patterns ]
+
 mkPattern : String -> Maybe String -> PROBLEM -> SOLUTION -> PATTERN
 mkPattern t d (MkExpr p) (MkExpr s) = MkExpr $ priv__mkPatt t d p s
 
@@ -189,7 +207,36 @@ getPatternTitle (MkExpr p) = doGet p
     doGet : {i : InterpRes tyPATTERN} -> SifPriv i tyPATTERN -> String
     doGet (priv__mkPatt t _ _ _) = t
 
--- ----------------------------------------------------------------- [ To Edda ]
+-- ------------------------------------------------------------- [ Conversions ]
+
+data SifOutFormat = ORG | XML | DOT | GRL | EDDA
+
+instance Eq SifOutFormat where
+  (==) ORG ORG = True
+  (==) XML XML = True
+  (==) DOT DOT = True
+  (==) GRL GRL = True
+  (==) EDDA EDDA = True
+  (==) _   _   = False
+
+instance Show SifOutFormat where
+  show ORG = "Org"
+  show XML = "XML"
+  show DOT = "dot"
+  show GRL = "GRL"
+  show EDDA = "Edda"
+
+readOutFMT : String -> Maybe SifOutFormat
+readOutFMT s =
+  case s of
+    "org" => Just ORG
+    "xml" => Just XML
+    "dot" => Just DOT
+    "grl" => Just GRL
+    "edda" => Nothing -- TODO Just EDDA
+    otherwise => Nothing
+
+
 
 partial
 toEdda : SifExpr tyPATTERN -> Maybe $ Edda PRIME MODEL
@@ -197,6 +244,12 @@ toEdda expr =
     case parse parseOrg (showSifExpr expr) of
       Left  err => Nothing
       Right doc => Just (refineEdda doc)
+
+
+partial
+toString : SifExpr tyPATTERN -> String
+toString (MkExpr p) = toOrg p
+
 
 partial
 toXML : SifExpr tyPATTERN -> Document DOCUMENT
@@ -206,7 +259,28 @@ toXML (MkExpr x) = setRoot root $ mkDocument (mkQName "pattern") Nothing
     root : Document ELEMENT
     root = runPureInit [(Z,Dict.empty)] (Model.toXML x)
 
+
 toDot : SifExpr tyPATTERN -> SimpleDot GRAPH
 toDot p = grlToDot $ getModel p
+
+convTy : SifOutFormat -> Type
+convTy ORG = String
+convTy XML = Document DOCUMENT
+convTy DOT = SimpleDot GRAPH
+convTy GRL = GModel
+convTy EDDA = Maybe $ Edda PRIME MODEL
+
+convTo : PATTERN -> (fmt : SifOutFormat) -> convTy fmt
+convTo p DOT = toDot p
+convTo p XML = toXML p
+convTo p ORG = toString p
+convTo p EDDA = toEdda p
+
+showConvTo : PATTERN -> (fmt : SifOutFormat) ->  String
+showConvTo p GRL = show (the (convTy GRL) (convTo p GRL))
+showConvTo p DOT = show (the (convTy DOT) (convTo p DOT))
+showConvTo p XML = show @{xml} $ (the (convTy XML) (convTo p XML))
+showConvTo p ORG = (the (convTy ORG) (convTo p ORG))
+showConvTo p EDDA = show       $ (the (convTy EDDA) (convTo p EDDA))
 
 -- --------------------------------------------------------------------- [ EOF ]

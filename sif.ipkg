@@ -9,25 +9,31 @@ modules = Sif.Pattern
 
         , Sif.Parser.Utils
         , Sif.Parser.Common
+        , Sif.Parser.Problem
+        , Sif.Parser.Pattern
+        , Sif.Parser.File
+        , Sif.Parser
 
---        , Sif.Parser.Problem
---        , Sif.Parser.Pattern
---        , Sif.Parser.File
---        , Sif.Parser
-
-        , Sif.Viewer
+        , Sif.Viewer.REPL
         , Sif.Viewer.Commands
+
+        , Sif.API
+        , Sif.Error
+        , Sif.Effs
 
         , Sif.PModel
 
         , Sif.Lib
+        , Sif.Lib.Problem
         , Sif.Lib.Problem.AccessControl
         , Sif.Lib.Problem.InformationSecrecy
         , Sif.Lib.Problem.PolicyEnforcement
 
-        , Sif.Lib.Pattern.Secrecy.AsymCrypto
-        , Sif.Lib.Pattern.Secrecy.SymmCrypto
+        , Sif.Lib.Solution
+        , Sif.Lib.Solution.Secrecy.AsymCrypto
+        , Sif.Lib.Solution.Secrecy.SymmCrypto
+        , Sif.Lib.Solution.AccessControl.ReferenceMonitor
+        , Sif.Lib.Solution.AccessControl.Authorisation
+        , Sif.Lib.Solution.AccessControl.ABAC
 
-        , Sif.Lib.Pattern.AccessControl.ReferenceMonitor
-        , Sif.Lib.Pattern.AccessControl.Authorisation
-        , Sif.Lib.Pattern.AccessControl.ABAC
+        , Sif.Lib.Pattern

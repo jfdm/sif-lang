@@ -5,7 +5,7 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| The pattern for ABAC.
-module Sif.Lib.Pattern.AccessControl.ABAC
+module Sif.Lib.Solution.AccessControl.ABAC
 
 import Sif.Pattern
 

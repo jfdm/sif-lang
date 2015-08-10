@@ -8,9 +8,8 @@ module Sif.Parser.File
 import Lightyear
 import Lightyear.Strings
 
-import Effects
-import Effect.Exception
-import Effect.File
+import Sif.Error
+import Sif.Effs
 
 %default partial
 
@@ -25,15 +24,15 @@ readFile = readAcc ""
 public
 readSifFile : Parser a
            -> String
-           -> Eff a [FILE_IO (), EXCEPTION String]
+           -> Eff a [FILE_IO (), 'sif ::: EXCEPTION SifError]
 readSifFile p f = do
     case !(open f Read) of
       True => do
         src <- readFile
         close
         case parse p src of
-          Left err  => raise err
+          Left err  => Sif.raise (ParseError err)
           Right res => pure res
-      False => raise $ "Cannot Read File Error: " ++ f
+      False => Sif.raise (FileMissing f)
 
 -- --------------------------------------------------------------------- [ EOF ]

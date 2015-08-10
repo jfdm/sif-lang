@@ -2,7 +2,8 @@
 
 IDRIS := idris
 LIB   := sif
-EXE   := sifexe
+VIEWER_EXE := sifViewer
+CHECKER_EXE := sifChecker
 
 .PHONY: doc clobber check clean lib install
 
@@ -13,12 +14,15 @@ lib:
 	${IDRIS} --build ${LIB}.ipkg
 
 exe: install
-	${IDRIS} --build ${EXE}.ipkg
+	${IDRIS} --build ${VIEWER_EXE}.ipkg
+	${IDRIS} --build ${CHECKER_EXE}.ipkg
+
 
 clean:
 	${IDRIS} --clean ${LIB}.ipkg
 	find . -name "*~" -delete
-	${IDRIS} --clean ${EXE}.ipkg
+	${IDRIS} --clean ${VIEWER_EXE}.ipkg
+	${IDRIS} --clean ${CHECKER_EXE}.ipkg
 
 check: clobber
 	${IDRIS} --checkpkg ${LIB}.ipkg

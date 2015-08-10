@@ -37,11 +37,4 @@ symCrypto : SOLUTION
 symCrypto = mkSolution "Symmetric Crypto" Nothing
                 [singleKey, maths]
 
-infoSecSymmCrypto : PATTERN
-infoSecSymmCrypto = mkPattern
-    "Information Security using Symmetric Crypto"
-    Nothing
-    infosec
-    symCrypto
-
 -- --------------------------------------------------------------------- [ EOF ]

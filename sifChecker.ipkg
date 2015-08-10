@@ -1,10 +1,9 @@
-package sifexe
+package sifChecker
 
 opts = "-p effects -p containers -p grl -p edda -p xml -p lightyear -p argparse -p graphviz -p sif --typeintype"
 
-main = Sif.Viewer.Default
+main = Sif.Checker
 
-executable = sifViewer
-
-
-modules = Sif.Viewer.Default
+modules = Sif.Checker
+        , Sif.Checker.Options
+executable = sif-checker

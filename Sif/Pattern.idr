@@ -18,6 +18,4 @@ import public XML.DOM
 import public Sif.Pattern.Model
 import public Sif.Pattern.API
 
-data SifOutFormat = DOT | ORG | XML
-
 -- --------------------------------------------------------------------- [ EOF ]

@@ -1,5 +1,8 @@
+sif
 sifc
 sifViewer
+sif-stdlib-viewer
+sif-checker
 sifdeps/
 *_doc/
 eddabin

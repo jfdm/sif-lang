@@ -1,40 +1,40 @@
-||| Defunct module
+-- ------------------------------------------------------------- [ Options.idr ]
+-- Module    : Options.idr
+-- Copyright : (c) Jan de Muijnck-Hughes
+-- License   : see LICENSE
+-- --------------------------------------------------------------------- [ EOH ]
+module Sif.Checker.Options
 
-module Sif.Viewer.Options
-
-import ArgParse
+import public ArgParse
 
 -- ----------------------------------------------------------------- [ Options ]
-
 
 record SifOpts where
   constructor MkSOpts
   pSpec : Maybe String
   sSpec : Maybe String
   check : Bool
-  args  : List String
   help  : Bool
   eval  : Bool
   out   : Maybe String
 
 defOpts : SifOpts
-defOpts = MkSOpts Nothing Nothing False Nil False False Nothing
+defOpts = MkSOpts Nothing Nothing False False False Nothing
 
 instance Default SifOpts where
   default = defOpts
 
 instance Eq SifOpts where
-  (==) (MkSOpts a b c d e f g) (MkSOpts a' b' c' d' e' f' g') =
+  (==) (MkSOpts a b c d e f) (MkSOpts a' b' c' d' e' f') =
     a' == a &&
     b' == b &&
     c' == c &&
     d' == d &&
     e' == e &&
-    f' == f &&
-    g' == g
+    f' == f
 
 convOpts : Arg -> SifOpts -> Maybe SifOpts
-convOpts (Files xs)     o = Just $ record {args = xs} o
+convOpts (Files xs)     o = Nothing
 convOpts (KeyValue k v) o =
   case k of
     "problem"  => Just $ record {pSpec = Just v} o
@@ -48,7 +48,7 @@ convOpts (Flag x) o =
     "eval"    => Just $ record {eval  = True} o
     otherwise => Nothing
 
-parseArgs : List String -> Eff SifOpts [EXCEPTION String]
+parseArgs : List String -> Eff SifOpts SifEffs
 parseArgs as = do
   res <- parseArgsRec defOpts convOpts as
   pure res

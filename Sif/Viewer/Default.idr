@@ -7,15 +7,16 @@
 ||| Sample and Default Viewer for the built in Pattern Library.
 module Sif.Viewer.Default
 
-import Sif.Viewer
+import System
 import Sif.Pattern
+import Sif.API
+import Sif.Viewer.REPL
 
-import Sif.Lib
 
 namespace Main
   main : IO ()
   main = do
-    run (modelViewer library)
+    run (modelViewer emptyLib)
     exit 0
 
 -- --------------------------------------------------------------------- [ EOF ]

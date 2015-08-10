@@ -1,3 +1,9 @@
+-- ------------------------------------------------------------ [ Commands.idr ]
+-- Module    : Commands.idr
+-- Copyright : (c) Jan de Muijnck-Hughes
+-- License   : see LICENSE
+-- --------------------------------------------------------------------- [ EOH ]
+
 module Sif.Viewer.Commands
 
 import Lightyear
@@ -13,11 +19,19 @@ import Sif.Pattern
 
 public
 data SifCMD : Type where
-  ShowPattern : Nat -> SifCMD
+  ShowPattern : Nat -> Maybe SifOutFormat -> Maybe String -> SifCMD
   ListLib     : SifCMD
-  SavePattern : Nat -> String -> String -> SifCMD
   EvalPattern : Nat -> SifCMD
+  CheckExtPattern : String -> String -> SifCMD
   Quit        : SifCMD
+
+covering
+getCmdIndex : SifCMD -> Maybe Nat
+getCmdIndex (CheckExtPattern _ _) = Nothing
+getCmdIndex Quit = Nothing
+getCmdIndex ListLib = Nothing
+getCmdIndex (ShowPattern n _ _) = Just n
+getCmdIndex (EvalPattern n)     = Just n
 
 private
 cmdShowPattern : Parser SifCMD
@@ -25,8 +39,20 @@ cmdShowPattern = do
     string ":show"
     space
     i <- integer
-    pure $ ShowPattern (cast $ abs i)
+    pure $ ShowPattern (cast $ abs i) (Just ORG) Nothing
   <?> "Show Pattern"
+
+private
+cmdShowAs : Parser SifCMD
+cmdShowAs = do
+    string ":showAs"
+    space
+    i <- integer
+    space
+    fmt <- ident
+    pure $ ShowPattern (cast $ abs i) (readOutFMT fmt) Nothing
+  <?> "Save Pattern"
+
 
 private
 cmdListLib : Parser SifCMD
@@ -45,7 +71,7 @@ cmdSavePattern = do
     fmt <- ident
     space
     fname <- ident
-    pure $ SavePattern (cast $ abs i) fmt fname
+    pure $ ShowPattern (cast $ abs i) (readOutFMT fmt) (Just fname)
   <?> "Save Pattern"
 
 private
@@ -64,12 +90,23 @@ cmdQuit = (string ":q"    *> return Quit)
       <|> (string ":exit" *> return Quit)
 
 private
+chkExtPattern : Parser SifCMD
+chkExtPattern = do
+    keyword ":chkPattern"
+    p <- literallyBetween '"'
+    space
+    s <- literallyBetween '"'
+    pure $ CheckExtPattern p s
+
+private
 cmd : Parser SifCMD
 cmd = cmdShowPattern
   <|> cmdListLib
+  <|> cmdShowAs
   <|> cmdSavePattern
   <|> cmdEvalPattern
   <|> cmdQuit
+  <|> chkExtPattern
   <?> "Command"
 
 public

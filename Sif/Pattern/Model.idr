@@ -65,13 +65,13 @@ interpReq : String -> InterpRes tyREQ
 interpReq s = IReq root
   where
     root : GLang ELEM
-    root = mkGoal s
+    root = mkGoal ("Requirement: " ++ s)
 
 interpProb : String -> List (InterpRes tyREQ) -> InterpRes tyPROBLEM
 interpProb s ps = IProb root (model' \= (root &= cs))
   where
     root : GLang ELEM
-    root = mkGoal s
+    root = mkGoal ("Problem: " ++ s)
 
     cs : List (GLang ELEM)
     cs = map (\(IReq x) => x) ps
@@ -97,8 +97,13 @@ interpTrait s m es ty = ITrait node cs
                ADV => v
                DIS => invertEval v
 
+    tVal : String
+    tVal = case ty of
+             ADV => "Trait Advantage: "
+             DIS => "Trait Disadvantage: "
+
     node : GLang ELEM
-    node = mkSatTask s (sVal m)
+    node = mkSatTask (tVal ++ s) (sVal m)
 
     cs : List (GLang INTENT)
     cs = map (\(ITraitL r c) => node ==> r | c) es
@@ -109,7 +114,7 @@ interpProp : String
 interpProp s ts = IProp pelem (Sigma.getProof elems)
   where
     pelem : GLang ELEM
-    pelem = mkTask s
+    pelem = mkTask ("Property: " ++ s)
 
     -- updateIntent : GLang INTENT -> GLang INTENT
     -- updateIntent (MkImpacts c a b) = MkImpacts c pelem b
@@ -139,7 +144,7 @@ interpSolt : String
 interpSolt s ps = ISolt root (Sigma.getProof elems)
   where
     root : GLang ELEM
-    root = mkTask s
+    root = mkTask ("Solution: " ++ s)
 
     cs : GLang STRUCT
     cs = (root &= map (\(IProp x ys) => x) ps)
@@ -163,7 +168,7 @@ interpPatt s (IProb rP m) (ISolt rS is) = IPatt model
   where
     model : GModel
     model = let (_ ** ds) = groupDecls is in
-        DList.foldl (flip $ insert) m (trace (showDList show ds) ds)
+        DList.foldl (flip $ insert) m ds
 
 
 -- ----------------------------------------- [ Private Internal Data Structure ]

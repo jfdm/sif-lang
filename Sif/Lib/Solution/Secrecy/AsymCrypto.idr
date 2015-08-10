@@ -5,7 +5,7 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| Modelling Information Secrecy using Asymmetric Crypto.
-module Sif.Lib.Pattern.Secrecy.AsymCrypto
+module Sif.Lib.Solution.Secrecy.AsymCrypto
 
 import Sif.Pattern
 
@@ -64,7 +64,5 @@ asymCrypto : SOLUTION
 asymCrypto = mkSolution "Asymmetric Crypto" Nothing
                 [keypairs, maths, secparam]
 
-infoSecAsymCrypto : PATTERN
-infoSecAsymCrypto = mkPattern "Information Security using Asymmetric Crypto" Nothing infosec asymCrypto
 
 -- --------------------------------------------------------------------- [ EOF ]
