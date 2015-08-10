@@ -1,99 +1,58 @@
-module Main
+-- -------------------------------------------------------------- [ Viewer.idr ]
+-- Module    : Viewer.idr
+-- Copyright : (c) Jan de Muijnck-Hughes
+-- License   : see LICENSE
+-- --------------------------------------------------------------------- [ EOH ]
+||| A Pattern Viewer
+module Sif.Viewer
 
-import System
-import Effects
-import Effect.System
-import Effect.State
-import Effect.Exception
-import Effect.File
-import Effect.StdIO
+import public System
 
-import Sif.Pattern
-import Sif.Parser
+import public Effects
+import public Effect.System
+import public Effect.State
+import public Effect.Exception
+import public Effect.File
+import public Effect.StdIO
+
+import Lightyear
+import Lightyear.Strings
+
+import public Sif.Pattern
+
+import Sif.Viewer.Commands
 
 import Data.GraphViz.SimpleDot
 
-import ArgParse
-
--- ----------------------------------------------------------------- [ Options ]
-
-record SifOpts where
-  constructor MkSOpts
-  pSpec : Maybe String
-  sSpec : Maybe String
-  check : Bool
-  args  : List String
-  help  : Bool
-  eval  : Bool
-  out   : Maybe String
-
-defOpts : SifOpts
-defOpts = MkSOpts Nothing Nothing False Nil False False Nothing
-
-instance Default SifOpts where
-  default = defOpts
-
-instance Eq SifOpts where
-  (==) (MkSOpts a b c d e f g) (MkSOpts a' b' c' d' e' f' g') =
-    a' == a &&
-    b' == b &&
-    c' == c &&
-    d' == d &&
-    e' == e &&
-    f' == f &&
-    g' == g
-
-convOpts : Arg -> SifOpts -> Maybe SifOpts
-convOpts (Files xs)     o = Just $ record {args = xs} o
-convOpts (KeyValue k v) o =
-  case k of
-    "problem"  => Just $ record {pSpec = Just v} o
-    "solution" => Just $ record {sSpec = Just v} o
-    "out"      => Just $ record {out   = Just v} o
-    otherwise  => Nothing
-convOpts (Flag x) o =
-  case x of
-    "check"   => Just $ record {check = True} o
-    "help"    => Just $ record {help  = True} o
-    "eval"    => Just $ record {eval  = True} o
-    otherwise => Nothing
-
-parseArgs : List String -> Eff SifOpts [EXCEPTION String]
-parseArgs as = do
-  res <- parseArgsRec defOpts convOpts as
-  pure res
-
+%access public
 -- -------------------------------------------------------------------- [ Effs ]
+
+data SifError : Type where
+  NoSuchPattern : SifError
+  UnSuppFormat  : SifError
+  ResultInvalid : SifError
+  NoSuchCommand : SifError
+
+instance Show SifError where
+  show NoSuchPattern = "No Such Pattern"
+  show UnSuppFormat  = "Unsupported output format"
+  show ResultInvalid = "Invalid evaluation result"
+  show NoSuchCommand = "No such command"
 
 SifEffs : List EFFECT
 SifEffs = [ FILE_IO ()
-          , EXCEPTION String
+          , EXCEPTION SifError
           , SYSTEM
           , STDIO
-          , 'bst  ::: STATE BuildEnv
-          , 'opts ::: STATE SifOpts ]
+          , STATE (List PATTERN)
+          ]
 
+{-
 fromJustEff : Maybe a -> Eff a [EXCEPTION String]
 fromJustEff (Just x) = pure x
 fromJustEff Nothing = raise "it was nothing"
 
-doCheck : Eff () SifEffs
-doCheck = do
-    opts <- 'opts :- get
-    case (sSpec opts, pSpec opts) of
-      (Just x, Just y) => do
-        readSifFile solution x
-        readSifFile problem  y
-        pure ()
-      (Just x, Nothing) => do
-        readSifFile solution x
-        pure ()
-      (Nothing, Just x) => do
-        readSifFile problem x
-        pure ()
-      (Nothing, Nothing) => raise "Need Files to check."
-
-doConv : SifExpr tyPATTERN -> Eff () SifEffs
+doConv : PATTERN -> Eff () SifEffs
 doConv p = do
     opts <- 'opts :- get
     case (out opts) of
@@ -133,21 +92,45 @@ doBuildEval (Just p) (Just s) = do
     let res = evalPattern pat
     printResults res
 doBuildEval _        _        = raise "Both problem and speficiation need to be given."
+-}
 
-mainEff : Eff () SifEffs
-mainEff = do
-  as <- getArgs
-  printLn as
-  if isNil as
-    then raise "No Arguments"
-    else do
-      os <- parseArgs as
-      'opts :- put os
-      if (check os)
-        then doCheck
-        else doBuildEval (pSpec os) (sSpec os)
+fetchCMD : Eff SifCMD SifEffs
+fetchCMD = do
+    putStr "sif-viewer> "
+    rawCmd <- getStr
+    case parseCMD rawCmd of
+      Left err => do
+        putStr "\n"
+        printLn NoSuchCommand
+        fetchCMD
+      Right cmd => pure cmd
 
-main : IO ()
-main = run mainEff
+||| Fetch and parse commands
+private
+runViewer : Eff () SifEffs
+runViewer = do
+    cmd <- fetchCMD
+    case cmd of
+      (ShowPattern n) => do
+          putStrLn "Show Pattern"
+          runViewer
+      (ListLib)       => do
+          putStrLn "List Lib"
+          runViewer
+      (SavePattern n fmt fname) => do
+          putStrLn "Show pattern"
+          runViewer
+      (EvalPattern n) => do
+          putStrLn "Eval Pattern"
+          runViewer
+      (Quit) => pure ()
+
+
+||| A Viewer to view a library of patterns.
+public
+modelViewer : List PATTERN -> Eff () SifEffs
+modelViewer ps = do
+    put ps
+    runViewer
 
 -- --------------------------------------------------------------------- [ EOF ]

@@ -2,9 +2,9 @@ package sifexe
 
 opts = "-p effects -p containers -p grl -p edda -p xml -p lightyear -p argparse -p graphviz -p sif --typeintype"
 
-main = Sif.Viewer
+main = Sif.Viewer.Default
 
-executable = sifModelViewer
+executable = sifViewer
 
 
-modules = Sif.Viewer
+modules = Sif.Viewer.Default

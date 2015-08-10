@@ -7,15 +7,20 @@ modules = Sif.Pattern
         , Sif.Pattern.API
         , Sif.Pattern.Utils
 
---        , Sif.Parser.Utils
---        , Sif.Parser.Common
+        , Sif.Parser.Utils
+        , Sif.Parser.Common
+
 --        , Sif.Parser.Problem
 --        , Sif.Parser.Pattern
 --        , Sif.Parser.File
 --        , Sif.Parser
 
+        , Sif.Viewer
+        , Sif.Viewer.Commands
+
         , Sif.PModel
 
+        , Sif.Lib
         , Sif.Lib.Problem.AccessControl
         , Sif.Lib.Problem.InformationSecrecy
         , Sif.Lib.Problem.PolicyEnforcement

@@ -183,6 +183,12 @@ covering
 evalPattern : PATTERN -> EvalResult
 evalPattern p = evalModel (getModel p) Nothing
 
+getPatternTitle : PATTERN -> String
+getPatternTitle (MkExpr p) = doGet p
+  where
+    doGet : {i : InterpRes tyPATTERN} -> SifPriv i tyPATTERN -> String
+    doGet (priv__mkPatt t _ _ _) = t
+
 -- ----------------------------------------------------------------- [ To Edda ]
 
 partial
