@@ -28,6 +28,7 @@ SifEffs = [ FILE_IO ()
           , STDIO
           , 'lib ::: STATE SifLib
           , 'bst ::: STATE BuildEnv
+          , 'opt ::: STATE SIfOpts
           ]
 
 namespace Sif
