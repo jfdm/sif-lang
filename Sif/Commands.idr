@@ -30,6 +30,8 @@ instance Eq SifCMD where
   (==) Help                   Help                      = True
   (==) Quit                   Quit                      = True
   (==) ListLib                ListLib                   = True
+  (==) (EvalPattern n)        (EvalPattern n')  =
+     n == n'
   (==) (ShowPattern n fmt fn) (ShowPattern n' fmt' fn') =
       n == n' &&
       fmt == fmt' &&
@@ -145,7 +147,6 @@ chkExtPattern = do
     s <- literallyBetween '"'
     pure $ CheckExtPattern p s
 
-private
 cmd : Parser SifCMD
 cmd = cmdShowPattern
   <|> cmdListLib

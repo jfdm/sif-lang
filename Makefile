@@ -5,7 +5,7 @@ LANGLIB := sif
 IOLIB   := sifio
 EXE     := sifexe
 
-.PHONY: doc clobber check clean io lang lib linecount
+.PHONY: doc clobber check clean io lang lib linecount testLang testIO tests
 
 lang:
 	${IDRIS} --build ${LANGLIB}.ipkg
@@ -40,6 +40,16 @@ doc:
 	${IDRIS} --mkdoc ${LANGLIB}.ipkg
 	${IDRIS} --mkdoc ${IOLIB}.ipkg
 	${IDRIS} --mkdoc ${EXE}.ipkg
+
+# testLang: lang
+
+# ${IDRIS} --testpkg ${LANGLIB}.ipkg
+
+testIO: lang
+	${IDRIS} --testpkg ${IOLIB}.ipkg
+
+tests: testIO
+
 
 linecount:
 	find . -name "*.idr" | grep -v Lib |xargs wc -l -

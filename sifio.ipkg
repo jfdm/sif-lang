@@ -1,6 +1,6 @@
 package sifio
 
-opts = "-p effects -p containers -p grl -p edda -p graphviz -p xml -p lightyear -p argparse -p sif --typeintype"
+opts = "-p effects -p containers -p grl -p edda -p graphviz -p xml -p lightyear -p argparse -p test -p sif --typeintype"
 
 modules = Sif.Parser.Utils
         , Sif.Parser.Common
@@ -18,7 +18,6 @@ modules = Sif.Parser.Utils
 
         , Sif.Main
 
-        , Sif.Test.Harness
         , Sif.Test.Commands
 
 tests =

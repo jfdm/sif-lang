@@ -12,6 +12,12 @@ cd lightyear/
 make install
 cd ../
 
+echo "Fetching testing"
+git clone git@github.com:jfdm/idris-testing.git testing
+cd testing/
+make install
+cd ../
+
 echo "Fetching containers"
 git clone git@github.com:jfdm/idris-containers.git containers
 cd containers/
