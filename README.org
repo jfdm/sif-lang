@@ -1,0 +1,44 @@
+#+TITLE: Sif: A DSML for Design Pattern Prototyping
+
+
+    :                        ____  _  __       _
+    :                       / ___|(_)/ _|     | |    __ _ _ __   __ _
+    :                       \___ \| | |_ _____| |   / _` | '_ \ / _` |
+    :                        ___) | |  _|_____| |__| (_| | | | | (_| |
+    :                       |____/|_|_|       |_____\__,_|_| |_|\__, |
+    :                                                           |___/
+
+* About
+Sif is a DSML for the rapid prototyping of Design Patterns using a
+requirements oriented modelling language based on the GRL.
+
+Sif is primarily a declarative EDSL implemented in the dependently typed language Idris. Users are free to use the EDSL and Idris tooling to construct pattern prototypes. Sif itself leverages Idris's environment for variable handling.
+
+A simple DSL is also provided that allows for pattern prototypes to be described in isolation away from Idris so they can be checked using the model checker.
+This DSL has a very limited concept of an environment.
+
+Sif is also packaged with a frontend that allows modellers to design their own pattern prelude and replace the default library with their own.
+The Sif frontend is a modal interface to a pattern library that allows for:
+
+1. Viewing pattern prototypes.
+2. Converting pattern prototypes to various output formats.
+3. Pattern prototype evaluation.
+4. Syntax checking of externally defined prototypes.
+
+Future work will be to consider extending the implementation of the DSL such that a fully fledged modelling language with environment can be introduced. Thus allowing for patterns to be developed outside of Idris.
+
+* Packages
+
+Sif consists of the following packages:
+
++ =sif= :: The Language definition file.
++ =sifio= :: A package for the Sif Modal Interface
++ =sifexe= :: The standard executable for sif modal checking.
+
+Developers wishing to create an interface for their own pattern library need to:
+
+1. Develop the library as an EDSL in Idris.
+2. Create a main file that passes a list of patterns in the library to the Sif Modal interface.
+3. Compile and execute.
+
+The setup for =sifexe= is the default example in how to create such a viewer.

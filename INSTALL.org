@@ -1,0 +1,12 @@
+#+TITLE: INSTALL
+
+1. Require base development tools, for example the contents of Build Essential on Debian/Ubuntu
+2. A semi-recent version of Idris, I develop against =HEAD=, but the latest version should be suitable.
+3. Run (or copy and paste) the commands from =fetch-deps.sh=. This script installs all the Idris dependencies that I use.
+4. Run either:
+  + =make exe= To build and install everything
+  + =make lang= to build and install only the language.
+  + =make io=   to build and install the language and modal interface
+  + =make doc= to generate the Idris doc files.
+  + =make clean= to clean the project
+  + =make clobber= to clobber the project.
