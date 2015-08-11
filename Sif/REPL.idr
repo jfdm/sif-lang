@@ -4,16 +4,30 @@
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
 ||| A Pattern Viewer
-module Sif.Viewer.REPL
+module Sif.REPL
 
 import System
 
-import Sif.Viewer.Commands
+import Sif.Commands
 import Sif.API
 
 %access public
 -- -------------------------------------------------------------------- [ Effs ]
 
+sifBanner : String
+sifBanner = """
+   _____ _ ____   __
+  / ___/(_) __/  / /   ____ _____  ____ _
+  \__ \/ / /_   / /   / __ `/ __ \/ __ `/
+ ___/ / / __/  / /___/ /_/ / / / / /_/ /
+/____/_/_/    /_____/\__,_/_/ /_/\__, /
+                                /____/
+
+http://www.github.com/jfdm/sif-lang
+Type :? for help
+
+Sif is free software with ABSOLUTELY NO WARRANTY.
+"""
 
 ||| Fetch and parse commands
 fetchCMD : Eff SifCMD SifEffs
@@ -29,7 +43,7 @@ fetchCMD = do
           Nothing => pure cmd
           Just n  => do
             lib <- 'lib :- get
-            if n < (List.length (patts lib))
+            if n < (size $ patts lib)
               then pure cmd
               else do
                printLn IndexOutOfBounds
@@ -40,40 +54,45 @@ doCommand (ShowPattern n fmt fname) = do
   case fname of
     Nothing => do
       putStrLn "Show Pattern"
-      doShowPattern n fmt
+      getAndPrintPattern n fmt
     Just fn => do
       putStrLn $ "Saving Pattern to " ++ fn ++ " as " ++ show fmt
-      putStrLn "TODO"
+      printLn FeatureNotImpl
 
 doCommand (ListLib) = do
   putStrLn "Listing Library"
-  doListLibrary
+  listLibrary
 
 doCommand (EvalPattern n) = do
   putStrLn "Eval Pattern"
-  doEvalPattern n
+  getAndEvalPattern n
 
 doCommand (CheckExtPattern p s) = do
   putStrLn "Importing..."
-  doChkExtPattern p s
+  evalPatternFromFile (Just p) (Just s)
 
 doCommand (Quit) = pure ()
 
-runViewer : Eff () SifEffs
-runViewer = do
+doCommand Help = putStrLn showHelp
+
+runREPL : Eff () SifEffs
+runREPL = do
     cmd <- fetchCMD
     case cmd of
       Quit => pure ()
       x    => do
         doCommand x
-        runViewer
+        runREPL
 
 
 ||| A Viewer to view a library of patterns.
 public
-modelViewer : SifLib -> Eff () SifEffs
-modelViewer extst = do
-    'lib :- update (\st => cmbState st extst)
-    runViewer
+sifREPL : Eff () SifEffs
+sifREPL =
+  case banner !('opts :- get) of
+    True => do
+      putStrLn sifBanner
+      runREPL
+    False => runREPL
 
 -- --------------------------------------------------------------------- [ EOF ]

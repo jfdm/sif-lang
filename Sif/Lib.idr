@@ -10,61 +10,57 @@ import Effect.Default
 
 import Sif.Pattern
 
+import public Data.AVL.Dict
 import public Sif.Lib.Problem
 import public Sif.Lib.Solution
 import public Sif.Lib.Pattern
 
 record SifLib where
   constructor MkSLib
-  patts : List PATTERN
-  probs : List PROBLEM
-  solts : List SOLUTION
+  counter : Nat
+  patts   : Dict Nat PATTERN
+
+emptyLib : SifLib
+emptyLib = MkSLib Z empty
+
+addToLibrary : PATTERN -> SifLib -> SifLib
+addToLibrary p (MkSLib c ps) = MkSLib (S c) (insert c p ps)
+
+addToLibraryM : List PATTERN -> SifLib -> SifLib
+addToLibraryM xs lib = foldl (flip $ addToLibrary) lib xs
 
 defaultLib : SifLib
-defaultLib = MkSLib xs ys zs
+defaultLib = addToLibraryM xs emptyLib
   where
     xs : List PATTERN
     xs = [ infoSecAsymCrypto
          , infoSecSymmCrypto
          , referenceMonitor]
 
-    ys : List PROBLEM
-    ys = [ accessControl
-         , infosec
-         , policyEnforcement]
-
-    zs : List SOLUTION
-    zs = [ symCrypto
-         , asymCrypto
-         , refmon]
-
-emptyLib : SifLib
-emptyLib = MkSLib Nil Nil Nil
-
 instance Default SifLib where
   default = defaultLib
 
-cmbState : SifLib -> SifLib -> SifLib
-cmbState (MkSLib a b c) (MkSLib a' b' c') =
-  MkSLib (a++a') (b++b') (c++c')
 
-getIndex : String -> (a -> String) -> List a -> List (Nat, String)
-getIndex s f xs = doGet Z xs
+getLibraryIndex : SifLib -> Dict Nat String
+getLibraryIndex lib = Dict.fromList idx
   where
-    doGet : Nat -> List a -> List (Nat, String)
-    doGet _ Nil = Nil
-    doGet c (x::xs) = (c, unwords [s, ":", f x]) :: doGet (S c) xs
+    f : (Nat, PATTERN) -> (Nat, String)
+    f (n, p) = (n, unwords ["Pattern:", getPatternTitle p])
 
-getPatternIndex : SifLib -> List (Nat, String)
-getPatternIndex (MkSLib ps _ _) =
-    getIndex "Pattern" (\x => getPatternTitle x) ps
+    idx : List (Nat, String)
+    idx = map f $ Dict.toList (patts lib)
 
-getSolutionIndex : SifLib -> List (Nat, String)
-getSolutionIndex (MkSLib _ _ ss) =
-    getIndex "Solution" (\x => getSolutionTitle x) ss
 
-getProblemIndex : SifLib -> List (Nat, String)
-getProblemIndex (MkSLib _ ps _) =
-    getIndex "Problem" (\x => getProblemTitle x) ps
+getPatternByIndex : Nat -> SifLib -> Maybe PATTERN
+getPatternByIndex n lib = Dict.lookup n (patts lib)
+
+indexToString : Dict Nat String -> String
+indexToString idx = unlines res
+  where
+    itemToString : (Nat, String) -> List String -> List String
+    itemToString (i,t) rs = (unwords [show i, "<--", t]) :: rs
+
+    res : List String
+    res = foldr (itemToString) Nil $ Dict.toList idx
 
 -- --------------------------------------------------------------------- [ EOF ]

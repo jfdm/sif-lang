@@ -1,0 +1,19 @@
+package sifio
+
+opts = "-p effects -p containers -p grl -p edda -p graphviz -p xml -p lightyear -p argparse -p sif --typeintype"
+
+modules = Sif.Parser.Utils
+        , Sif.Parser.Common
+        , Sif.Parser.Problem
+        , Sif.Parser.Pattern
+        , Sif.Parser.File
+        , Sif.Parser
+
+        , Sif.REPL
+        , Sif.Commands
+        , Sif.Options
+        , Sif.API
+        , Sif.Error
+        , Sif.Effs
+
+        , Sif.Main

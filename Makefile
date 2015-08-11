@@ -1,39 +1,42 @@
 ##  Makefile
 
-IDRIS := idris
-LIB   := sif
-VIEWER_EXE := sifViewer
-CHECKER_EXE := sifChecker
+IDRIS   := idris
+LANGLIB := sif
+IOLIB   := sifio
+EXE     := sifexe
 
-.PHONY: doc clobber check clean lib install
+.PHONY: doc clobber check clean io lang lib
 
-install:
-	${IDRIS} --install ${LIB}.ipkg
+lang:
+	${IDRIS} --build ${LANGLIB}.ipkg
+	${IDRIS} --install ${LANGLIB}.ipkg
 
-lib:
-	${IDRIS} --build ${LIB}.ipkg
+io:
+	${IDRIS} --build ${IOLIB}.ipkg
+	${IDRIS} --install ${IOLIB}.ipkg
 
-exe: install
-	${IDRIS} --build ${VIEWER_EXE}.ipkg
-	${IDRIS} --build ${CHECKER_EXE}.ipkg
+lib: lang io
+
+
+exe: lib
+	${IDRIS} --build ${EXE}.ipkg
 
 
 clean:
-	${IDRIS} --clean ${LIB}.ipkg
+	${IDRIS} --clean ${LANGLIB}.ipkg
+	${IDRIS} --clean ${IOLIB}.ipkg
+	${IDRIS} --clean ${EXE}.ipkg
 	find . -name "*~" -delete
-	${IDRIS} --clean ${VIEWER_EXE}.ipkg
-	${IDRIS} --clean ${CHECKER_EXE}.ipkg
 
 check: clobber
-	${IDRIS} --checkpkg ${LIB}.ipkg
+	${IDRIS} --checkpkg ${LANGLIB}.ipkg
+	${IDRIS} --checkpkg ${IOLIB}.ipkg
+	${IDRIS} --checkpkg ${EXE}.ipkg
 
 clobber : clean
 	find . -name "*.ibc" -delete
 
-# test: install
-# 	$(MAKE) -C test build
-# 	(cd test; ./a.out)
-# 	$(MAKE) -C test clean
-
 doc:
-	${IDRIS} --mkdoc ${LIB}.ipkg
+	${IDRIS} --mkdoc ${LANGLIB}.ipkg
+	${IDRIS} --mkdoc ${IOLIB}.ipkg
+	${IDRIS} --mkdoc ${EXE}.ipkg

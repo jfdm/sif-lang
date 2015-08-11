@@ -105,10 +105,10 @@ solutionFromFile f = do
 -- ----------------------------------------------------------- [ Build Pattern ]
 
 public
-buildPattern : String
-            -> String
-            -> Eff PATTERN BuildEffs
-buildPattern p s = do
+buildPatternFromFile : String
+                    -> String
+                    -> Eff PATTERN BuildEffs
+buildPatternFromFile p s = do
   'bst :- put (defBuildSt)
   p' <- problemFromFile p
   s' <- solutionFromFile s

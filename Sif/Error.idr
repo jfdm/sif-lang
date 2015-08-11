@@ -7,13 +7,18 @@
 module Sif.Error
 
 data SifError : Type where
-  IndexOutOfBounds : SifError
-  NoSuchPattern : SifError
-  UnSuppFormat  : SifError
-  ResultInvalid : SifError
-  NoSuchCommand : SifError
-  InternalErr   : SifError
-  ImportError   : SifError
+  IndexOutOfBounds  : SifError
+  NoSuchPattern     : SifError
+  UnSuppFormat      : SifError
+  ResultInvalid     : SifError
+  NoSuchCommand     : SifError
+  InternalErr       : SifError
+  ImportError       : SifError
+  NoFileGiven       : SifError
+  NoModeSpecified   : SifError
+  NoFormatSpecified : SifError
+  FeatureNotImpl    : SifError
+
   IDMissing      : String -> SifError
   ProblemMissing : String -> SifError
   DuplicateID   : String -> SifError
@@ -27,11 +32,15 @@ instance Show SifError where
   show ResultInvalid    = "Invalid evaluation result"
   show NoSuchCommand    = "No such command"
   show ImportError      = "Import Error"
+  show NoFileGiven      = "No File Given"
+  show NoModeSpecified  = "Node Mode Specified"
+  show NoFormatSpecified = "No output format specified"
+  show FeatureNotImpl    = "Feature Not Implemented"
+
   show (IDMissing id)      = "Identifier Missing: " ++ show id
   show (ProblemMissing id) = "Problem Doesn't Exist: " ++ show id
   show (DuplicateID id)    = "Identifier already Exists: " ++ show id
   show (FileMissing fname) = "File Missing " ++ fname
   show (ParseError  err)   = "ParseError:\n" ++ err
-
 
 -- --------------------------------------------------------------------- [ EOF ]

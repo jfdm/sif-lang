@@ -4,7 +4,7 @@
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
 
-module Sif.Viewer.Commands
+module Sif.Commands
 
 import Lightyear
 import Lightyear.Strings
@@ -24,14 +24,31 @@ data SifCMD : Type where
   EvalPattern : Nat -> SifCMD
   CheckExtPattern : String -> String -> SifCMD
   Quit        : SifCMD
+  Help        : SifCMD
+
+showHelp : String
+showHelp = """
+Command                 | Description
+------------------------|-------------------------------------------------------
+:list                   | List library contents
+:show n                 | Show pattern identified by index.
+:eval n                 | Evaluate pattern identified by index.
+:showAs n fmt           | Show pattern using given format.
+:saveAs n fmt fname     | Save pattern in given format to file specified.
+:chkExtPattern probFile | Check externally defined pattern.
+               solFile  |
+:quit :q :exit          | Quit the repl
+:? :help                | Show this help
+"""
 
 covering
 getCmdIndex : SifCMD -> Maybe Nat
+getCmdIndex Help                  = Nothing
+getCmdIndex Quit                  = Nothing
+getCmdIndex ListLib               = Nothing
+getCmdIndex (ShowPattern n _ _)   = Just n
+getCmdIndex (EvalPattern n)       = Just n
 getCmdIndex (CheckExtPattern _ _) = Nothing
-getCmdIndex Quit = Nothing
-getCmdIndex ListLib = Nothing
-getCmdIndex (ShowPattern n _ _) = Just n
-getCmdIndex (EvalPattern n)     = Just n
 
 private
 cmdShowPattern : Parser SifCMD
@@ -64,7 +81,7 @@ cmdListLib = do
 private
 cmdSavePattern : Parser SifCMD
 cmdSavePattern = do
-    string ":save"
+    string ":saveAs"
     space
     i <- integer
     space
@@ -90,6 +107,11 @@ cmdQuit = (string ":q"    *> return Quit)
       <|> (string ":exit" *> return Quit)
 
 private
+help : Parser SifCMD
+help = (string ":?"    *> return Help)
+   <|> (string ":help" *> return Help)
+
+private
 chkExtPattern : Parser SifCMD
 chkExtPattern = do
     keyword ":chkPattern"
@@ -107,6 +129,7 @@ cmd = cmdShowPattern
   <|> cmdEvalPattern
   <|> cmdQuit
   <|> chkExtPattern
+  <|> help
   <?> "Command"
 
 public

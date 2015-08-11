@@ -1,0 +1,9 @@
+package sifexe
+
+opts = "-p effects -p containers -p grl -p edda -p graphviz -p xml -p lightyear -p argparse -p sif -p sifio --typeintype"
+
+modules = Main
+
+main = Main
+
+executable = sifc

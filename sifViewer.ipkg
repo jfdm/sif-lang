@@ -1,9 +1,0 @@
-package sifViewer
-
-opts = "-p effects -p containers -p grl -p edda -p xml -p lightyear -p argparse -p graphviz -p sif --typeintype"
-
-main = Sif.Viewer.Default
-
-modules = Sif.Viewer.Default
-
-executable = sifStdlibViewer

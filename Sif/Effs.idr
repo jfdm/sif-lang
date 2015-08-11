@@ -13,12 +13,15 @@ import public Effect.Exception
 import public Effect.File
 import public Effect.StdIO
 
+import public ArgParse
+
 import public Sif.Pattern
 import public Sif.Parser.State
 import public Sif.Error
 import public Sif.Lib
+import public Sif.Options
 
-import public ArgParse
+
 
 SifEffs : List EFFECT
 SifEffs = [ FILE_IO ()
@@ -26,9 +29,9 @@ SifEffs = [ FILE_IO ()
           , 'argparse ::: EXCEPTION ArgParseError
           , SYSTEM
           , STDIO
-          , 'lib ::: STATE SifLib
-          , 'bst ::: STATE BuildEnv
-          , 'opt ::: STATE SIfOpts
+          , 'lib  ::: STATE SifLib
+          , 'bst  ::: STATE BuildEnv
+          , 'opts ::: STATE SifOpts
           ]
 
 namespace Sif
@@ -40,5 +43,9 @@ namespace Sif
 fromJustEff : Maybe a -> Eff a ['sif ::: EXCEPTION SifError]
 fromJustEff (Just x) = pure x
 fromJustEff Nothing = Sif.raise InternalErr
+
+
+getOptions : Eff SifOpts SifEffs
+getOptions = parseArgsRec defOpts convOpts !getArgs
 
 -- --------------------------------------------------------------------- [ EOF ]

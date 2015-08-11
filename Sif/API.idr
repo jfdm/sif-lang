@@ -15,62 +15,97 @@ import public Sif.Parser
 import public Sif.Error
 import public Sif.Effs
 
+||| COnv and SHow -- horrible horrible code.
+showConvTo : PATTERN -> (fmt : SifOutFormat) -> Maybe String
+showConvTo p GRL = Just $ show (the (convTy GRL) (convTo p GRL))
+showConvTo p DOT = Just $ show (the (convTy DOT) (convTo p DOT))
+showConvTo p XML = Just $ show @{xml} $ (the (convTy XML) (convTo p XML))
+showConvTo p ORG = Just $ (the (convTy ORG) (convTo p ORG))
+showConvTo p EDDA = Nothing
+
+
+||| Print results of evaluation
 printResults : EvalResult -> Eff () SifEffs
-printResults BadModel  = Sif.raise ResultInvalid
-printResults (Result xs) = printList xs
+printResults BadModel = Sif.raise ResultInvalid
+printResults res      =
+    case EvalResult.toString res printNode of
+      Nothing    => Sif.raise ResultInvalid
+      (Just str) => putStrLn str
   where
-    printNode : GoalNode -> Eff () SifEffs
-    printNode x = do
-      sVal <- fromJustEff $ getSValue x
-      putStrLn $ unwords [ show sVal, "==>", getNodeTitle x]
+    printNode : GoalNode -> String
+    printNode x = unwords [ show $ getSValue x, "==>", getNodeTitle x]
 
-    printList : List GoalNode -> Eff () SifEffs
-    printList Nil     = pure ()
-    printList (x::xs) = do printNode x; printList xs
+||| Syntax check a Problem or a solution pairing.
+doSyntaxCheck : Maybe String -> Maybe String -> Eff () SifEffs
 
-doListLibrary : Eff () SifEffs
-doListLibrary = do
+doSyntaxCheck (Just x) (Just y) = do
+    readSifFile problem x
+    readSifFile solution y
+    pure ()
+
+doSyntaxCheck (Just x) (Nothing) = do
+    readSifFile problem x
+    pure ()
+
+doSyntaxCheck (Nothing) (Just y) = do
+    readSifFile solution y
+    pure ()
+
+doSyntaxCheck (Nothing) (Nothing) = Sif.raise NoFileGiven
+
+
+evalAndPrintPattern : PATTERN -> Eff () SifEffs
+evalAndPrintPattern p = do
+  putStrLn $ unwords ["evaluating pattern", getPatternTitle p]
+  let eRes = evalPattern p
+  printResults eRes
+
+buildPattern : Maybe String -> Maybe String -> Eff PATTERN SifEffs
+buildPattern Nothing Nothing   = Sif.raise NoFileGiven
+buildPattern Nothing  _        = Sif.raise (FileMissing ("Solution File "))
+buildPattern _        Nothing  = Sif.raise (FileMissing ("Problem File "))
+buildPattern (Just p) (Just s) = buildPatternFromFile p s
+
+
+evalPatternFromFile : Maybe String -> Maybe String -> Eff () SifEffs
+evalPatternFromFile p' s' = do
+  p <- buildPattern p' s'
+  putStrLn $ unwords ["loaded", getPatternTitle p]
+  evalAndPrintPattern p
+
+
+printPattern : PATTERN -> Maybe SifOutFormat -> Eff () SifEffs
+printPattern _ Nothing    = printLn NoFormatSpecified
+printPattern p (Just fmt) = do
+    case showConvTo p fmt of
+      Nothing  => printLn UnSuppFormat
+      Just res => putStrLn res
+
+-- ------------------------------------------------------- [ Library Functions ]
+
+listLibrary : Eff () SifEffs
+listLibrary = do
     lib <- 'lib :- get
+    let idx = (getLibraryIndex lib)
     putStrLn "Patterns"
-    doList $ getPatternIndex lib
-    putStrLn "Problems"
-    doList $ getProblemIndex lib
-    putStrLn "Solutions"
-    doList $ getSolutionIndex lib
-  where
-    doList : List (Nat, String) -> Eff () SifEffs
-    doList Nil = pure ()
-    doList ((i,t)::xs) = do
-      putStr $ show i
-      putStr " <-- "
-      putStrLn t
-      doList xs
+    putStrLn (indexToString idx)
 
-getPattern : Nat -> Eff PATTERN SifEffs
-getPattern n = do
-  lib <- 'lib :- get
-  case index' n (patts lib) of
+
+getPatternByIndexEff : Nat -> Eff PATTERN SifEffs
+getPatternByIndexEff n =
+  case getPatternByIndex n !('lib :- get) of
     Nothing => Sif.raise NoSuchPattern
     Just p' => pure p'
 
-doEvalPattern : Nat -> Eff () SifEffs
-doEvalPattern n = do
-  p <- getPattern n
-  let eRes = evalPattern p
-  printResults eRes
+getAndEvalPattern : Nat -> Eff () SifEffs
+getAndEvalPattern n = do
+  p <- getPatternByIndexEff n
+  evalAndPrintPattern p
 
-doShowPattern : Nat -> Maybe SifOutFormat -> Eff () SifEffs
-doShowPattern n Nothing = printLn UnSuppFormat
-doShowPattern n (Just fmt) = do
-  p <- getPattern n
-  putStrLn $ showConvTo p fmt
-
-doChkExtPattern : String -> String -> Eff () SifEffs
-doChkExtPattern p s = do
-  p <- buildPattern p s
-  putStrLn $ unwords ["loaded", getPatternTitle p]
-  let eRes = evalPattern p
-  printResults eRes
+getAndPrintPattern : Nat -> Maybe SifOutFormat -> Eff () SifEffs
+getAndPrintPattern n fmt = do
+  p <- getPatternByIndexEff n
+  printPattern p fmt
 
 
 -- --------------------------------------------------------------------- [ EOF ]

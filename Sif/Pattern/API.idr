@@ -245,7 +245,6 @@ toEdda expr =
       Left  err => Nothing
       Right doc => Just (refineEdda doc)
 
-
 partial
 toString : SifExpr tyPATTERN -> String
 toString (MkExpr p) = toOrg p
@@ -275,12 +274,5 @@ convTo p DOT = toDot p
 convTo p XML = toXML p
 convTo p ORG = toString p
 convTo p EDDA = toEdda p
-
-showConvTo : PATTERN -> (fmt : SifOutFormat) ->  String
-showConvTo p GRL = show (the (convTy GRL) (convTo p GRL))
-showConvTo p DOT = show (the (convTy DOT) (convTo p DOT))
-showConvTo p XML = show @{xml} $ (the (convTy XML) (convTo p XML))
-showConvTo p ORG = (the (convTy ORG) (convTo p ORG))
-showConvTo p EDDA = show       $ (the (convTy EDDA) (convTo p EDDA))
 
 -- --------------------------------------------------------------------- [ EOF ]
