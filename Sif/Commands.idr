@@ -26,6 +26,31 @@ data SifCMD : Type where
   Quit        : SifCMD
   Help        : SifCMD
 
+instance Eq SifCMD where
+  (==) Help                   Help                      = True
+  (==) Quit                   Quit                      = True
+  (==) ListLib                ListLib                   = True
+  (==) (ShowPattern n fmt fn) (ShowPattern n' fmt' fn') =
+      n == n' &&
+      fmt == fmt' &&
+      fn == fn'
+  (==) (CheckExtPattern p s)  (CheckExtPattern p' s')   =
+      p == p' && s == s'
+  (==) _ _ = False
+
+instance Show SifCMD where
+  show (ShowPattern n fmt fname) = with List
+      unwords ["[ShowPattern", show n, show fmt, show fname,"]"]
+  show (EvalPattern n) = with List
+      unwords ["[EvaluatePattern", show n, "]"]
+  show (CheckExtPattern p s) = with List
+      unwords ["[CheckExternal Pattern", p, s, "]"]
+  show Quit     = "[Quit]"
+  show Help     = "[Help]"
+  show ListLib  = "[List]"
+
+
+
 showHelp : String
 showHelp = """
 Command                 | Description

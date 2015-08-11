@@ -17,3 +17,9 @@ modules = Sif.Parser.Utils
         , Sif.Effs
 
         , Sif.Main
+
+        , Sif.Test.Harness
+        , Sif.Test.Commands
+
+tests =
+        Sif.Test.Commands.runTests
