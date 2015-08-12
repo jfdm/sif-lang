@@ -6,6 +6,8 @@ import public Sif.API
 import public Sif.REPL
 import public Sif.Options
 import public Sif.Effs
+import public Sif.Library
+import public Sif.Prelude
 
 runMode : Maybe SifMode -> Eff () SifEffs
 runMode Nothing     = sifREPL
@@ -15,17 +17,17 @@ runMode (Just HELP) = printLn FeatureNotImpl
 runMode (Just REPL) = sifREPL
 
 runMode (Just Eval) = do
-    os <- 'opts :- get
+    os <- getOptions
     putStrLn $ "Evaluating Pattern"
     evalPatternFromFile (pSpec os) (sSpec os)
 
 runMode (Just Check) = do
-    os <- 'opts :- get
+    os <- getOptions
     putStrLn $ "Checking Providing Files"
     doSyntaxCheck (pSpec os) (sSpec os)
 
 runMode (Just Conv) = do
-    os <- 'opts :- get
+    os <- getOptions
     putStrLn "Converting Pattern"
     p <- buildPattern (pSpec os) (sSpec os)
     case out os of
@@ -34,11 +36,10 @@ runMode (Just Conv) = do
 
 sifMain : List PATTERN -> Eff () SifEffs
 sifMain ps = do
-    options <- getOptions
+    options <- parseOptions
     'opts :- put options
-    default_library <- 'lib :- get
-    let default_library' = if (prelude options)
-                            then addToLibraryM ps default_library
-                            else addToLibraryM ps emptyLib
-    'lib :- put default_library'
+    'lib :- put (if (prelude options)
+                   then addToLibraryM ps library
+                   else addToLibraryM ps emptyLib)
+    loadExtLibrary
     runMode (mode options)

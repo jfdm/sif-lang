@@ -5,7 +5,7 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| The Problem of information secrecy
-module Sif.Lib.Problem.InformationSecrecy
+module Sif.Prelude.Problem.InformationSecrecy
 
 import Sif.Pattern
 

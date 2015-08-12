@@ -1,25 +1,33 @@
-##  Makefile
+# ----------------------------------------------------------------- [ Makefile ]
+# Module    : Makefile
+# Copyright : (c) Jan de Muijnck-Hughes
+# License   : see LICENSE
+# ---------------------------------------------------------------------- [ EOH ]
 
 IDRIS   := idris
 LANGLIB := sif
 IOLIB   := sifio
+PRELUDE := sifprelude
 EXE     := sifexe
 
-.PHONY: doc clobber check clean io lang lib linecount testLang testIO tests
+.PHONY: doc clobber check clean io lang linecount testLang testIO tests prelude all
 
 lang:
 	${IDRIS} --build ${LANGLIB}.ipkg
 	${IDRIS} --install ${LANGLIB}.ipkg
 
+prelude:
+	${IDRIS} --build ${PRELUDE}.ipkg
+	${IDRIS} --install ${PRELUDE}.ipkg
+
 io:
 	${IDRIS} --build ${IOLIB}.ipkg
 	${IDRIS} --install ${IOLIB}.ipkg
 
-lib: lang io
-
-
-exe: lib
+exe:
 	${IDRIS} --build ${EXE}.ipkg
+
+all: lang prelude io exe
 
 
 clean:
@@ -53,3 +61,5 @@ tests: testIO
 
 linecount:
 	find . -name "*.idr" | grep -v Lib |xargs wc -l -
+
+# ---------------------------------------------------------------------- [ EOF ]

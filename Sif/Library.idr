@@ -4,16 +4,13 @@
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
 ||| A library of Patterns
-module Sif.Lib
+module Sif.Library
 
 import Effect.Default
 
 import Sif.Pattern
 
 import public Data.AVL.Dict
-import public Sif.Lib.Problem
-import public Sif.Lib.Solution
-import public Sif.Lib.Pattern
 
 record SifLib where
   constructor MkSLib
@@ -30,12 +27,7 @@ addToLibraryM : List PATTERN -> SifLib -> SifLib
 addToLibraryM xs lib = foldl (flip $ addToLibrary) lib xs
 
 defaultLib : SifLib
-defaultLib = addToLibraryM xs emptyLib
-  where
-    xs : List PATTERN
-    xs = [ infoSecAsymCrypto
-         , infoSecSymmCrypto
-         , referenceMonitor]
+defaultLib = emptyLib
 
 instance Default SifLib where
   default = defaultLib

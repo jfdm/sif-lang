@@ -14,21 +14,23 @@ import public Effect.File
 import public Effect.StdIO
 
 import public ArgParse
+import public Config.YAML
 
 import public Sif.Pattern
 import public Sif.Parser.State
 import public Sif.Error
-import public Sif.Lib
+import public Sif.Library
 import public Sif.Options
 
-
+%access public
 
 SifEffs : List EFFECT
 SifEffs = [ FILE_IO ()
-          , 'sif ::: EXCEPTION SifError
-          , 'argparse ::: EXCEPTION ArgParseError
           , SYSTEM
           , STDIO
+          , 'sif      ::: EXCEPTION SifError
+          , 'argparse ::: EXCEPTION ArgParseError
+          , 'config   ::: EXCEPTION ConfigError
           , 'lib  ::: STATE SifLib
           , 'bst  ::: STATE BuildEnv
           , 'opts ::: STATE SifOpts
@@ -39,13 +41,17 @@ namespace Sif
   raise err = 'sif :- Exception.raise err
 
 
-
 fromJustEff : Maybe a -> Eff a ['sif ::: EXCEPTION SifError]
 fromJustEff (Just x) = pure x
 fromJustEff Nothing = Sif.raise InternalErr
 
+getOptions : Eff SifOpts ['opts ::: STATE SifOpts]
+getOptions = 'opts :- get
 
-getOptions : Eff SifOpts SifEffs
-getOptions = parseArgsRec defOpts convOpts !getArgs
+getLibrary : Eff SifLib ['lib ::: STATE SifLib]
+getLibrary = 'lib :- get
+
+parseOptions : Eff SifOpts SifEffs
+parseOptions = parseArgsRec defOpts convOpts !getArgs
 
 -- --------------------------------------------------------------------- [ EOF ]

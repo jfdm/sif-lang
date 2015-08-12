@@ -3,12 +3,12 @@
 -- Copyright : (c) Jan de Muijnck-Hughes
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
-module Sif.Lib.Solution
+module Sif.Prelude.Solution
 
-import public Sif.Lib.Solution.Secrecy.AsymCrypto
-import public Sif.Lib.Solution.Secrecy.SymmCrypto
-import public Sif.Lib.Solution.AccessControl.ABAC
-import public Sif.Lib.Solution.AccessControl.Authorisation
-import public Sif.Lib.Solution.AccessControl.ReferenceMonitor
+import public Sif.Prelude.Solution.Secrecy.AsymCrypto
+import public Sif.Prelude.Solution.Secrecy.SymmCrypto
+import public Sif.Prelude.Solution.AccessControl.ABAC
+import public Sif.Prelude.Solution.AccessControl.Authorisation
+import public Sif.Prelude.Solution.AccessControl.ReferenceMonitor
 
 -- --------------------------------------------------------------------- [ EOF ]

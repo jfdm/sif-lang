@@ -3,10 +3,10 @@
 -- Copyright : (c) Jan de Muijnck-Hughes
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
-module Sif.Lib.Problem
+module Sif.Prelude.Problem
 
-import public Sif.Lib.Problem.AccessControl
-import public Sif.Lib.Problem.InformationSecrecy
-import public Sif.Lib.Problem.PolicyEnforcement
+import public Sif.Prelude.Problem.AccessControl
+import public Sif.Prelude.Problem.InformationSecrecy
+import public Sif.Prelude.Problem.PolicyEnforcement
 
 -- --------------------------------------------------------------------- [ EOF ]

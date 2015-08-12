@@ -5,11 +5,11 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| Reference Monitor
-module Sif.Lib.Solution.AccessControl.ReferenceMonitor
+module Sif.Prelude.Solution.AccessControl.ReferenceMonitor
 
 import Sif.Pattern
 
-import Sif.Lib.Problem.PolicyEnforcement
+import Sif.Prelude.Problem.PolicyEnforcement
 
 -- -------------------------------------------------------------- [ Properties ]
 

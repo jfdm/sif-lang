@@ -5,11 +5,11 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| Modelling Information Secrecy using Asymmetric Crypto.
-module Sif.Lib.Solution.Secrecy.AsymCrypto
+module Sif.Prelude.Solution.Secrecy.AsymCrypto
 
 import Sif.Pattern
 
-import Sif.Lib.Problem.InformationSecrecy
+import Sif.Prelude.Problem.InformationSecrecy
 
 import GRL.Eval
 

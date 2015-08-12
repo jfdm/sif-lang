@@ -6,14 +6,18 @@
 
 module Sif.API
 
+import public Config.Error
+import public Config.YAML
+
 import public Sif.Effs
 import public Sif.Error
 import public Sif.Pattern
-import public Sif.Lib
+import public Sif.Library
 import public Sif.Parser
+import public Sif.Prelude
+import public Sif.Options
 
-import public Sif.Error
-import public Sif.Effs
+%access public
 
 ||| COnv and SHow -- horrible horrible code.
 showConvTo : PATTERN -> (fmt : SifOutFormat) -> Maybe String
@@ -82,6 +86,15 @@ printPattern p (Just fmt) = do
       Just res => putStrLn res
 
 -- ------------------------------------------------------- [ Library Functions ]
+
+loadExtLibrary : Eff () SifEffs
+loadExtLibrary = do
+    opts <- getOptions
+    case (extprelude opts) of
+      Nothing   => pure ()
+      Just pdir => do
+        pIDX <- readYAMLConfig (pdir ++ "/index.yaml")
+        printLn pIDX
 
 listLibrary : Eff () SifEffs
 listLibrary = do

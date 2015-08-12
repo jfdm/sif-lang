@@ -5,7 +5,7 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| The problem of enforcing access control.
-module Sif.Lib.Problem.PolicyEnforcement
+module Sif.Prelude.Problem.PolicyEnforcement
 
 import Sif.Pattern
 

@@ -32,20 +32,20 @@ instance Eq SifMode where
 
 record SifOpts where
   constructor MkSOpts
-  pSpec : Maybe String
-  sSpec : Maybe String
-  mode  : Maybe SifMode
-  out   : Maybe String
-  to    : Maybe SifOutFormat
-  libdir  : Maybe String
-  prelude : Bool
-  banner  : Bool
+  pSpec      : Maybe String
+  sSpec      : Maybe String
+  mode       : Maybe SifMode
+  out        : Maybe String
+  to         : Maybe SifOutFormat
+  extprelude : Maybe String
+  prelude    : Bool
+  banner     : Bool
 
 
 defOpts : SifOpts
 defOpts = MkSOpts
     Nothing Nothing (Just REPL) Nothing Nothing Nothing
-    True True
+    False True
 
 instance Default SifOpts where
   default = defOpts
@@ -59,21 +59,21 @@ convOpts : Arg -> SifOpts -> Maybe SifOpts
 convOpts (Files xs)     o = Nothing
 convOpts (KeyValue k v) o =
   case k of
-    "libdir"   => Just $ record {libdir = Just v}       o
-    "problem"  => Just $ record {pSpec  = Just v}       o
-    "solution" => Just $ record {sSpec  = Just v}       o
-    "out"      => Just $ record {out    = Just v}       o
-    "to"       => Just $ record {to     = readOutFMT v} o
-    otherwise  => Nothing
+    "extprelude" => Just $ record {extprelude = Just v}       o
+    "problem"    => Just $ record {pSpec      = Just v}       o
+    "solution"   => Just $ record {sSpec      = Just v}       o
+    "out"        => Just $ record {out        = Just v}       o
+    "to"         => Just $ record {to         = readOutFMT v} o
+    otherwise    => Nothing
 convOpts (Flag x) o =
   case x of
-    "help"      => Just $ record {mode    = Just HELP}  o
-    "version"   => Just $ record {mode    = Just VERS}  o
-    "check"     => Just $ record {mode    = Just Check} o
-    "eval"      => Just $ record {mode    = Just Eval}  o
-    "conv"      => Just $ record {mode    = Just Conv}  o
-    "nobanner"  => Just $ record {banner  = False}      o
-    "noprelude" => Just $ record {prelude = False}      o
+    "help"     => Just $ record {mode    = Just HELP}  o
+    "version"  => Just $ record {mode    = Just VERS}  o
+    "check"    => Just $ record {mode    = Just Check} o
+    "eval"     => Just $ record {mode    = Just Eval}  o
+    "conv"     => Just $ record {mode    = Just Conv}  o
+    "nobanner" => Just $ record {banner  = False}      o
+    "prelude"  => Just $ record {prelude = True}       o
     otherwise => Nothing
 
 -- --------------------------------------------------------------------- [ EOF ]

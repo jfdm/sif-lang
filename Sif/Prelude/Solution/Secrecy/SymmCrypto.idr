@@ -5,11 +5,11 @@
 -- --------------------------------------------------------------------- [ EOH ]
 
 ||| Modelling Information Secrecy using Symmetric Cryptography.
-module Sif.Lib.Pattern.Secrecy.SymCrypto
+module Sif.Prelude.Pattern.Secrecy.SymCrypto
 
 import Sif.Pattern
 
-import Sif.Lib.Problem.InformationSecrecy
+import Sif.Prelude.Problem.InformationSecrecy
 
 import GRL.Eval
 

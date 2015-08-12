@@ -3,11 +3,11 @@
 -- Copyright : (c) Jan de Muijnck-Hughes
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
-module Sif.Lib.Pattern
+module Sif.Prelude.Pattern
 
 import Sif.Pattern
-import public Sif.Lib.Problem
-import public Sif.Lib.Solution
+import Sif.Prelude.Problem
+import Sif.Prelude.Solution
 
 -- ------------------------------------------------------ [ Pattern Definition ]
 

@@ -9,17 +9,4 @@ modules = Sif.Pattern
 
         , Sif.PModel
 
-        , Sif.Lib
-        , Sif.Lib.Problem
-        , Sif.Lib.Problem.AccessControl
-        , Sif.Lib.Problem.InformationSecrecy
-        , Sif.Lib.Problem.PolicyEnforcement
-
-        , Sif.Lib.Solution
-        , Sif.Lib.Solution.Secrecy.AsymCrypto
-        , Sif.Lib.Solution.Secrecy.SymmCrypto
-        , Sif.Lib.Solution.AccessControl.ReferenceMonitor
-        , Sif.Lib.Solution.AccessControl.Authorisation
-        , Sif.Lib.Solution.AccessControl.ABAC
-
-        , Sif.Lib.Pattern
+        , Sif.Library

@@ -18,6 +18,12 @@ cd testing/
 make install
 cd ../
 
+echo "Fetching config"
+git clone git@github.com:jfdm/idris-config.git config
+cd config/
+make install
+cd ../
+
 echo "Fetching containers"
 git clone git@github.com:jfdm/idris-containers.git containers
 cd containers/

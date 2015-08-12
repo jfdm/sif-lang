@@ -11,14 +11,16 @@ import Lightyear.Strings
 import Sif.Error
 import Sif.Effs
 
+%access public
 %default partial
 
+private
 readFile : Eff String [FILE_IO (OpenFile Read)]
 readFile = readAcc ""
   where
     readAcc : String -> Eff String [FILE_IO (OpenFile Read)]
-    readAcc acc = if (not !eof)
-                     then readAcc (acc ++ !readLine)
+    readAcc acc = if (not !(eof))
+                     then readAcc (acc ++ !(readLine))
                      else pure acc
 
 public
@@ -28,7 +30,7 @@ readSifFile : Parser a
 readSifFile p f = do
     case !(open f Read) of
       True => do
-        src <- readFile
+        src <- File.readFile
         close
         case parse p src of
           Left err  => Sif.raise (ParseError err)

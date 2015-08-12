@@ -1,0 +1,17 @@
+package sifprelude
+
+opts = "-p effects -p containers -p grl -p edda -p graphviz -p xml -p lightyear -p argparse -p sif --typeintype"
+
+modules = Sif.Prelude.Pattern
+
+        , Sif.Prelude.Problem
+        , Sif.Prelude.Problem.AccessControl
+        , Sif.Prelude.Problem.InformationSecrecy
+        , Sif.Prelude.Problem.PolicyEnforcement
+
+        , Sif.Prelude.Solution
+        , Sif.Prelude.Solution.Secrecy.AsymCrypto
+        , Sif.Prelude.Solution.Secrecy.SymmCrypto
+        , Sif.Prelude.Solution.AccessControl.ReferenceMonitor
+        , Sif.Prelude.Solution.AccessControl.Authorisation
+        , Sif.Prelude.Solution.AccessControl.ABAC

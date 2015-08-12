@@ -1,4 +1,4 @@
-module Sif.Lib.Solution.AccessControl.Authorisation
+module Sif.Prelude.Solution.AccessControl.Authorisation
 
 import Sif.Pattern
 
