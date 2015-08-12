@@ -85,7 +85,72 @@ printPattern p (Just fmt) = do
       Nothing  => printLn UnSuppFormat
       Just res => putStrLn res
 
+-- ------------------------------------------------------------ [ YAML Parsing ]
+
+{-
+Schema is
+
+file ::= pattern+
+pattern ::= "pattern": {"problem":!!str, "solution": (vale::!!str)}
+
+-}
+
+private
+getString : YAMLNode -> Maybe String
+getString (YAMLString s) = Just s
+getString _              = Nothing
+
+private
+isPatternMap : YAMLNode -> Bool
+isPatternMap (YAMLString str) = toLower str == "pattern"
+isPatternMap _ = False
+
+private
+getPatternKVPairs : YAMLNode -> List (YAMLNode)
+getPatternKVPairs (YAMLDoc _ doc) with (doc)
+  | (YAMLMap ps) = map snd $ filter (\(x,y) => isPatternMap x) ps
+  | otherwise = Nil
+
+private
+getStringKey : (YAMLNode, YAMLNode) -> Maybe String
+getStringKey (k,_) = getString k
+
+private
+getStringValue : (YAMLNode, YAMLNode) -> Maybe String
+getStringValue (_,v) = getString v
+
+private
+getPSPair : YAMLNode -> Maybe (String, String)
+getPSPair (YAMLMap [p,s]) =
+    case (getStringKey p, getStringKey s) of
+      (Just p', Just s') =>
+        if toLower p' == "problem" && toLower s' == "solution"
+          then case (getStringValue p, getStringValue s) of
+            (Just p'', Just s'') => Just (p'', s'')
+            otherwise            => Nothing
+          else Nothing
+      otherwise          => Nothing
+getPSPair _  = Nothing
+
+private
+filterPreludeIDX : YAMLNode -> List (String, String)
+filterPreludeIDX doc = mapMaybe (getPSPair) $ getPatternKVPairs doc
+
+
 -- ------------------------------------------------------- [ Library Functions ]
+
+importPreludeIDX : String -> List (String, String) -> Eff () SifEffs
+importPreludeIDX _      Nil         = pure ()
+importPreludeIDX nspace ((p,s)::ps) = do
+    putStrLn $ unlines [ "Trying to build:"
+                       , "\tProblem File: " ++ show (pDir p)
+                       , "\tSolution File: " ++ show (pDir s)]
+    patt <- buildPatternFromFile (pDir p) (pDir s)
+    'lib :- update (\idx => addToLibrary patt idx)
+    importPreludeIDX nspace ps
+  where
+    pDir : String -> String
+    pDir f = nspace ++ "/" ++ f
 
 loadExtLibrary : Eff () SifEffs
 loadExtLibrary = do
@@ -93,12 +158,16 @@ loadExtLibrary = do
     case (extprelude opts) of
       Nothing   => pure ()
       Just pdir => do
-        pIDX <- readYAMLConfig (pdir ++ "/index.yaml")
-        printLn pIDX
+        case !(readYAMLConfig (pdir ++ "/index.yaml")) of
+          Left err   => printLn err
+          Right pIDX =>
+            case filterPreludeIDX pIDX of
+              Nil => printLn ImportError
+              ps  => importPreludeIDX pdir ps
 
 listLibrary : Eff () SifEffs
 listLibrary = do
-    lib <- 'lib :- get
+    lib <- getLibrary
     let idx = (getLibraryIndex lib)
     putStrLn "Patterns"
     putStrLn (indexToString idx)
@@ -106,7 +175,7 @@ listLibrary = do
 
 getPatternByIndexEff : Nat -> Eff PATTERN SifEffs
 getPatternByIndexEff n =
-  case getPatternByIndex n !('lib :- get) of
+  case getPatternByIndex n !getLibrary of
     Nothing => Sif.raise NoSuchPattern
     Just p' => pure p'
 

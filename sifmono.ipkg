@@ -1,0 +1,46 @@
+package sifmono
+
+opts = "-p effects -p containers -p grl -p lightyear -p config -p edda -p graphviz -p xml -p argparse --typeintype"
+
+main = Main
+executable = sifc
+
+
+modules = Sif.Parser.Utils
+        , Sif.Parser.Common
+        , Sif.Parser.Problem
+        , Sif.Parser.Pattern
+        , Sif.Parser.File
+        , Sif.Parser
+
+        , Sif.REPL
+        , Sif.Commands
+        , Sif.Options
+        , Sif.API
+        , Sif.Error
+        , Sif.Effs
+
+        , Sif.Main
+
+        , Sif.Pattern
+        , Sif.Pattern.Model
+        , Sif.Pattern.API
+        , Sif.Pattern.Utils
+
+        , Sif.PModel
+
+        , Sif.Library
+
+        , Sif.Prelude.Pattern
+
+        , Sif.Prelude.Problem
+        , Sif.Prelude.Problem.AccessControl
+        , Sif.Prelude.Problem.InformationSecrecy
+        , Sif.Prelude.Problem.PolicyEnforcement
+
+        , Sif.Prelude.Solution
+        , Sif.Prelude.Solution.Secrecy.AsymCrypto
+        , Sif.Prelude.Solution.Secrecy.SymmCrypto
+        , Sif.Prelude.Solution.AccessControl.ReferenceMonitor
+        , Sif.Prelude.Solution.AccessControl.Authorisation
+        , Sif.Prelude.Solution.AccessControl.ABAC

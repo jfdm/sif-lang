@@ -14,7 +14,6 @@ import public Effect.File
 import public Effect.StdIO
 
 import public ArgParse
-import public Config.YAML
 
 import public Sif.Pattern
 import public Sif.Parser.State
@@ -30,7 +29,6 @@ SifEffs = [ FILE_IO ()
           , STDIO
           , 'sif      ::: EXCEPTION SifError
           , 'argparse ::: EXCEPTION ArgParseError
-          , 'config   ::: EXCEPTION ConfigError
           , 'lib  ::: STATE SifLib
           , 'bst  ::: STATE BuildEnv
           , 'opts ::: STATE SifOpts
@@ -52,6 +50,6 @@ getLibrary : Eff SifLib ['lib ::: STATE SifLib]
 getLibrary = 'lib :- get
 
 parseOptions : Eff SifOpts SifEffs
-parseOptions = parseArgsRec defOpts convOpts !getArgs
+parseOptions = parseArgs defOpts convOpts !getArgs
 
 -- --------------------------------------------------------------------- [ EOF ]

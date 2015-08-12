@@ -7,10 +7,13 @@
 module Sif.Library
 
 import Effect.Default
+import Config.YAML
 
 import Sif.Pattern
 
 import public Data.AVL.Dict
+
+%access public
 
 record SifLib where
   constructor MkSLib

@@ -42,7 +42,7 @@ fetchCMD = do
         case getCmdIndex cmd of
           Nothing => pure cmd
           Just n  => do
-            lib <- 'lib :- get
+            lib <- getLibrary
             if n < (size $ patts lib)
               then pure cmd
               else do
@@ -89,7 +89,7 @@ runREPL = do
 public
 sifREPL : Eff () SifEffs
 sifREPL =
-  case banner !('opts :- get) of
+  case banner !(getOptions) of
     True => do
       putStrLn sifBanner
       runREPL
