@@ -146,7 +146,7 @@ importPreludeIDX nspace ((p,s)::ps) = do
                        , "\tProblem File: " ++ show (pDir p)
                        , "\tSolution File: " ++ show (pDir s)]
     patt <- buildPatternFromFile (pDir p) (pDir s)
-    'lib :- update (\idx => addToLibrary patt idx)
+    updateLibrary (\idx => addToLibrary patt idx)
     importPreludeIDX nspace ps
   where
     pDir : String -> String

@@ -20,11 +20,6 @@ import public Sif.Parser.State
 %default partial
 %access private
 
-public
-BuildEffs : List EFFECT
-BuildEffs = [ FILE_IO ()
-            , 'sif ::: EXCEPTION SifError
-            , 'bst ::: STATE BuildEnv]
 
 -- ----------------------------------------------------------- [ Build Problem ]
 conRQ : RTy -> String -> Maybe String -> REQUIREMENT
@@ -34,30 +29,30 @@ conRQ RELI s d = mkReliability s d
 conRQ PERF s d = mkPerformance s d
 conRQ SUPP s d = mkSupportability s d
 
-doRQ : ProbAST ReqTy -> Eff REQUIREMENT BuildEffs
+doRQ : ProbAST ReqTy -> Eff REQUIREMENT SifEffs
 doRQ (MkReq i ty t d) = do
-  st <- 'bst :- get
+  st <- getBuildState
   case lookup i (getRQs st) of
     Just x  => Sif.raise (DuplicateID i)
     Nothing => do
       let r = conRQ ty t d
-      'bst :- put (record { getRQs = (i,r) :: (getRQs st)} st)
+      putBuildState (record { getRQs = (i,r) :: (getRQs st)} st)
       pure r
 
-doRQs : List (ProbAST ReqTy) -> Eff (List REQUIREMENT) BuildEffs
+doRQs : List (ProbAST ReqTy) -> Eff (List REQUIREMENT) SifEffs
 doRQs xs = do
   rval <- mapE (\x => doRQ x) xs
   pure rval
 
 
-getProblemEff : ProbAST ProbTy -> Eff PROBLEM BuildEffs
+getProblemEff : ProbAST ProbTy -> Eff PROBLEM SifEffs
 getProblemEff (MkProb i t d rs) = do
     rs' <- doRQs rs
     let p = mkProblem t d rs'
-    'bst :- update (\st => record {getProb = (i, Just p)} st)
+    updateBuildState (\st => record {getProb = (i, Just p)} st)
     pure p
 
-problemFromFile : String -> Eff PROBLEM BuildEffs
+problemFromFile : String -> Eff PROBLEM SifEffs
 problemFromFile s = do
     past <- readSifFile problem s
     rval <- getProblemEff past
@@ -66,28 +61,28 @@ problemFromFile s = do
 -- ---------------------------------------------------------- [ Build Solution ]
 
 
-buildAffect : SolAST AffectTy -> Eff TLINK BuildEffs
+buildAffect : SolAST AffectTy -> Eff TLINK SifEffs
 buildAffect (Affects c i) = do
-  st <- 'bst :- get
+  st <- getBuildState
   case lookup i (getRQs st) of
     Nothing => Sif.raise (IDMissing i)
     Just r  => pure $ mkLink c r
 
-buildTrait : SolAST TraitTy -> Eff TRAIT BuildEffs
+buildTrait : SolAST TraitTy -> Eff TRAIT SifEffs
 buildTrait (Trait ty t v d as) = do
   as' <- mapE (\x => buildAffect x) as
   case ty of
     ADV => pure $ mkAdvantage t d v as'
     DIS => pure $ mkDisadvantage t d v as'
 
-buildProperty : SolAST PropTy -> Eff PROPERTY BuildEffs
+buildProperty : SolAST PropTy -> Eff PROPERTY SifEffs
 buildProperty (Property t d ts) = do
   ts' <- mapE (\x => buildTrait x) ts
   pure $ mkProperty t d ts'
 
-buildSolution : SolAST SolTy -> Eff SOLUTION BuildEffs
+buildSolution : SolAST SolTy -> Eff SOLUTION SifEffs
 buildSolution (Solution t pID d ps) = do
-  st <- 'bst :- get
+  st <- getBuildState
   let pID' = fst $ getProb st
   if not (pID' == pID)
     then Sif.raise (ProblemMissing pID')
@@ -95,10 +90,10 @@ buildSolution (Solution t pID d ps) = do
       ps' <- mapE (\p => buildProperty p) ps
       pure $ mkSolution t d ps'
 
-solutionFromFile : String -> Eff SOLUTION BuildEffs
+solutionFromFile : String -> Eff SOLUTION SifEffs
 solutionFromFile f = do
     (pt, sast) <- readSifFile solution f
-    'bst :- update (\st => record {getPData = pt} st)
+    updateBuildState (\st => record {getPData = pt} st)
     sval <- buildSolution sast
     pure sval
 
@@ -107,12 +102,12 @@ solutionFromFile f = do
 public
 buildPatternFromFile : String
                     -> String
-                    -> Eff PATTERN BuildEffs
+                    -> Eff PATTERN SifEffs
 buildPatternFromFile p s = do
-  'bst :- put (defBuildSt)
+  putBuildState (defBuildSt)
   p' <- problemFromFile p
   s' <- solutionFromFile s
-  st <- 'bst :- get
+  st <- getBuildState
   pure $ mkPattern (fst $ getPData st) (snd $ getPData st) p' s'
 
 

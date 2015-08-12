@@ -36,10 +36,10 @@ runMode (Just Conv) = do
 
 sifMain : List PATTERN -> Eff () SifEffs
 sifMain ps = do
-    options <- parseOptions
-    'opts :- put options
-    'lib :- put (if (prelude options)
-                   then addToLibraryM ps library
-                   else addToLibraryM ps emptyLib)
+    opts <- parseOptions
+    putOptions opts
+    putLibrary (if (prelude opts)
+                 then addToLibraryM ps library
+                 else addToLibraryM ps emptyLib)
     loadExtLibrary
-    runMode (mode options)
+    runMode (mode opts)
