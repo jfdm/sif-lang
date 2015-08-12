@@ -1,0 +1,8 @@
+%YAML 1.2
+---
+pattern: {problem: problem.p.sif, solution: solution.s.sif}
+pattern: {problem: problem.p.sif, solution: solution.s.sif}
+pattern: {problem: problem.p.sif, solution: solution.s.sif}
+pattern: {problem: problem.p.sif, solution: solution.s.sif}
+pattern: {problem: problem.p.sif, solution: solution.s.sif}
+...

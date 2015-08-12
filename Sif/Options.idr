@@ -37,30 +37,33 @@ record SifOpts where
   mode  : Maybe SifMode
   out   : Maybe String
   to    : Maybe SifOutFormat
-  banner  : Bool
+  libdir  : Maybe String
   prelude : Bool
+  banner  : Bool
+
 
 defOpts : SifOpts
 defOpts = MkSOpts
-    Nothing Nothing (Just REPL) Nothing Nothing
+    Nothing Nothing (Just REPL) Nothing Nothing Nothing
     True True
 
 instance Default SifOpts where
   default = defOpts
 
 instance Eq SifOpts where
-  (==) (MkSOpts a b c d e f g ) (MkSOpts a' b' c' d' e' f' g') =
+  (==) (MkSOpts a b c d e f g h) (MkSOpts a' b' c' d' e' f' g' h') =
     a' == a && b' == b && c' == c && d' == d &&
-    e' == e && f' == f && g' == g
+    e' == e && f' == f && g' == g && h' == h
 
 convOpts : Arg -> SifOpts -> Maybe SifOpts
 convOpts (Files xs)     o = Nothing
 convOpts (KeyValue k v) o =
   case k of
-    "problem"  => Just $ record {pSpec = Just v} o
-    "solution" => Just $ record {sSpec = Just v} o
-    "out"      => Just $ record {out   = Just v} o
-    "to"       => Just $ record {to    = readOutFMT v} o
+    "libdir"   => Just $ record {libdir = Just v}       o
+    "problem"  => Just $ record {pSpec  = Just v}       o
+    "solution" => Just $ record {sSpec  = Just v}       o
+    "out"      => Just $ record {out    = Just v}       o
+    "to"       => Just $ record {to     = readOutFMT v} o
     otherwise  => Nothing
 convOpts (Flag x) o =
   case x of

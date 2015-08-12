@@ -36,10 +36,9 @@ sifMain : List PATTERN -> Eff () SifEffs
 sifMain ps = do
     options <- getOptions
     'opts :- put options
-    case (prelude options) of
-      True => do
-        'lib :- update (\lib => addToLibraryM ps lib)
-        runMode (mode options)
-      False => do
-        'lib :- put (addToLibraryM ps emptyLib)
-        runMode (mode options)
+    default_library <- 'lib :- get
+    let default_library' = if (prelude options)
+                            then addToLibraryM ps default_library
+                            else addToLibraryM ps emptyLib
+    'lib :- put default_library'
+    runMode (mode options)
