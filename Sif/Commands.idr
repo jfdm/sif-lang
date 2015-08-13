@@ -83,7 +83,7 @@ cmdShowPattern = do
     string ":show"
     space
     i <- integer
-    pure $ ShowPattern (cast $ abs i) (Just ORG) Nothing
+    pure $ ShowPattern (cast $ abs i) (Just COMPACT) Nothing
   <?> "Show Pattern"
 
 private

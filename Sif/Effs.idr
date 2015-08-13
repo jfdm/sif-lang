@@ -15,11 +15,11 @@ import public Effect.StdIO
 
 import public ArgParse
 
-import public Sif.Pattern
-import public Sif.Parser.State
-import public Sif.Error
-import public Sif.Library
-import public Sif.Options
+import Sif.Pattern
+import Sif.Parser.State
+import Sif.Error
+import Sif.Library
+import Sif.Options
 
 %access public
 

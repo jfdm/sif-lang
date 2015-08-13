@@ -9,13 +9,16 @@ module Sif.API
 import public Config.Error
 import public Config.YAML
 
-import public Sif.Effs
-import public Sif.Error
-import public Sif.Pattern
-import public Sif.Library
-import public Sif.Parser
-import public Sif.Prelude
-import public Sif.Options
+import Data.GraphViz.SimpleDot
+import XML.DOM
+
+import Sif.Effs
+import Sif.Error
+import Sif.Pattern
+import Sif.Library
+import Sif.Parser
+import Sif.Prelude
+import Sif.Options
 
 %access public
 
@@ -25,6 +28,7 @@ showConvTo p GRL = Just $ show (the (convTy GRL) (convTo p GRL))
 showConvTo p DOT = Just $ show (the (convTy DOT) (convTo p DOT))
 showConvTo p XML = Just $ show @{xml} $ (the (convTy XML) (convTo p XML))
 showConvTo p ORG = Just $ (the (convTy ORG) (convTo p ORG))
+showConvTo p COMPACT = Just $ (the (convTy COMPACT) (convTo p COMPACT))
 showConvTo p EDDA = Nothing
 
 
@@ -79,11 +83,12 @@ evalPatternFromFile p' s' = do
 
 
 printPattern : PATTERN -> Maybe SifOutFormat -> Eff () SifEffs
-printPattern _ Nothing    = printLn NoFormatSpecified
+printPattern _ Nothing        = printLn NoFormatSpecified
+printPattern p (Just COMPACT) = printLn p
 printPattern p (Just fmt) = do
     case showConvTo p fmt of
-      Nothing  => printLn UnSuppFormat
-      Just res => putStrLn res
+      Nothing      => printLn UnSuppFormat
+      Just res     => putStrLn res
 
 -- ------------------------------------------------------------ [ YAML Parsing ]
 

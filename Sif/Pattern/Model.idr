@@ -11,44 +11,16 @@ import Effects
 import Effect.State
 
 import Data.Sigma.DList
--- import public Data.Sigma.DList.Eff
-
 import Data.AVL.Dict
 import GRL.Lang.GLang
 
-import Edda
-import Edda.Reader.Org
-
 import XML.DOM
 
+import Sif.Pattern.Common
 import Sif.Pattern.Utils
-
-import Debug.Trace
 
 %access public
 %default total
-
--- ----------------------------------------------- [ Problems and Requirements ]
-
--- Encoding of CONTROL | CODE | ACTION ??
--- Encoding of Categories => Security, Access Control, HCI...
-
--- These internal types are not used. How to use them?
-
-data RTy = FUNC | USAB | RELI | PERF | SUPP
-
-instance Cast RTy String where
-  cast FUNC = "functional"
-  cast USAB = "usability"
-  cast RELI = "reliability"
-  cast PERF = "performance"
-  cast SUPP = "supportability"
-
-data TTy = ADV  | DIS
-data STy = ABSTRACT | CONCRETE
-
-data SifTy = tyREQ     | tyTRAIT   | tyPROPERTY | tySOLUTION
-           | tyPROBLEM | tyPATTERN | tyTRAITend
 
 -- ------------------------------------------------------------- [ Interpreter ]
 
@@ -115,10 +87,6 @@ interpProp s ts = IProp pelem (Sigma.getProof elems)
   where
     pelem : GLang ELEM
     pelem = mkTask ("Property: " ++ s)
-
-    -- updateIntent : GLang INTENT -> GLang INTENT
-    -- updateIntent (MkImpacts c a b) = MkImpacts c pelem b
-    -- updateIntent (MkEffects c a b) = MkEffects c pelem b
 
     newTS : List (GLang ELEM, List (GLang INTENT))
     newTS = map (\(ITrait x ys) => (x, ys)) ts
@@ -217,6 +185,46 @@ getReqTitle (priv__mkReq ty t d) = t
 -- -------------------------------------------------------------------- [ Show ]
 
 covering
+showSifPriv : SifPriv i ty -> String
+showSifPriv (priv__mkReq ty t d) = with List
+    unwords ["\t\t", show ty, show t]
+
+showSifPriv (priv__mkProb t d rs) = with List
+    unwords [ "\t Problem:", show t, "\n"
+            , unlines $ mapDList (\x => showSifPriv x) rs
+            , "\n"]
+
+showSifPriv (priv__mkTLink cval r) = with List
+    unwords ["\t\t\t", show cval, (getReqTitle r), "\n"]
+
+showSifPriv (priv__mkTrait ty t d s rs) = with List
+    unwords [
+        "\t\t", show ty, ":" , show t , "is", show s , "\n"
+      , concat (mapDList (showSifPriv) rs)
+      , "\n"]
+
+showSifPriv (priv__mkProp t d ts) = with List
+    unwords [
+        "\t Property: " , t , "\n"
+     , concat (mapDList (showSifPriv) ts)
+     , "\n"]
+
+showSifPriv (priv__mkSolt t d ps) = with List
+    unwords [
+         "\t Solution: " , t , "\n"
+      , Foldable.concat (mapDList showSifPriv ps)
+      , "\n"]
+
+showSifPriv (priv__mkPatt t d p s) = with List
+    unwords [
+         "Pattern:" , show t , "\n"
+      , showSifPriv p
+      , showSifPriv s]
+
+instance Show (SifPriv i ty) where
+  show = showSifPriv
+
+covering
 toOrg : SifPriv i ty -> String
 toOrg (priv__mkReq _ t d) = with List
     unwords [
@@ -270,8 +278,8 @@ XEffs : List EFFECT
 XEffs = [STATE (Nat, Dict String Nat)]
 
 covering
-toXML : SifPriv i ty -> Eff (Document ELEMENT) XEffs
-toXML (priv__mkReq ty t d) = do
+toXML' : SifPriv i ty -> Eff (Document ELEMENT) XEffs
+toXML' (priv__mkReq ty t d) = do
        let e  = addScore $ mkNDNode (cast ty) t d
        (idGen,_) <- get
        let idVal = cast {to=Int} (S idGen)
@@ -279,17 +287,17 @@ toXML (priv__mkReq ty t d) = do
        update (\(idGen,ids) => ((S idGen), insert t (S idGen) ids))
        pure $ e'
 
-toXML (priv__mkProb t d rs) = do
+toXML' (priv__mkProb t d rs) = do
        let e = addScore $ mkNDNode "problem" t d
        -- The following mess is because I could get Effectful HOFs for DList to work.
        -- <mess>
        let rs' = toLDP rs
-       rs'' <- mapE (\r => toXML (Sigma.getProof r)) rs'
+       rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
        let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "requirements") rs''
        -- </mess>
        pure $ e <++> rNodes
 
-toXML (priv__mkTLink cval r) = do
+toXML' (priv__mkTLink cval r) = do
        (_,ids) <- get
        let id = lookup (getReqTitle r) ids
        let e = mkSimpleElement "affect"
@@ -297,30 +305,30 @@ toXML (priv__mkTLink cval r) = do
        pure $ addScore $ (setAttribute "cvalue" (cast cval)
                  (setAttribute "linksTo" (cast idval) e))
 
-toXML (priv__mkTrait ty t d s rs) = do
+toXML' (priv__mkTrait ty t d s rs) = do
        let e  = addScore $ mkNDNode "trait" t d
        let e' = setAttribute "svalue" (cast s) e
        -- <mess>
        let rs' = toLDP rs
-       rs'' <- mapE (\r => toXML (Sigma.getProof r)) rs'
+       rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
        let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "affects") rs''
        -- </mess>
        pure $ e' <++> (addScore rNodes)
 
-toXML (priv__mkProp t d rs) = do
+toXML' (priv__mkProp t d rs) = do
        let e = addScore $ mkNDNode "property" t d
        -- <mess>
        let rs' = toLDP rs
-       rs'' <- mapE (\r => toXML (Sigma.getProof r)) rs'
+       rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
        let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "traits") rs''
        -- </mess>
        pure $ e <++> (addScore rNodes)
 
-toXML (priv__mkSolt t d rs) = do
+toXML' (priv__mkSolt t d rs) = do
        let e = addScore $ mkNDNode "solution" t d
        -- <mess>
        let rs' = toLDP rs
-       rs'' <- mapE (\r => toXML (Sigma.getProof r)) rs'
+       rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
        let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "properties") rs''
        -- </mess>
        pure $ e
@@ -328,10 +336,10 @@ toXML (priv__mkSolt t d rs) = do
          <++> mkStructure
          <++> mkDynamics
 
-toXML (priv__mkPatt t d p s) = do
+toXML' (priv__mkPatt t d p s) = do
        let e = addScore $ mkNDNode "pattern" t d
-       pNode <- toXML p
-       sNode <- toXML s
+       pNode <- toXML' p
+       sNode <- toXML' s
        pure $ e <++> mkRels
                 <++> mkStudies
                 <++> (addScore $ mkEmptyNode "evidence")
@@ -340,6 +348,10 @@ toXML (priv__mkPatt t d p s) = do
                 <++> (addScore $ mkEmptyNode "context")
                 <++> mkMdata
 
-toXML _ = pure $ mkSimpleElement "bug"
+toXML' _ = pure $ mkSimpleElement "bug"
+
+partial
+toXML : SifPriv i ty -> Document ELEMENT
+toXML root = runPureInit [(Z,Dict.empty)] (toXML' root)
 
 -- --------------------------------------------------------------------- [ EOF ]

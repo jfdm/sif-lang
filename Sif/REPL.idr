@@ -9,7 +9,13 @@ module Sif.REPL
 import System
 
 import Sif.Commands
+import Sif.Parser
+import Sif.Pattern
 import Sif.API
+import Sif.Options
+import Sif.Error
+import Sif.Effs
+import Sif.Library
 
 %access public
 -- -------------------------------------------------------------------- [ Effs ]

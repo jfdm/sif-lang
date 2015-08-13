@@ -10,7 +10,6 @@ modules = Sif.Parser.Utils
         , Sif.Parser.Common
         , Sif.Parser.Problem
         , Sif.Parser.Pattern
-        , Sif.Parser.File
         , Sif.Parser
 
         , Sif.REPL
@@ -24,8 +23,8 @@ modules = Sif.Parser.Utils
 
         , Sif.Pattern
         , Sif.Pattern.Model
-        , Sif.Pattern.API
         , Sif.Pattern.Utils
+        , Sif.Pattern.Common
 
         , Sif.PModel
 

@@ -9,8 +9,9 @@ LANGLIB := sif
 IOLIB   := sifio
 PRELUDE := sifprelude
 EXE     := sifexe
+MONO    := sifmono
 
-.PHONY: doc clobber check clean io lang linecount testLang testIO tests prelude all
+.PHONY: doc clobber check clean io lang linecount testLang testIO tests prelude all monolithic perfbuild
 
 lang:
 	${IDRIS} --build ${LANGLIB}.ipkg
@@ -29,6 +30,12 @@ exe:
 
 all: lang prelude io exe
 
+monolithic:
+	${IDRIS} --build ${MONO}.ipkg
+
+perfbuild: clobber
+	/usr/bin/time -p ${IDRIS} --checkpkg ${MONO}.ipkg
+	/usr/bin/time -p ${IDRIS} --build ${MONO}.ipkg
 
 clean:
 	${IDRIS} --clean ${LANGLIB}.ipkg
@@ -40,6 +47,8 @@ check: clobber
 	${IDRIS} --checkpkg ${LANGLIB}.ipkg
 	${IDRIS} --checkpkg ${IOLIB}.ipkg
 	${IDRIS} --checkpkg ${EXE}.ipkg
+	${IDRIS} --checkpkg ${MONO}.ipkg
+
 
 clobber : clean
 	find . -name "*.ibc" -delete

@@ -4,8 +4,8 @@ opts = "-p effects -p containers -p grl -p edda -p xml -p test -p graphviz --typ
 
 modules = Sif.Pattern
         , Sif.Pattern.Model
-        , Sif.Pattern.API
         , Sif.Pattern.Utils
+        , Sif.Pattern.Common
 
         , Sif.PModel
 

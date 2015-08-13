@@ -5,8 +5,8 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Sif.Parser
 
-import public Lightyear
-import public Lightyear.Strings
+import Lightyear
+import Lightyear.Strings
 
 import Sif.Effs
 
@@ -14,12 +14,31 @@ import public Sif.Parser.Problem
 import public Sif.Parser.Pattern
 
 import Sif.Pattern
-import public Sif.Parser.File
-import public Sif.Parser.State
+import Sif.Error
+
+import Sif.Parser.State
 
 %default partial
 %access private
 
+public
+readSifFile : Parser a
+           -> String
+           -> Eff a SifEffs
+readSifFile p f = do
+    case !(open f Read) of
+      True => do
+        src <- readAcc ""
+        close
+        case parse p src of
+          Left err  => Sif.raise (ParseError err)
+          Right res => pure res
+      False => Sif.raise (FileMissing f)
+  where
+    readAcc : String -> Eff String [FILE_IO (OpenFile Read)]
+    readAcc acc = if (not !(eof))
+                     then readAcc (acc ++ !(readLine))
+                     else pure acc
 
 -- ----------------------------------------------------------- [ Build Problem ]
 conRQ : RTy -> String -> Maybe String -> REQUIREMENT

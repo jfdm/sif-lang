@@ -6,6 +6,7 @@ import public Sif.API
 import public Sif.REPL
 import public Sif.Options
 import public Sif.Effs
+import public Sif.Error
 import public Sif.Library
 import public Sif.Prelude
 

@@ -6,7 +6,6 @@ modules = Sif.Parser.Utils
         , Sif.Parser.Common
         , Sif.Parser.Problem
         , Sif.Parser.Pattern
-        , Sif.Parser.File
         , Sif.Parser
 
         , Sif.REPL
