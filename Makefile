@@ -36,6 +36,8 @@ monolithic:
 perfbuild: clobber
 	/usr/bin/time -p ${IDRIS} --checkpkg ${MONO}.ipkg
 	/usr/bin/time -p ${IDRIS} --build ${MONO}.ipkg
+	${IDRIS} --clean ${MONO}.ipkg
+	/usr/bin/time -p ${IDRIS} --build ${MONO}.ipkg
 
 clean:
 	${IDRIS} --clean ${LANGLIB}.ipkg

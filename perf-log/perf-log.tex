@@ -1,0 +1,80 @@
+\documentclass[pdftex]{beamer}
+
+\usepackage{pgfplots}
+%\usepackage{pdfplotstable}
+\pgfplotsset{compat=1.12}
+
+
+\begin{document}
+\begin{frame}
+\begin{center}
+\begin{tikzpicture}
+  \begin{axis}[%
+    title={Type Checking Project},
+    xlabel={commit},
+    ylabel={Time}]
+  \addplot table [x=x, y=tyCHK]{stats.dat};
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\begin{tikzpicture}
+  \begin{axis}[%
+     title={Type Checking Main and CodeGen},
+     xlabel={commit},
+     ylabel={Time}]
+  \addplot table [x=x, y=CodeGen]{stats.dat};
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\begin{tikzpicture}
+  \begin{axis}[%
+     title={Executable Size},
+     xlabel={commit},
+     ylabel= {Size}]
+  \addplot table [x=x, y=exe]{stats.dat};
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\begin{tikzpicture}
+  \begin{axis}[%
+     title={LoC},
+     xlabel={commit},
+     ylabel = {Size}]
+  \addplot table [x=x, y=LoC]{stats.dat};
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\begin{tikzpicture}
+  \begin{axis}[%
+     title={Monolithic Build},
+     xlabel={commit},
+     ylabel = {Size}]
+  \addplot table [x=x, y=Mono]{stats.dat};
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\end{document}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

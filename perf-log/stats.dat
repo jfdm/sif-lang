@@ -1,0 +1,3 @@
+x       Date            commit  LoC     tyCHK   CodeGen Mono    exe       Comment
+1       2014-08-12      c88abac 2917    156.85  197.58  340     5662007   {Initial measurement}
+2       2014-08-12      f883f0f 2955    154.03  199.43  337.13  5681726   {Namespace cleanup}
