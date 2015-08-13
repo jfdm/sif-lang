@@ -1,0 +1,5 @@
+sif problem policyenforce as "Policy Enforcement"
+
+enforcement    <- Functional "Policy Enforcement"
+timely         <- Functional "Timely Enforcement"
+agnostic       <- Functional "Tech Agnostic"

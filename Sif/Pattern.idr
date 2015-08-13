@@ -265,7 +265,9 @@ convTy GRL = GModel
 convTy EDDA = Maybe $ Edda PRIME MODEL
 convTy COMPACT = String
 
+partial
 convTo : PATTERN -> (fmt : SifOutFormat) -> convTy fmt
+convTo p GRL = getModel p
 convTo p DOT = toDot p
 convTo p XML = toXML p
 convTo p ORG = toString p

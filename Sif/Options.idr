@@ -76,4 +76,26 @@ convOpts (Flag x) o =
     "prelude"  => Just $ record {prelude = True}       o
     otherwise => Nothing
 
+helpStr : String
+helpStr = """Sif-Lang (C) Jan de Muijnck-Hughes 2015
+
+Available Options:
+
+Flag                 | Description
+---------------------|----------------------------------------------------------
+--extprelude="<dir>" | Load an externally defined prelude.
+--problem="<fname>"  | A problem specification.
+--solution="<fname"  | A solution specification.
+--out="<fname>"      | File name to save things to.
+--to="<fmt>"         | The output format.
+
+--help               | Display help
+--version            | Display version
+--check              | Check problem solution pairing.
+--eval               | Evaluate problem solution pairing
+--conv               | Convert problem solution pairing
+--nobanner           | Don't display banner
+--prelude            | Load the default prelude.
+"""
+
 -- --------------------------------------------------------------------- [ EOF ]

@@ -195,17 +195,17 @@ showSifPriv (priv__mkProb t d rs) = with List
             , "\n"]
 
 showSifPriv (priv__mkTLink cval r) = with List
-    unwords ["\t\t\t", show cval, (getReqTitle r), "\n"]
+    unwords ["\t\t\t\t", show cval, (getReqTitle r), "\n"]
 
 showSifPriv (priv__mkTrait ty t d s rs) = with List
     unwords [
-        "\t\t", show ty, ":" , show t , "is", show s , "\n"
+        "\t\t\t", show ty, ":" , show t , "is", show s , "\n"
       , concat (mapDList (showSifPriv) rs)
       , "\n"]
 
 showSifPriv (priv__mkProp t d ts) = with List
     unwords [
-        "\t Property: " , t , "\n"
+        "\t\t Property: " , t , "\n"
      , concat (mapDList (showSifPriv) ts)
      , "\n"]
 

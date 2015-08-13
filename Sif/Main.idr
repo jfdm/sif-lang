@@ -1,3 +1,8 @@
+-- ---------------------------------------------------------------- [ Main.idr ]
+-- Module    : Main.idr
+-- Copyright : (c) Jan de Muijnck-Hughes
+-- License   : see LICENSE
+-- --------------------------------------------------------------------- [ EOH ]
 module Sif.Main
 
 import public Sif.Parser
@@ -13,7 +18,7 @@ import public Sif.Prelude
 runMode : Maybe SifMode -> Eff () SifEffs
 runMode Nothing     = sifREPL
 runMode (Just VERS) = printLn FeatureNotImpl
-runMode (Just HELP) = printLn FeatureNotImpl
+runMode (Just HELP) = putStrLn helpStr
 
 runMode (Just REPL) = sifREPL
 
@@ -44,3 +49,5 @@ sifMain ps = do
                  else addToLibraryM ps emptyLib)
     loadExtLibrary
     runMode (mode opts)
+
+-- --------------------------------------------------------------------- [ EOF ]

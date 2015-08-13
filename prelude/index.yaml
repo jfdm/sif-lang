@@ -1,8 +1,5 @@
 %YAML 1.2
 ---
-pattern: {problem: problem.p.sif, solution: solution.s.sif}
-pattern: {problem: problem.p.sif, solution: solution.s.sif}
-pattern: {problem: problem.p.sif, solution: solution.s.sif}
-pattern: {problem: problem.p.sif, solution: solution.s.sif}
-pattern: {problem: problem.p.sif, solution: solution.s.sif}
+pattern: {problem: infosec.problem.sif,        solution: asymmcrypto.solution.sif}
+pattern: {problem: policyenforce.problem.sif,  solution: peppoint.solution.sif}
 ...

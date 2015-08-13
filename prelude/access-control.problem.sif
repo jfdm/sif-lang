@@ -1,0 +1,7 @@
+sif problem accesscontrol as "Access Control"
+
+control    <- Functional "Access Restriction"
+indy       <- Functional "Application Independence"
+flexi      <- Functional "Flexibility"
+ease       <- Functional "Easy Adjustment"
+simpeAdmin <- Functional "Ease of Administration"

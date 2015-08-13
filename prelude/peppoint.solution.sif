@@ -1,0 +1,34 @@
+sif solution
+
+solves policyenforce
+makes pattern "Policy Enforcement Points"
+
+Solution "Policy Enforcement Points" {
+
+  Property "Abstract Definition" {
+    Advantage "Agnostic" is Satisfied {
+       Affects {
+          Makes agnostic
+       }
+    }
+	Disadvantage "Generalism" is Denied {
+       Affects {
+         Hurts agnostic
+       }
+    }
+  }
+
+  Property "Single Enforcement Point" {
+    Advantage "Enforces Policy" is Satisfied {
+      Affects {
+        Makes enforcement,
+		Makes timely
+      }
+    }
+    Disadvantage "Choke Point" is Denied {
+     Affects {
+       Hurts timely
+     }
+    }
+  }
+}
