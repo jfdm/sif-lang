@@ -1,4 +1,4 @@
-
+#+TITLE: Notes
 
 + Problem has requirements :: Graph of goals
 + Solution has properties  :: Node decomposed into sub-graphs of tasks
@@ -28,3 +28,40 @@
 + Info sec is the problem
 + Asym is the partial solution
 + RSA, DSA are the real solutions.
+
+* Using Algebraic Effects
+** Using Effects
+Use a globally defined list of effects, and only use sublists if you can get away with it.
+** Labels
+*** Libary Authors should label 'their' effects
+If you are designing a a library that uses Algebraic effects:
+
++ Label effects that are unique to the library, such as Exception and State. Other effects, such as FILE_IO and SYSTEM and LOG need not be labelled.
++ Label should be unique and a simple naming scheme would be =<name of package><descriptibe term>=.
+  + Exceptions in Foo would be labelled =fooerr=
+  + State in Foo woulb be labelled =foostate=
+*** Hide the Lables
+With the use of labels can come messy looking code and forgetfulness of label names.
+The latter especially if you hide the list of effects.
+
+A good trick is to re-domain the effects such that the effectful functions are accessed using the form =<package name>.<function name>=.
+
+For Example
+#+BEGIN_EXAMPLE
+FooEffs : List EFFECT
+FooEffs = [FILE_IO (), SYSTEM, STDIO, 'foost ::: STATE FState, 'fooerr ::: Exception FooError]
+
+namespace Foo
+  raise : FooError -> Eff b ['fooerr ::: Exception FooError]
+  raise err = 'fooerr :- Exception.raise err
+
+getState : Eff FState ['foost ::: STATE FState]
+getState = 'foost :- get
+
+updateState : (FState -> FState) -> Eff () ['foost ::: STATE FState]
+updateState u = 'foost :- update (\st => u st)
+
+replaceState : FState -> Eff () ['foost ::: STATE FState]
+replaceState newST = 'foost :- put newST
+
+#+END_EXAMPLE

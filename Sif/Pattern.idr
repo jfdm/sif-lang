@@ -17,7 +17,7 @@ import public Sif.Pattern.Common
 import Sif.Pattern.Model
 import Sif.Pattern.Utils
 
-%default partial
+%default total
 %access public
 
 -- --------------------------------------------------- [ Public Data Structure ]
@@ -27,8 +27,7 @@ data SifExpr : SifTy -> Type where
   MkExpr  : {i : InterpRes ty} -> SifPriv i ty-> SifExpr ty
 
 
-private
-partial
+private partial
 showSifExpr : SifExpr ty -> String
 showSifExpr (MkExpr e) = showSifPriv e
 
@@ -127,9 +126,11 @@ mkProblem : String
          -> PROBLEM
 mkProblem s d rs = MkExpr $ priv__mkProb s d (Sigma.getProof $ conv rs)
 
+partial
 getProblemTitle : PROBLEM -> String
 getProblemTitle (MkExpr p) = doGet p
   where
+    partial
     doGet : {i : InterpRes tyPROBLEM} -> SifPriv i tyPROBLEM -> String
     doGet (priv__mkProb t _ _) = t
 
@@ -190,7 +191,7 @@ getModel (MkExpr p) = doGetModel p
     doGetModel : {i : InterpRes tyPATTERN} -> SifPriv i tyPATTERN -> GModel
     doGetModel {i} _ = extract i
 
-covering
+partial
 evalPattern : PATTERN -> EvalResult
 evalPattern p = evalModel (getModel p) Nothing
 
@@ -202,7 +203,7 @@ getPatternTitle (MkExpr p) = doGet p
 
 -- ------------------------------------------------------------- [ Conversions ]
 
-data SifOutFormat = ORG | XML | DOT | GRL | EDDA | COMPACT
+data SifOutFormat = ORG | XML | DOT | GRL | EDDA | COMPACT | IDRIS
 
 instance Eq SifOutFormat where
   (==) ORG     ORG     = True
@@ -211,6 +212,7 @@ instance Eq SifOutFormat where
   (==) GRL     GRL     = True
   (==) EDDA    EDDA    = True
   (==) COMPACT COMPACT = True
+  (==) IDRIS   IDRIS   = True
   (==) _       _       = False
 
 instance Show SifOutFormat where
@@ -220,6 +222,7 @@ instance Show SifOutFormat where
   show GRL = "GRL"
   show EDDA = "Edda"
   show COMPACT = "Compact"
+  show IDRIS   = "Idris"
 
 readOutFMT : String -> Maybe SifOutFormat
 readOutFMT s =
@@ -229,10 +232,9 @@ readOutFMT s =
     "dot" => Just DOT
     "grl" => Just GRL
     "compact" => Just COMPACT
+    "idris"   => Nothing
     "edda" => Nothing -- TODO Just EDDA
     otherwise => Nothing
-
-
 
 partial
 toEdda : SifExpr tyPATTERN -> Maybe $ Edda PRIME MODEL
@@ -245,7 +247,6 @@ partial
 toString : SifExpr tyPATTERN -> String
 toString (MkExpr p) = toOrg p
 
-
 partial
 toXML : SifExpr tyPATTERN -> Document DOCUMENT
 toXML (MkExpr x) = setRoot root $ mkDocument (mkQName "pattern") Nothing
@@ -257,21 +258,25 @@ toXML (MkExpr x) = setRoot root $ mkDocument (mkQName "pattern") Nothing
 toDot : SifExpr tyPATTERN -> SimpleDot GRAPH
 toDot p = grlToDot $ getModel p
 
+covering
 convTy : SifOutFormat -> Type
-convTy ORG = String
-convTy XML = Document DOCUMENT
-convTy DOT = SimpleDot GRAPH
-convTy GRL = GModel
-convTy EDDA = Maybe $ Edda PRIME MODEL
+convTy ORG     = String
+convTy XML     = Document DOCUMENT
+convTy DOT     = SimpleDot GRAPH
+convTy GRL     = GModel
+convTy EDDA    = Maybe $ Edda PRIME MODEL
 convTy COMPACT = String
+convTy IDRIS   = Maybe String
 
-partial
-convTo : PATTERN -> (fmt : SifOutFormat) -> convTy fmt
-convTo p GRL = getModel p
-convTo p DOT = toDot p
-convTo p XML = toXML p
-convTo p ORG = toString p
-convTo p EDDA = toEdda p
+covering partial
+convTo : SifExpr tyPATTERN -> (fmt : SifOutFormat) -> convTy fmt
+convTo p ORG     = Pattern.toString p
+convTo p XML     = toXML p
+convTo p DOT     = toDot p
+convTo p GRL     = Pattern.getModel p
+convTo p EDDA    = toEdda p
 convTo p COMPACT = show p
+convTo p IDRIS   = Nothing
+
 
 -- --------------------------------------------------------------------- [ EOF ]

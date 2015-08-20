@@ -20,15 +20,20 @@ import Sif.Parser
 import Sif.Prelude
 import Sif.Options
 
+%default partial
+
 %access public
 
+
 ||| COnv and SHow -- horrible horrible code.
+partial covering
 showConvTo : PATTERN -> (fmt : SifOutFormat) -> Maybe String
 showConvTo p GRL = Just $ show (the (convTy GRL) (convTo p GRL))
 showConvTo p DOT = Just $ show (the (convTy DOT) (convTo p DOT))
 showConvTo p XML = Just $ show @{xml} $ (the (convTy XML) (convTo p XML))
 showConvTo p ORG = Just $ (the (convTy ORG) (convTo p ORG))
 showConvTo p COMPACT = Just $ (the (convTy COMPACT) (convTo p COMPACT))
+showConvTo p IDRIS   = Nothing
 showConvTo p EDDA = Nothing
 
 
