@@ -23,7 +23,7 @@ data SifError : Type where
   ProblemMissing : String -> SifError
   DuplicateID   : String -> SifError
   FileMissing   : String -> SifError
-  ParseError    : String -> SifError
+  ParseError    : String -> String -> SifError
 
 instance Show SifError where
   show IndexOutOfBounds = "Index Out of Bounds"
@@ -36,11 +36,14 @@ instance Show SifError where
   show NoModeSpecified  = "Node Mode Specified"
   show NoFormatSpecified = "No output format specified"
   show FeatureNotImpl    = "Feature Not Implemented"
+  show InternalErr       = "Internal Error"
 
   show (IDMissing id)      = "Identifier Missing: " ++ show id
   show (ProblemMissing id) = "Problem Doesn't Exist: " ++ show id
   show (DuplicateID id)    = "Identifier already Exists: " ++ show id
   show (FileMissing fname) = "File Missing " ++ fname
-  show (ParseError  err)   = "ParseError:\n" ++ err
+  show (ParseError fn err) =
+      unlines [ unwords ["Error Parsing file", show fn, "error was:"]
+              , err]
 
 -- --------------------------------------------------------------------- [ EOF ]

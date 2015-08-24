@@ -1,0 +1,31 @@
+sif problem absDataCreation as "Making Data Creation Abstract"
+
+Description """
+Given an abstract description of an data structure together with several concrete implementations of these data structure.
+The problem is how to present, create, and serve objects using their abstract representation without exposing their concrete implementation.
+"""
+
+separateObjects <- Functional "Separate Data Structures"
+"""
+The solution must provide separate representation and implementation data structures.
+"""
+
+agnosticObjectGeneration <- Functional "Agnostic Generation of Objects"
+"""
+The solution must allow for the generation of data structure instances without knowledge of the underlying implementation.
+"""
+
+closedForModification <- Functional "Closed for Modification"
+"""
+The creation of objects should be closed for modification.
+"""
+
+flexibleReplacement <- Functional "Flexible Replacement"
+"""
+There should be an ability to replace the method of creation easily.
+"""
+
+minimalDependancies <- Supportability "Minimal Dependencies"
+"""
+The resulting code should have minimal dependencies.
+"""

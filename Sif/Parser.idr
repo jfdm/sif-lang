@@ -31,7 +31,7 @@ readSifFile p f = do
         src <- readAcc ""
         close
         case parse p src of
-          Left err  => Sif.raise (ParseError err)
+          Left err  => Sif.raise (ParseError f err)
           Right res => pure res
       False => Sif.raise (FileMissing f)
   where

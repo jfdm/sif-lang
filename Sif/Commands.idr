@@ -23,34 +23,9 @@ data SifCMD : Type where
   ListLib     : SifCMD
   EvalPattern : Nat -> SifCMD
   CheckExtPattern : String -> String -> SifCMD
+  PreludeLoad : Maybe String -> SifCMD
   Quit        : SifCMD
   Help        : SifCMD
-
-instance Eq SifCMD where
-  (==) Help                   Help                      = True
-  (==) Quit                   Quit                      = True
-  (==) ListLib                ListLib                   = True
-  (==) (EvalPattern n)        (EvalPattern n')  =
-     n == n'
-  (==) (ShowPattern n fmt fn) (ShowPattern n' fmt' fn') =
-      n == n' &&
-      fmt == fmt' &&
-      fn == fn'
-  (==) (CheckExtPattern p s)  (CheckExtPattern p' s')   =
-      p == p' && s == s'
-  (==) _ _ = False
-
-instance Show SifCMD where
-  show (ShowPattern n fmt fname) = with List
-      unwords ["[ShowPattern", show n, show fmt, show fname,"]"]
-  show (EvalPattern n) = with List
-      unwords ["[EvaluatePattern", show n, "]"]
-  show (CheckExtPattern p s) = with List
-      unwords ["[CheckExternal Pattern", p, s, "]"]
-  show Quit     = "[Quit]"
-  show Help     = "[Help]"
-  show ListLib  = "[List]"
-
 
 
 showHelp : String
@@ -58,12 +33,14 @@ showHelp = """
 Command                 | Description
 ------------------------|-------------------------------------------------------
 :list                   | List library contents
-:show n                 | Show pattern identified by index.
+:display n              | Show pattern identified by index.
 :eval n                 | Evaluate pattern identified by index.
-:showAs n fmt           | Show pattern using given format.
-:saveAs n fmt fname     | Save pattern in given format to file specified.
-:chkExtPattern probFile | Check externally defined pattern.
-               solFile  |
+:convert n fmt          | Show pattern using given format.
+:save n fmt "fname"     | Save pattern in given format to file specified.
+:chkPattern "probFile"  | Check externally defined pattern.
+            "solFile"   |
+:load "dirname"         | Replace prelude.
+:reload                 | Reload prelude.
 :quit :q :exit          | Quit the repl
 :? :help                | Show this help
 """
@@ -76,20 +53,21 @@ getCmdIndex ListLib               = Nothing
 getCmdIndex (ShowPattern n _ _)   = Just n
 getCmdIndex (EvalPattern n)       = Just n
 getCmdIndex (CheckExtPattern _ _) = Nothing
+getCmdIndex (PreludeLoad _)       = Nothing
 
 private
-cmdShowPattern : Parser SifCMD
-cmdShowPattern = do
-    string ":show"
+display : Parser SifCMD
+display = do
+    string ":display"
     space
     i <- integer
     pure $ ShowPattern (cast $ abs i) (Just COMPACT) Nothing
   <?> "Show Pattern"
 
 private
-cmdShowAs : Parser SifCMD
-cmdShowAs = do
-    string ":showAs"
+convert : Parser SifCMD
+convert = do
+    string ":convert"
     space
     i <- integer
     space
@@ -99,16 +77,16 @@ cmdShowAs = do
 
 
 private
-cmdListLib : Parser SifCMD
-cmdListLib = do
+list : Parser SifCMD
+list = do
     string ":list"
     pure ListLib
   <?> "List libs"
 
 private
-cmdSavePattern : Parser SifCMD
-cmdSavePattern = do
-    string ":saveAs"
+save : Parser SifCMD
+save = do
+    string ":save"
     space
     i <- integer
     space
@@ -119,8 +97,8 @@ cmdSavePattern = do
   <?> "Save Pattern"
 
 private
-cmdEvalPattern : Parser SifCMD
-cmdEvalPattern = do
+eval : Parser SifCMD
+eval = do
     string ":eval"
     space
     i <- integer
@@ -128,8 +106,8 @@ cmdEvalPattern = do
   <?> "Eval Command"
 
 private
-cmdQuit : Parser SifCMD
-cmdQuit = (string ":q"    *> return Quit)
+quit : Parser SifCMD
+quit = (string ":q"    *> return Quit)
       <|> (string ":quit" *> return Quit)
       <|> (string ":exit" *> return Quit)
 
@@ -139,22 +117,29 @@ help = (string ":?"    *> return Help)
    <|> (string ":help" *> return Help)
 
 private
-chkExtPattern : Parser SifCMD
-chkExtPattern = do
-    keyword ":chkPattern"
+check : Parser SifCMD
+check = do
+    keyword ":check"
     p <- literallyBetween '"'
     space
     s <- literallyBetween '"'
     pure $ CheckExtPattern p s
 
+private
+load : Parser SifCMD
+load = (do keyword ":load"; dir <- literallyBetween '"'; return (PreludeLoad (Just dir)) )
+    <|> (keyword ":reload" *> return (PreludeLoad Nothing))
+    <?> "Loading"
+
 cmd : Parser SifCMD
-cmd = cmdShowPattern
-  <|> cmdListLib
-  <|> cmdShowAs
-  <|> cmdSavePattern
-  <|> cmdEvalPattern
-  <|> cmdQuit
-  <|> chkExtPattern
+cmd = display
+  <|> list
+  <|> convert
+  <|> save
+  <|> eval
+  <|> quit
+  <|> load
+  <|> check
   <|> help
   <?> "Command"
 

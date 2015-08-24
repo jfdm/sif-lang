@@ -11,8 +11,11 @@ import Lightyear.Strings
 
 import Sif.Parser.Utils
 
-descString : Parser $ String
-descString = literallyBetweenLR '{' '}' <?> "Description Block"
+descString : Parser String
+descString = literal
+         <|> (literallyBetween '\"')
+         <|> (literallyBetweenLR '{' '}')
+         <?> "Description Block"
 
 keyword : String -> Parser ()
 keyword s = lexeme $ string s *> pure ()
@@ -21,6 +24,7 @@ desc : Parser $ String
 desc = do
    lexeme $ string "Description"
    s <- descString
+   space
    pure s
   <?> "Description"
 

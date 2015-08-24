@@ -120,6 +120,7 @@ getPatternKVPairs : YAMLNode -> List (YAMLNode)
 getPatternKVPairs (YAMLDoc _ doc) with (doc)
   | (YAMLMap ps) = map snd $ filter (\(x,y) => isPatternMap x) ps
   | otherwise = Nil
+getPatternKVPairs _ = Nil
 
 private
 getStringKey : (YAMLNode, YAMLNode) -> Maybe String

@@ -1,0 +1,61 @@
+sif solution
+
+solves infosec
+makes pattern "InfoSec through SymCrypto"
+
+Solution "Symmetric Cryptography" {
+
+  Property "Public Key Pairs" {
+    Advantage "Same Keys" is Satisfied {
+       Affects {
+          Makes recipConf
+       }
+    }
+	Disadvantage "PKI" is Satisfied {
+       Affects {
+         Hurts multiSecLevels
+       }
+    }
+    Disadvantage "Single Key" is Satisfied {
+	   Affects {
+	     Hurts dataConf,
+		 Hurts recipConf
+	   }
+	}
+  }
+
+  Property "Maths Algorithms" {
+    Advantage "Maths Guarantee" is Satisfied {
+      Affects {
+        Makes dataConf
+      }
+    }
+    Advantage "Computationally InExpensive" is Satisfied {
+     Affects {
+       Helps mechPerf
+     }
+    }
+    Advantage "Maths well studied" is Satisfied {
+	  Affects {
+	    Helps recipConf
+	  }
+	}
+  }
+  Property "Variable Security Parameter" {
+    Advantage "Greater Security" is Satisfied {
+	    Affects {
+	      Makes multiSecLevels
+		}
+	}
+   Disadvantage "Parameter Selection" is Satisfied {
+        Affects {
+		  Hurts multiSecLevels
+		}
+   }
+   Disadvantage "Parameter Computation" is Satisfied {
+       Affects {
+	     Hurts mechPerf
+	   }
+   }
+  }
+}

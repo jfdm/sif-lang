@@ -34,6 +34,9 @@ mkNDNode n t d = (addScore $ mkNode n)
             <++> (addScore $ mkDescNode d)
             <++> (addScore $ "name" <+=> t)
 
+--addND : Document ELEMENT -> String -> Maybe String -> Document ELEMENT
+--addND n t d =
+
 mkMdata : Document ELEMENT
 mkMdata = mkNode "metadata"
      <++> mkPCNode "auditors" "auditor"
@@ -58,12 +61,12 @@ mkModel = setAttribute
 
 mkStructure : Document ELEMENT
 mkStructure = addScore $ mkNode "structure"
-    <++> mkDescNode Nothing
+    <++> (addScore $ mkDescNode Nothing)
     <++> mkModel
 
 mkDynamics : Document ELEMENT
 mkDynamics = addScore $ mkNode "dynamics"
-    <++> mkDescNode Nothing
+    <++> (addScore $ mkDescNode Nothing)
     <++> mkModel
 
 mkRels : Document ELEMENT

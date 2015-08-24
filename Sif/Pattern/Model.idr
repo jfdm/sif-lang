@@ -288,44 +288,53 @@ toXML' (priv__mkReq ty t d) = do
        pure $ e'
 
 toXML' (priv__mkProb t d rs) = do
-       let e = addScore $ mkNDNode "problem" t d
+       let e = addScore $ mkNode "problem"
        -- The following mess is because I could get Effectful HOFs for DList to work.
        -- <mess>
        let rs' = toLDP rs
        rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
        let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "requirements") rs''
        -- </mess>
-       pure $ e <++> rNodes
+       pure $ e
+         <++> rNodes
+         <++> (addScore $ mkDescNode d)
+         <++> ("name" <+=> t)
 
 toXML' (priv__mkTLink cval r) = do
        (_,ids) <- get
        let id = lookup (getReqTitle r) ids
        let e = mkSimpleElement "affect"
        let idval = cast {to=Int} $ fromMaybe 0 id
-       pure $ addScore $ (setAttribute "cvalue" (cast cval)
-                 (setAttribute "linksTo" (cast idval) e))
+       pure $ (setAttribute "cvalue" (cast cval)
+              (setAttribute "linksTo" (cast idval) e))
 
 toXML' (priv__mkTrait ty t d s rs) = do
-       let e  = addScore $ mkNDNode "trait" t d
+       let e  = addScore $ mkNode "trait"
        let e' = setAttribute "svalue" (cast s) e
        -- <mess>
        let rs' = toLDP rs
        rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
        let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "affects") rs''
        -- </mess>
-       pure $ e' <++> (addScore rNodes)
+       pure $ e'
+         <++> (rNodes)
+         <++> (mkDescNode d)
+         <++> ("name" <+=> t)
 
 toXML' (priv__mkProp t d rs) = do
-       let e = addScore $ mkNDNode "property" t d
+       let e = addScore $ mkNode "property"
        -- <mess>
        let rs' = toLDP rs
        rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
        let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "traits") rs''
        -- </mess>
-       pure $ e <++> (addScore rNodes)
+       pure $ e
+         <++> rNodes
+         <++> (mkDescNode d)
+         <++> ("name" <+=> t)
 
 toXML' (priv__mkSolt t d rs) = do
-       let e = addScore $ mkNDNode "solution" t d
+       let e = addScore $ mkNode "solution"
        -- <mess>
        let rs' = toLDP rs
        rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
@@ -335,9 +344,11 @@ toXML' (priv__mkSolt t d rs) = do
          <++> (addScore rNodes)
          <++> mkStructure
          <++> mkDynamics
+         <++> (mkDescNode d)
+         <++> ("name" <+=> t)
 
 toXML' (priv__mkPatt t d p s) = do
-       let e = addScore $ mkNDNode "pattern" t d
+       let e = mkNode "pattern"
        pNode <- toXML' p
        sNode <- toXML' s
        pure $ e <++> mkRels
@@ -347,6 +358,8 @@ toXML' (priv__mkPatt t d p s) = do
                 <++> pNode
                 <++> (addScore $ mkEmptyNode "context")
                 <++> mkMdata
+                <++> (mkDescNode d)
+                <++> ("name" <+=> t)
 
 toXML' _ = pure $ mkSimpleElement "bug"
 

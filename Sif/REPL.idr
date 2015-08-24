@@ -55,7 +55,11 @@ fetchCMD = do
                printLn IndexOutOfBounds
                fetchCMD
 
+covering
 doCommand : SifCMD -> Eff () SifEffs
+doCommand Quit = pure ()
+doCommand Help = putStrLn showHelp
+
 doCommand (ShowPattern n fmt fname) = do
   case fname of
     Nothing => do
@@ -69,6 +73,13 @@ doCommand (ListLib) = do
   putStrLn "Listing Library"
   listLibrary
 
+doCommand (PreludeLoad x) = do
+  case x of
+    Nothing => loadExtLibrary
+    dirname => do
+      updateOptions (\o => record {extprelude = dirname} o)
+      loadExtLibrary
+
 doCommand (EvalPattern n) = do
   putStrLn "Eval Pattern"
   getAndEvalPattern n
@@ -77,9 +88,6 @@ doCommand (CheckExtPattern p s) = do
   putStrLn "Importing..."
   evalPatternFromFile (Just p) (Just s)
 
-doCommand (Quit) = pure ()
-
-doCommand Help = putStrLn showHelp
 
 runREPL : Eff () SifEffs
 runREPL = do

@@ -1,0 +1,60 @@
+sif solution
+
+solves absDataCreation
+makes pattern "Data Creation through the Factory Method"
+
+Solution "Factory Method" {
+
+  Property "Abstract Factory" {
+    Description """A mechanism to generate concrete classes based upon a predetermined decision procedure."""
+
+    Advantage "Separation" is Satisfied {
+       Affects {
+          Makes separateObjects,
+		  Makes agnosticObjectGeneration,
+		  Makes closedForModification,
+		  SomePos flexibleReplacement
+       }
+    }
+	Disadvantage "Choke Point" is Denied {
+       Affects {
+         Makes minimalDependancies
+       }
+    }
+  }
+
+  Property "Factory Client" {
+    Description """The function in the code base that utilises the factory to create objects."""
+
+    Advantage "Kept the Same" is Satisfied {
+      Affects {
+        Makes closedForModification,
+		Makes minimalDependancies
+      }
+    }
+  }
+
+  Property "Abstract Product Interface" {
+    Description """This represents the abstract representation of the data structure to be created. It is with this representation that developers will interact with the product."""
+
+	Advantage "Is Abstract" is Satisfied {
+	    Affects {
+  	      Makes separateObjects,
+		  Helps agnosticObjectGeneration
+		}
+    }
+  }
+
+  Property "Concrete Products" {
+    Description """
+This provides concrete representations of the data structure to be created.
+This will be used to implement the abstract data structure."""
+
+    Advantage "Is Real" is Satisfied {
+	  Affects {
+	      Makes separateObjects,
+		  Helps agnosticObjectGeneration
+		}
+    }
+  }
+}

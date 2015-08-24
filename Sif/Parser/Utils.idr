@@ -15,4 +15,19 @@ literallyBetweenLR l r =
 literallyBetween : Char -> Parser String
 literallyBetween c = literallyBetweenLR c c
 
+manyTill : Monad m => ParserT m String a
+                   -> ParserT m String b
+                   -> ParserT m String (List a)
+manyTill p end = scan
+  where
+    scan : Monad m => ParserT m String (List a)
+    scan = do { end; return List.Nil } <|>
+           do { x <- p; xs <- scan; return (x::xs)}
+
+literal : Parser String
+literal = do
+    token "\"\"\""
+    ss <- manyTill anyChar (token "\"\"\"")
+    pure (pack ss)
+
 -- --------------------------------------------------------------------- [ EOF ]

@@ -1,5 +1,10 @@
 %YAML 1.2
 ---
 pattern: {problem: infosec.problem.sif,        solution: asymmcrypto.solution.sif}
+pattern: {problem: infosec.problem.sif,        solution: symmcrypto.solution.sif}
+pattern: {problem: infosec.problem.sif,        solution: hybridcrypto.solution.sif}
+pattern: {problem: datacreation.problem.sif,   solution: simplefactory.solution.sif}
+pattern: {problem: datacreation.problem.sif,   solution: factorymethod.solution.sif}
+pattern: {problem: datacreation.problem.sif,   solution: abstractfactory.solution.sif}
 pattern: {problem: policyenforce.problem.sif,  solution: peppoint.solution.sif}
 ...

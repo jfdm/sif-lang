@@ -1,9 +1,9 @@
 sif solution
 
 solves infosec
-makes pattern "InfoSec through AsymCrypto"
+makes pattern "InfoSec through Hybrid Schemes"
 
-Solution "Asymmetric Cryptography" {
+Solution "Hybrid Cryptography" {
 
   Property "Public Key Pairs" {
     Advantage "Different Keys" is Satisfied {
