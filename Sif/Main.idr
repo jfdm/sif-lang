@@ -5,15 +5,16 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Sif.Main
 
-import public Sif.Parser
-import public Sif.Pattern
-import public Sif.API
-import public Sif.REPL
-import public Sif.Options
-import public Sif.Effs
-import public Sif.Error
-import public Sif.Library
-import public Sif.Prelude
+import System.
+
+import Sif.Parser
+import Sif.Pattern
+import Sif.API
+import Sif.REPL
+import Sif.Options
+import Sif.Effs
+import Sif.Error
+import Sif.Library
 
 runMode : Maybe SifMode -> Eff () SifEffs
 runMode Nothing     = sifREPL
@@ -40,14 +41,16 @@ runMode (Just Conv) = do
       Nothing => printPattern p (to os)
       Just _  => printLn FeatureNotImpl
 
-sifMain : List PATTERN -> Eff () SifEffs
-sifMain ps = do
+sifMain : Eff () SifEffs
+sifMain = do
     opts <- parseOptions
     putOptions opts
-    putLibrary (if (prelude opts)
-                 then addToLibraryM ps library
-                 else addToLibraryM ps emptyLib)
     loadExtLibrary
     runMode (mode opts)
+
+main : IO ()
+main = do
+  run $ sifMain
+  exit 0
 
 -- --------------------------------------------------------------------- [ EOF ]

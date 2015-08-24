@@ -7,19 +7,14 @@
 IDRIS   := idris
 LANGLIB := sif
 IOLIB   := sifio
-PRELUDE := sifprelude
 EXE     := sifexe
 MONO    := sifmono
 
-.PHONY: doc clobber check clean io lang linecount testLang testIO tests prelude all monolithic perfbuild
+.PHONY: doc clobber check clean io lang linecount testLang testIO tests all monolithic perfbuild
 
 lang:
 	${IDRIS} --build ${LANGLIB}.ipkg
 	${IDRIS} --install ${LANGLIB}.ipkg
-
-prelude:
-	${IDRIS} --build ${PRELUDE}.ipkg
-	${IDRIS} --install ${PRELUDE}.ipkg
 
 io:
 	${IDRIS} --build ${IOLIB}.ipkg

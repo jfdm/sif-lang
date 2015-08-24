@@ -17,7 +17,6 @@ import Sif.Error
 import Sif.Pattern
 import Sif.Library
 import Sif.Parser
-import Sif.Prelude
 import Sif.Options
 
 %default partial
@@ -166,7 +165,7 @@ importPreludeIDX nspace ((p,s)::ps) = do
 loadExtLibrary : Eff () SifEffs
 loadExtLibrary = do
     opts <- getOptions
-    case (extprelude opts) of
+    case (prelude opts) of
       Nothing   => pure ()
       Just pdir => do
         case !(readYAMLConfig (pdir ++ "/index.yaml")) of
@@ -199,6 +198,5 @@ getAndPrintPattern : Nat -> Maybe SifOutFormat -> Eff () SifEffs
 getAndPrintPattern n fmt = do
   p <- getPatternByIndexEff n
   printPattern p fmt
-
 
 -- --------------------------------------------------------------------- [ EOF ]

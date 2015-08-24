@@ -2,8 +2,8 @@ package sifexe
 
 opts = "-p effects -p containers -p grl -p lightyear -p config -p edda -p graphviz -p xml -p argparse -p sif -p sifprelude -p sifio --typeintype"
 
-modules = Main
+modules = Sif.Main
 
-main = Main
+main = Sif.Main
 
 executable = sifc

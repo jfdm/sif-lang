@@ -77,7 +77,7 @@ doCommand (PreludeLoad x) = do
   case x of
     Nothing => loadExtLibrary
     dirname => do
-      updateOptions (\o => record {extprelude = dirname} o)
+      updateOptions (\o => record {prelude = dirname} o)
       loadExtLibrary
 
 doCommand (EvalPattern n) = do

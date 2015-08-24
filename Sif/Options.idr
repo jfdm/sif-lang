@@ -37,29 +37,28 @@ record SifOpts where
   mode       : Maybe SifMode
   out        : Maybe String
   to         : Maybe SifOutFormat
-  extprelude : Maybe String
-  prelude    : Bool
+  prelude    : Maybe String
   banner     : Bool
 
 
 defOpts : SifOpts
 defOpts = MkSOpts
     Nothing Nothing (Just REPL) Nothing Nothing Nothing
-    False True
+    True
 
 instance Default SifOpts where
   default = defOpts
 
-instance Eq SifOpts where
-  (==) (MkSOpts a b c d e f g h) (MkSOpts a' b' c' d' e' f' g' h') =
-    a' == a && b' == b && c' == c && d' == d &&
-    e' == e && f' == f && g' == g && h' == h
+-- instance Eq SifOpts where
+--   (==) (MkSOpts a b c d e f g h) (MkSOpts a' b' c' d' e' f' g' h') =
+--     a' == a && b' == b && c' == c && d' == d &&
+--     e' == e && f' == f && g' == g && h' == h
 
 convOpts : Arg -> SifOpts -> Maybe SifOpts
 convOpts (Files xs)     o = Nothing
 convOpts (KeyValue k v) o =
   case k of
-    "extprelude" => Just $ record {extprelude = Just v}       o
+    "prelude"    => Just $ record {prelude    = Just v}       o
     "problem"    => Just $ record {pSpec      = Just v}       o
     "solution"   => Just $ record {sSpec      = Just v}       o
     "out"        => Just $ record {out        = Just v}       o
@@ -73,7 +72,6 @@ convOpts (Flag x) o =
     "eval"     => Just $ record {mode    = Just Eval}  o
     "conv"     => Just $ record {mode    = Just Conv}  o
     "nobanner" => Just $ record {banner  = False}      o
-    "prelude"  => Just $ record {prelude = True}       o
     otherwise => Nothing
 
 helpStr : String
@@ -83,7 +81,7 @@ Available Options:
 
 Flag                 | Description
 ---------------------|----------------------------------------------------------
---extprelude="<dir>" | Load an externally defined prelude.
+--prelude="<dir>"    | Load an externally defined prelude.
 --problem="<fname>"  | A problem specification.
 --solution="<fname"  | A solution specification.
 --out="<fname>"      | File name to save things to.
@@ -95,7 +93,6 @@ Flag                 | Description
 --eval               | Evaluate problem solution pairing
 --conv               | Convert problem solution pairing
 --nobanner           | Don't display banner
---prelude            | Load the default prelude.
 """
 
 -- --------------------------------------------------------------------- [ EOF ]
