@@ -1,12 +1,11 @@
 sif solution
 
-solves infosec
-makes pattern "InfoSec through Hybrid Schemes"
 
-Solution "Hybrid Cryptography" {
+
+Solution "Symmetric Cryptography" solves infosec {
 
   Property "Public Key Pairs" {
-    Advantage "Different Keys" is Satisfied {
+    Advantage "Same Keys" is Satisfied {
        Affects {
           Makes recipConf
        }
@@ -16,9 +15,10 @@ Solution "Hybrid Cryptography" {
          Hurts multiSecLevels
        }
     }
-    Advantage "Key Pair" is Satisfied {
+    Disadvantage "Single Key" is Satisfied {
 	   Affects {
-	     Helps dataConf
+	     Hurts dataConf,
+		 Hurts recipConf
 	   }
 	}
   }
@@ -29,9 +29,9 @@ Solution "Hybrid Cryptography" {
         Makes dataConf
       }
     }
-    Disadvantage "Computationally Expensive" is WeakSatis {
+    Advantage "Computationally InExpensive" is Satisfied {
      Affects {
-       Hurts mechPerf
+       Helps mechPerf
      }
     }
     Advantage "Maths well studied" is Satisfied {

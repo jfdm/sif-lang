@@ -1,0 +1,81 @@
+sif solution
+
+Description """Information Secrecy is about keeping data confidential. Public key encryption provides a mathematically guaranteed mechanism that allows data to be obfuscated such that only the recipient can reconstitute the messages original meaning."""
+
+Solution "Public Key Cryptography" solves infosec {
+
+  Description """Public key crypto schemes are an application of asymmetric cryptography in which the public/private key pair is used for encryption/decryption respectively. Asymmetric crypto schemes consist of three algorithms.
+
++ keygen :: Given a security parameter generates a public private key pair.
++ encrypt :: Given a public key and a message, encrypts the message under the given public key.
++ decrypt :: Given a private key and a ciphertext, =decrypt= returns a readable plaintext if the private key was paired with the ciphertexts encryption key.
+"""
+
+  Property "Maths Algorithm" {
+    Description "The underlying mathematical algorithm that provides the asymmetric cipher used."
+    Advantage "Formal Guarantee" is Satisfied {
+	  Description "There will be a formal proof of the operations working."
+      Affects { Helps dataConf, Helps recipConf }
+    }
+
+    Disadvantage "Computationally Expensive" is WeakSatis {
+	  Description "The maths algorithm is generally computationally expensive on large data."
+      Affects { Hurts mechPerf, Hurts minDisrupt}
+    }
+
+  }
+
+  Property "Implementation in Code" {
+    Description "The Implementation"
+	Trait "Implementation InSecure" is WeakSatis {
+	  Description "There is possibility that the implementation of the algorithm is insecure/poor."
+	  Affects {
+	    SomeNeg recipConf, SomeNeg dataConf, Unknown minDisrupt, SomeNeg secureImpl
+	  }
+	}
+	Trait "Implementation obfuscates understanding" is WeakDen {
+	  Description "Some implementations really make it hard to understand things"
+	  Affects { Hurts understandable, Hurts minDisrupt}
+    }
+  }
+
+  Property "Key Pairs" {
+    Description "There are two keys in use."
+    Advantage "PublicEnc/PrivateDec Keys" is Satisfied {
+	  Description "Reduces problems with Key Security"
+       Affects { Makes recipConf by "Only recipient has key to unlock the message"}
+    }
+	Trait "Key Distribution" is Satisfied {
+	   Description "A means of key distribution is required to ensure that public key ownership can be attested."
+       Affects {
+         SomeNeg recipConf by "Keys are distributed insecurely.",
+		 SomeNeg minDisrupt by "Incorrect Distribution."
+       }
+    }
+    Trait "Key Management" is Satisfied {
+	   Description "This solution requires the management of keys. That is, for each recipient the sender has to obtain a encryption key."
+	   Affects {
+	     SomeNeg dataConf by "Possibly sending data encrypted under the wrong key."
+	   }
+	}
+  }
+
+  Property "Variable Security Parameters" {
+    Description "Different algorithm's will have different security parameters, and may allow different key lengths."
+    Advantage "Greater Security" is Satisfied {
+	  Description "Many algorithms have variable security levels. Data can been secured at various levels."
+	    Affects { Helps multiSecLevels }
+	}
+   Trait "Parameter Selection" is Satisfied {
+     Description "Common parameters are required to be selected and agreed upon."
+        Affects {
+		    SomeNeg multiSecLevels by "insecure parameters being selected."
+		  , SomeNeg secureImpl     by "insecure paremeters being selected."
+		}
+   }
+   Disadvantage "Parameter Computation" is Satisfied {
+     Description "Some parameters though secure might occur a greater processing cost."
+       Affects { Hurts mechPerf, Hurts minDisrupt }
+   }
+  }
+}

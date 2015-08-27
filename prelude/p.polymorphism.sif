@@ -1,8 +1,10 @@
-sif problem absDataCreation as "Making Data Creation Abstract"
+sif problem
+
+Problem "Polymorphic Data Usage" as polymorph
 
 Description """
 Given an abstract description of an data structure together with several concrete implementations of these data structure.
-The problem is how to present, create, and serve objects using their abstract representation without exposing their concrete implementation.
+The problem is how to present, create, serve, and work with data using an abstract representation without exposing their concrete implementation.
 """
 
 separateObjects <- Functional "Separate Data Structures"
@@ -17,7 +19,7 @@ The solution must allow for the generation of data structure instances without k
 
 closedForModification <- Functional "Closed for Modification"
 """
-The creation of objects should be closed for modification.
+The creation and use of data instances should be closed for modification.
 """
 
 flexibleReplacement <- Functional "Flexible Replacement"
@@ -28,4 +30,9 @@ There should be an ability to replace the method of creation easily.
 minimalDependancies <- Supportability "Minimal Dependencies"
 """
 The resulting code should have minimal dependencies.
+"""
+
+languageAgnostic <- Functional "Language Agnostic"
+"""
+The solution should limit the use of language specific features.
 """

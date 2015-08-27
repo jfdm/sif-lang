@@ -1,0 +1,52 @@
+sif solution
+
+Description """
+Defines an interface for creating data but lets the subclasses decide which class to instantiate. Factory method lets a class defer instantiation to subclasses.
+"""
+
+Solution "Factory Methods" solves polymorph {
+  Property "Creators with Interfaces" {
+    Description """
+Utilisation of a generic construction mechanism that contains the implementation/manipulate details common for all products, aside from the actual construction mechanism.
+
+Concrete mechanisms will extend the generic mechanism to perform construction of the products. It is these concrete mechanisms that are responsible for creating one or more concrete products, and is the only mechanism with knowledge of this creation.
+"""
+	Advantage "Generic Creators" is Satisfied {
+      Affects {
+	    Helps agnosticObjectGeneration,
+		Helps separateObjects,
+		Helps closedForModification,
+		Helps flexibleReplacement
+      }
+	}
+  }
+  Property "Product with an Interface" {
+    Description """
+Provision of a generic interface which all product implementations must satisfy.
+This allows for products to be used agnostic to their implementation.
+"""
+    Advantage "Using Products Interfaces" is Satisfied {
+	  Description "Facilitates the actual separation of product implementation and creation"
+	  Affects {
+	    Helps separateObjects,
+		Helps closedForModification,
+		Helps flexibleReplacement
+      }
+    }
+	Disadvantage "Single Product" is WeakSatis {
+	  Description "Only a single product is created"
+	  Affects {
+		  SomeNeg separateObjects by "restricting the factory to a single product."
+		, SomeNeg minimalDependancies by "Multiple products will require multiple creators"
+      }
+    }
+  }
+  Property "Possibly Language Agnostic" {
+    Description """The techniques used for decoupling product descriptions and implementations are not bespoke to a single language. This decoupling can be achieved using inheritance, interfaces, typeclasses, traits."""
+	Advantage "Lang Agnostic Techniques" is WeakSatis {
+	  Affects {
+	    Helps languageAgnostic
+	  }
+    }
+  }
+}

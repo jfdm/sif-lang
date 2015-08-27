@@ -1,9 +1,6 @@
 sif solution
 
-solves absDataCreation
-makes pattern "Simple Factory Pattern"
-
-Solution "Simple Factory" {
+Solution "Simple Factory" solves polymorph {
 
   Property "Factory" {
     Description """A mechanism to generate concrete classes based upon a predetermined decision procedure."""

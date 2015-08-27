@@ -1,4 +1,6 @@
-sif problem accesscontrol as "Access Control"
+sif problem
+
+Problem "Access Control" as accesscontrol
 
 control     <- Functional "Access Restriction"
 indy        <- Functional "Application Independence"

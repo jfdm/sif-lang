@@ -1,4 +1,6 @@
-sif problem policyenforce as "Policy Enforcement"
+sif problem
+
+Problem "Policy Enforcement" as policyenforce
 
 enforcement    <- Functional "Policy Enforcement"
 timely         <- Functional "Timely Enforcement"

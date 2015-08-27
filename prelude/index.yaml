@@ -1,10 +1,11 @@
 %YAML 1.2
 ---
-pattern: {problem: infosec.problem.sif,        solution: asymmcrypto.solution.sif}
-pattern: {problem: infosec.problem.sif,        solution: symmcrypto.solution.sif}
-pattern: {problem: infosec.problem.sif,        solution: hybridcrypto.solution.sif}
-pattern: {problem: datacreation.problem.sif,   solution: simplefactory.solution.sif}
-pattern: {problem: datacreation.problem.sif,   solution: factorymethod.solution.sif}
-pattern: {problem: datacreation.problem.sif,   solution: abstractfactory.solution.sif}
-pattern: {problem: policyenforce.problem.sif,  solution: peppoint.solution.sif}
+pattern: {problem: p.infosec.sif,        solution: s.crypto.asymm.sif}
+pattern: {problem: p.infosec.sif,        solution: s.crypto.pkenc.sif}
+pattern: {problem: p.infosec.sif,        solution: s.crypto.symm.sif}
+pattern: {problem: p.infosec.sif,        solution: s.crypto.hybrid.sif}
+pattern: {problem: p.polymorphism.sif,   solution: s.factory.simple.sif}
+pattern: {problem: p.polymorphism.sif,   solution: s.factory.method.sif}
+pattern: {problem: p.polymorphism.sif,   solution: s.factory.abstract.sif}
+pattern: {problem: p.policy.enforce.sif, solution: s.pep.sif}
 ...

@@ -1,9 +1,6 @@
 sif solution
 
-solves policyenforce
-makes pattern "Policy Enforcement Points"
-
-Solution "Policy Enforcement Points" {
+Solution "Policy Enforcement Points" solves policyenforce {
 
   Property "Abstract Definition" {
     Advantage "Agnostic" is Satisfied {

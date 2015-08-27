@@ -1,6 +1,0 @@
-sif problem infosec as "Information Secrecy"
-
-dataConf       <- Functional "Data Confidentiality"
-recipConf      <- Functional "Recipient Confidentiality"
-multiSecLevels <- Performance "Suitable Security Level"
-mechPerf       <- Performance "Suitable performance"

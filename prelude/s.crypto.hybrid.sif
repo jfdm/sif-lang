@@ -1,0 +1,69 @@
+sif solution
+
+Description """Provides information security through the provision on
+ an efficient public-key crypto-scheme."""
+
+Solution "Hybrid Cryptography" solves infosec {
+
+  Description """Asymmetric Schemes allow for cryptographic keys to be made separate for encryption and decryption, but have an operational complexity that increases with the size of the data to be encrypted. Symmetric schemes have low operational complexity, but require the use of a shared key. These schemes can be combined to provide an efficient solution using asymmetric cryptography to information security."""
+
+  Property "Data Encapsulation Mechanism" {
+    Description "A symmetric cipher to encrypt the data to be protected."
+	Advantage "Efficient Computation" is Satisfied {
+	  Affects { Helps mechPerf }
+    }
+
+    Disadvantage "Symm Algorithm Selection" is WeakSatis {
+	  Description "Bad algorithm leads to possible insecure data."
+	  Affects { SomeNeg dataConf }
+    }
+
+	Disadvantage "Symm Key" is WeakSatis {
+	  Description "If symmetric key gets exposed. security is weakened."
+	  Affects { SomeNeg recipConf}
+    }
+  }
+
+  Property "Key Encapsulation Mechanism" {
+    Description "An asymmetric cipher to encrypt the data key."
+	Advantage "Provides Asymmetric Access" is Satisfied {
+	  Affects { Helps dataConf, Helps recipConf }
+    }
+	Trait "Asymm Algorithm Setup" is WeakSatis {
+	  Description "A poor algorithm leads to insecurities"
+	  Affects { SomeNeg dataConf, SomeNeg recipConf }
+    }
+
+	Trait "Asymm Algorithm Selection" is WeakSatis {
+	  Description "Bad algorithm leads to possible insecure symmetric key"
+	  Affects { SomeNeg recipConf, SomeNeg dataConf }
+    }
+
+	Disadvantage "Requires PKI" is WeakSatis {
+	  Description "Use of asymmetric crypto requires a public key infrastructure to ensure that public encryption keys ownership can be attested."
+	  Affects { SomeNeg recipConf }
+    }
+  }
+
+  Property "Security Parameters" {
+    Trait "Variable Asymm Key Length" is Satisfied {
+	  Description "Variable key length"
+	  Affects {Helps multiSecLevels, Hurts mechPerf}
+    }
+    Trait "Greater Security" is Satisfied {
+	    Affects {
+	      Helps multiSecLevels
+		}
+	}
+   Disadvantage "Parameter Selection" is Satisfied {
+        Affects {
+		  Hurts multiSecLevels
+		}
+   }
+   Disadvantage "Parameter Computation" is Satisfied {
+       Affects {
+	     Hurts mechPerf
+	   }
+   }
+  }
+}
