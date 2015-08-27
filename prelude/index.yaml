@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
-pattern: {problem: p.infosec.sif,        solution: s.crypto.asymm.sif}
 pattern: {problem: p.infosec.sif,        solution: s.crypto.pkenc.sif}
+pattern: {problem: p.infosec.sif,        solution: s.crypto.asymm.sif}
 pattern: {problem: p.infosec.sif,        solution: s.crypto.symm.sif}
 pattern: {problem: p.infosec.sif,        solution: s.crypto.hybrid.sif}
 pattern: {problem: p.polymorphism.sif,   solution: s.factory.simple.sif}

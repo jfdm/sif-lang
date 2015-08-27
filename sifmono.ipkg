@@ -8,7 +8,6 @@ executable = sifc
 
 modules = Effect.Logging.Level
         , Effect.Logging.Default
-        , Effect.Logging.Category
 
         , Sif.Pattern.Utils
         , Sif.Pattern.Common

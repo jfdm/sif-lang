@@ -19,6 +19,8 @@ import XML.DOM
 import Sif.Pattern.Common
 import Sif.Pattern.Utils
 
+import Debug.Trace
+
 %access public
 %default total
 
@@ -130,15 +132,10 @@ interpSolt s ps = ISolt root (Sigma.getProof elems)
     elems : (es ** DList GTy GLang es)
     elems = (_ ** [root, cs] ++ (Sigma.getProof getDecls))
 
-interpPatt : String
-          -> InterpRes tyPROBLEM
+interpPatt : InterpRes tyPROBLEM
           -> InterpRes tySOLUTION
           -> InterpRes tyPATTERN
-interpPatt s (IProb rP m) (ISolt rS is) = IPatt model
-  where
-    model : GModel
-    model = let (_ ** ds) = groupDecls is in
-        DList.foldl (flip $ insert) m ds
+interpPatt (IProb rP m) (ISolt rS is) = IPatt (DList.foldl (flip $ insert) m (getProof $ groupDecls is))
 
 
 -- ----------------------------------------- [ Private Internal Data Structure ]
@@ -180,7 +177,7 @@ data SifPriv : InterpRes ty -> SifTy -> Type where
               -> (desc : Maybe String)
               -> SifPriv p tyPROBLEM
               -> SifPriv s tySOLUTION
-              -> SifPriv (interpPatt title p s) tyPATTERN
+              -> SifPriv (interpPatt p s) tyPATTERN
 
 getReqTitle : SifPriv i tyREQ -> String
 getReqTitle (priv__mkReq ty t d) = t

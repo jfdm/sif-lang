@@ -139,6 +139,7 @@ buildPatternFromFile p s = do
   p' <- problemFromFile p
   s' <- solutionFromFile s
   st <- getBuildState
+  trace $ unwords ["Building Pattern", show $ pattTitle st]
   pure $ mkPattern (pattTitle st) (pattDesc st) p' s'
 
 

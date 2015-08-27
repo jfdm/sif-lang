@@ -17,6 +17,8 @@ import public Sif.Pattern.Common
 import Sif.Pattern.Model
 import Sif.Pattern.Utils
 
+import Debug.Trace
+
 %default total
 %access public
 
