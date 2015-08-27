@@ -58,11 +58,14 @@ requirement = do
 
 problem : Parser $ ProbAST ProbTy
 problem = do
-    lexeme $ string "sif"
-    lexeme $ string "problem"
-    i <- ident
-    lexeme $ string "as"
+    keyword "sif"
+    string "problem"
+    eol
+    space
+    keyword "Problem"
     t <- title
+    keyword "as"
+    i <- ident
     space
     d <- opt desc
     rs <- many requirement

@@ -44,8 +44,12 @@ printResults res      =
       Nothing    => Sif.raise ResultInvalid
       (Just str) => putStrLn str
   where
+    showSValue : Maybe SValue -> String
+    showSValue Nothing  = "Nothing"
+    showSValue (Just x) = show x
+
     printNode : GoalNode -> String
-    printNode x = unwords [ show $ getSValue x, "==>", getNodeTitle x]
+    printNode x = unwords [ showSValue (getSValue x), "==>\t", getNodeTitle x]
 
 ||| Syntax check a Problem or a solution pairing.
 doSyntaxCheck : Maybe String -> Maybe String -> Eff () SifEffs
@@ -152,9 +156,10 @@ filterPreludeIDX doc = mapMaybe (getPSPair) $ getPatternKVPairs doc
 importPreludeIDX : String -> List (String, String) -> Eff () SifEffs
 importPreludeIDX _      Nil         = pure ()
 importPreludeIDX nspace ((p,s)::ps) = do
-    putStrLn $ unlines [ "Trying to build:"
-                       , "\tProblem File: " ++ show (pDir p)
-                       , "\tSolution File: " ++ show (pDir s)]
+    putStrLn $ unwords ["Importing Prelude:", nspace]
+    info $ unlines [ "Trying to build:"
+                   , "\tProblem File: "  ++ show (pDir p)
+                   , "\tSolution File: " ++ show (pDir s)]
     patt <- buildPatternFromFile (pDir p) (pDir s)
     updateLibrary (\idx => addToLibrary patt idx)
     importPreludeIDX nspace ps
@@ -162,8 +167,9 @@ importPreludeIDX nspace ((p,s)::ps) = do
     pDir : String -> String
     pDir f = nspace ++ "/" ++ f
 
-loadExtLibrary : Eff () SifEffs
-loadExtLibrary = do
+loadPrelude : Eff () SifEffs
+loadPrelude = do
+    putLibrary emptyLib
     opts <- getOptions
     case (prelude opts) of
       Nothing   => pure ()

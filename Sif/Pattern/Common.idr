@@ -28,11 +28,12 @@ instance Show RTy where
   show PERF = "Performance"
   show SUPP = "Supportability"
 
-data TTy = ADV  | DIS
+data TTy = ADV  | DIS | GEN
 
 instance Show TTy where
   show ADV = "Advantage"
   show DIS = "Disadvantage"
+  show GEN = "Trait"
 
 data STy = ABSTRACT | CONCRETE
 

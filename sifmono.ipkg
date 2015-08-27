@@ -6,7 +6,11 @@ main = Sif.Main
 executable = sifc
 
 
-modules = Sif.Pattern.Utils
+modules = Effect.Logging.Level
+        , Effect.Logging.Default
+        , Effect.Logging.Category
+
+        , Sif.Pattern.Utils
         , Sif.Pattern.Common
         , Sif.Pattern.Model
         , Sif.Pattern

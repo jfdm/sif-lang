@@ -26,10 +26,12 @@ readSifFile : Parser a
            -> String
            -> Eff a SifEffs
 readSifFile p f = do
+    trace $ unwords ["Reading file:", f]
     case !(open f Read) of
       True => do
         src <- readAcc ""
         close
+        trace "Parsing File"
         case parse p src of
           Left err  => Sif.raise (ParseError f err)
           Right res => pure res
@@ -66,13 +68,16 @@ doRQs xs = do
 
 getProblemEff : ProbAST ProbTy -> Eff PROBLEM SifEffs
 getProblemEff (MkProb i t d rs) = do
+    trace "Building problem specification"
     rs' <- doRQs rs
     let p = mkProblem t d rs'
-    updateBuildState (\st => record {getProb = (i, Just p)} st)
+    updateBuildState (\st => record { getProb   = (i, Just p)
+                                    , pattTitle = t} st)
     pure p
 
 problemFromFile : String -> Eff PROBLEM SifEffs
 problemFromFile s = do
+    trace "Fetching problem specification"
     past <- readSifFile problem s
     rval <- getProblemEff past
     pure $ rval
@@ -81,38 +86,45 @@ problemFromFile s = do
 
 
 buildAffect : SolAST AffectTy -> Eff TLINK SifEffs
-buildAffect (Affects c i) = do
+buildAffect (Affects c i d) = do
+  debug $ unwords ["Building Affect for", show i]
   st <- getBuildState
   case lookup i (getRQs st) of
     Nothing => Sif.raise (IDMissing i)
-    Just r  => pure $ mkLink c r
+    Just r  => pure $ mkLink c r d
 
 buildTrait : SolAST TraitTy -> Eff TRAIT SifEffs
 buildTrait (Trait ty t v d as) = do
+  debug $ unwords ["Building Trait", show t]
   as' <- mapE (\x => buildAffect x) as
   case ty of
+    GEN => pure $ mkTrait t d v as'
     ADV => pure $ mkAdvantage t d v as'
     DIS => pure $ mkDisadvantage t d v as'
 
 buildProperty : SolAST PropTy -> Eff PROPERTY SifEffs
 buildProperty (Property t d ts) = do
+  debug $ unwords ["Building Property", show t]
   ts' <- mapE (\x => buildTrait x) ts
   pure $ mkProperty t d ts'
 
 buildSolution : SolAST SolTy -> Eff SOLUTION SifEffs
 buildSolution (Solution t pID d ps) = do
+  trace "Building solution specification"
   st <- getBuildState
   let pID' = fst $ getProb st
   if not (pID' == pID)
     then Sif.raise (ProblemMissing pID')
     else do
       ps' <- mapE (\p => buildProperty p) ps
+      updateBuildState (\st => record {pattTitle = unwords [pattTitle st, "through",t]} st)
       pure $ mkSolution t d ps'
 
 solutionFromFile : String -> Eff SOLUTION SifEffs
 solutionFromFile f = do
-    (pt, sast) <- readSifFile solution f
-    updateBuildState (\st => record {getPData = pt} st)
+    trace "Fetching Solution Specification"
+    (pd, sast) <- readSifFile solution f
+    updateBuildState (\st => record {pattDesc = pd} st)
     sval <- buildSolution sast
     pure sval
 
@@ -127,7 +139,7 @@ buildPatternFromFile p s = do
   p' <- problemFromFile p
   s' <- solutionFromFile s
   st <- getBuildState
-  pure $ mkPattern (fst $ getPData st) (snd $ getPData st) p' s'
+  pure $ mkPattern (pattTitle st) (pattDesc st) p' s'
 
 
 -- --------------------------------------------------------------------- [ EOF ]

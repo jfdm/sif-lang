@@ -10,10 +10,11 @@ record BuildState where
   constructor MkSState
   getProb  : (String, Maybe PROBLEM)
   getRQs   : List (String, REQUIREMENT)
-  getPData : (String, Maybe String)
+  pattTitle : String
+  pattDesc  : Maybe String
 
 defBuildSt : BuildState
-defBuildSt = MkSState ("", Nothing) Nil ("", Nothing)
+defBuildSt = MkSState ("", Nothing) Nil "" Nothing
 
 instance Default BuildState where
   default = defBuildSt

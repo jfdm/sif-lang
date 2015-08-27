@@ -12,6 +12,7 @@ import public Effect.State
 import public Effect.Exception
 import public Effect.File
 import public Effect.StdIO
+import public Effect.Logging.Default
 
 import public ArgParse
 
@@ -36,6 +37,7 @@ SifEffs : List EFFECT
 SifEffs = [ FILE_IO ()
           , SYSTEM
           , STDIO
+          , LOG
           , 'sif      ::: EXCEPTION SifError
           , 'argparse ::: EXCEPTION ArgParseError
           , 'sstate   ::: STATE SifState

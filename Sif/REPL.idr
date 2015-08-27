@@ -75,10 +75,10 @@ doCommand (ListLib) = do
 
 doCommand (PreludeLoad x) = do
   case x of
-    Nothing => loadExtLibrary
+    Nothing => loadPrelude
     dirname => do
       updateOptions (\o => record {prelude = dirname} o)
-      loadExtLibrary
+      loadPrelude
 
 doCommand (EvalPattern n) = do
   putStrLn "Eval Pattern"

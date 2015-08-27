@@ -45,7 +45,8 @@ sifMain : Eff () SifEffs
 sifMain = do
     opts <- parseOptions
     putOptions opts
-    loadExtLibrary
+    setLogLvl (loglvl opts)
+    loadPrelude
     runMode (mode opts)
 
 main : IO ()

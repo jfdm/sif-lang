@@ -23,6 +23,7 @@ data SolASTty = SolTy | PropTy | TraitTy | AffectTy
 data SolAST : SolASTty -> Type where
   Affects : (value : CValue)
          -> (id : String)
+         -> (desc : Maybe String)
          -> SolAST AffectTy
   Trait : TTy
        -> (title : String)
@@ -42,27 +43,28 @@ data SolAST : SolASTty -> Type where
 
 -- ----------------------------------------------------------------- [ Parsers ]
 traitTy : Parser TTy
-traitTy = (lexeme $ string "Advantage"    *> return ADV)
-      <|> (lexeme $ string "Disadvantage" *> return DIS)
+traitTy = (keyword "Advantage"    *> return ADV)
+      <|> (keyword "Disadvantage" *> return DIS)
+      <|> (keyword "Trait"        *> return DIS)
       <?> "Trait Type"
 
 cValue : Parser CValue
-cValue = (lexeme $ string "Makes"   *> return MAKES)
-     <|> (lexeme $ string "Helps"   *> return HELPS)
-     <|> (lexeme $ string "SomePos" *> return SOMEPOS)
-     <|> (lexeme $ string "Unknown" *> return UNKNOWN)
-     <|> (lexeme $ string "SomeNeg" *> return SOMENEG)
-     <|> (lexeme $ string "Breaks"  *> return BREAK)
-     <|> (lexeme $ string "Hurts"   *> return HURTS)
+cValue = (keyword "Makes"   *> return MAKES)
+     <|> (keyword "Helps"   *> return HELPS)
+     <|> (keyword "SomePos" *> return SOMEPOS)
+     <|> (keyword "Unknown" *> return UNKNOWN)
+     <|> (keyword "SomeNeg" *> return SOMENEG)
+     <|> (keyword "Breaks"  *> return BREAK)
+     <|> (keyword "Hurts"   *> return HURTS)
      <?> "CValue"
 
 sValue : Parser SValue
-sValue = (lexeme $ string "Denied"    *> return DENIED)
-     <|> (lexeme $ string "WeakDen"   *> return WEAKDEN)
-     <|> (lexeme $ string "WeakSatis" *> return WEAKSATIS)
-     <|> (lexeme $ string "Satisfied" *> return SATISFIED)
-     <|> (lexeme $ string "Undecided" *> return UNDECIDED)
-     <|> (lexeme $ string "None"      *> return NONE)
+sValue = (keyword "Denied"    *> return DENIED)
+     <|> (keyword "WeakDen"   *> return WEAKDEN)
+     <|> (keyword "WeakSatis" *> return WEAKSATIS)
+     <|> (keyword "Satisfied" *> return SATISFIED)
+     <|> (keyword "Undecided" *> return UNDECIDED)
+     <|> (keyword "None"      *> return NONE)
      <?> "Trait Type"
 
 affect : Parser $ SolAST AffectTy
@@ -70,7 +72,9 @@ affect = do
     c <- cValue
     space
     i <- ident
-    pure $ Affects c i
+    space
+    d <- opt $ (keyword "by" *> descString)
+    pure $ Affects c i d
   <?> "Affects"
 
 trait : Parser $ SolAST TraitTy
@@ -111,24 +115,21 @@ property = do
         pure (d, ts)
       <?> "Property Body"
 
-solution : Parser $ ((String, Maybe String), SolAST SolTy)
+solution : Parser $ (Maybe String, SolAST SolTy)
 solution = do
       keyword "sif"
       space
-      keyword "solution"
-      space
-      keyword "solves"
-      pID <- ident
-      keyword "makes"
-      space
-      keyword "pattern"
-      pt <- title
+      string "solution"
+      eol
       space
       pd <- opt desc
       keyword "Solution"
       t <- title
+      keyword "solves"
+      space
+      pID <- ident
       (d,ps) <- braces $ body
-      pure $ ((pt,pd), Solution t pID d ps)
+      pure $ (pd, Solution t pID d ps)
     <?> "Solution"
   where
     body : Parser (Maybe String, List $ SolAST PropTy)

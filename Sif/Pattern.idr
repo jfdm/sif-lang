@@ -136,8 +136,16 @@ getProblemTitle (MkExpr p) = doGet p
 
 -- --------------------------------------------------------------- [ Solutions ]
 
-mkLink : CValue -> REQUIREMENT -> TLINK
-mkLink c r = MkExpr $ priv__mkTLink c (Sigma.getProof $ convR r)
+mkLink : CValue -> REQUIREMENT -> Maybe String ->  TLINK
+mkLink c r d = MkExpr $ priv__mkTLink c (Sigma.getProof $ convR r) d
+
+mkTrait : String
+       -> Maybe String
+       -> SValue
+       -> (ts : TLINKS)
+       -> TRAIT
+mkTrait t d s rs =
+    MkExpr $ priv__mkTrait GEN t d s (Sigma.getProof $ conv rs)
 
 mkAdvantage : String
            -> Maybe String

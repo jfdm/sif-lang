@@ -65,12 +65,14 @@ interpTrait : String
 interpTrait s m es ty = ITrait node cs
   where
     sVal : SValue -> SValue
-    sVal v = case ty of
+    sVal v = case ty of  -- Disadvantages...
+               GEN => v
                ADV => v
                DIS => invertEval v
 
     tVal : String
     tVal = case ty of
+             GEN => "Trait General:"
              ADV => "Trait Advantage: "
              DIS => "Trait Disadvantage: "
 
@@ -153,8 +155,9 @@ data SifPriv : InterpRes ty -> SifTy -> Type where
               -> SifPriv (interpProb title xs) tyPROBLEM
 
   priv__mkTLink : (cval : CValue)
-              -> SifPriv r tyREQ
-              -> SifPriv (interpTLink cval r) tyTRAITend
+               -> (req : SifPriv r tyREQ)
+               -> (desc : Maybe String)
+               -> SifPriv (interpTLink cval r) tyTRAITend
 
   priv__mkTrait : (ty : TTy)
                -> (title : String)
@@ -187,31 +190,31 @@ getReqTitle (priv__mkReq ty t d) = t
 covering
 showSifPriv : SifPriv i ty -> String
 showSifPriv (priv__mkReq ty t d) = with List
-    unwords ["\t\t", show ty, show t]
+    unwords ["   ", show ty, show t]
 
 showSifPriv (priv__mkProb t d rs) = with List
-    unwords [ "\t Problem:", show t, "\n"
+    unwords [ "  Problem:", show t, "\n"
             , unlines $ mapDList (\x => showSifPriv x) rs
             , "\n"]
 
-showSifPriv (priv__mkTLink cval r) = with List
-    unwords ["\t\t\t\t", show cval, (getReqTitle r), "\n"]
+showSifPriv (priv__mkTLink cval r d) = with List
+    unwords ["       ", show cval, (getReqTitle r), "\n"]
 
 showSifPriv (priv__mkTrait ty t d s rs) = with List
     unwords [
-        "\t\t\t", show ty, ":" , show t , "is", show s , "\n"
+        "     ", show ty, ":" , show t , "is", show s , "\n"
       , concat (mapDList (showSifPriv) rs)
       , "\n"]
 
 showSifPriv (priv__mkProp t d ts) = with List
     unwords [
-        "\t\t Property: " , t , "\n"
+        "     Property: " , t , "\n"
      , concat (mapDList (showSifPriv) ts)
      , "\n"]
 
 showSifPriv (priv__mkSolt t d ps) = with List
     unwords [
-         "\t Solution: " , t , "\n"
+         "  Solution: " , t , "\n"
       , Foldable.concat (mapDList showSifPriv ps)
       , "\n"]
 
@@ -237,15 +240,15 @@ toOrg (priv__mkProb t d rs) = with List
         fromMaybe "" d, "\n\n",
         (concat $ intersperse "\n" (mapDList (\x => toOrg x) rs)), "\n\n"]
 
-toOrg (priv__mkTLink cval r) = with List
-    unwords ["|", show cval, "|", (getReqTitle r), " |\n"]
+toOrg (priv__mkTLink cval r d) = with List
+    unlines [ unwords ["****", concat ["/",show cval, "/"], (getReqTitle r)]
+            , fromMaybe "" d, "\n\n"]
 
-toOrg (priv__mkTrait _ t d s rs) = with List
+toOrg (priv__mkTrait ty t d s rs) = with List
     unwords [
-        "*** Trait: " , t , "\n\n"
-      , fromMaybe "" d , "\n\n"
+        "*** Trait:", show ty, t , "\n\n"
       , "+ Evaluation Value :: " , show s , "\n\n"
-      , "| Affect Value | Requirement Name |\n"
+      , fromMaybe "" d , "\n\n"
       , concat (mapDList (toOrg) rs)
       , "\n\n"]
 
@@ -300,16 +303,18 @@ toXML' (priv__mkProb t d rs) = do
          <++> (addScore $ mkDescNode d)
          <++> ("name" <+=> t)
 
-toXML' (priv__mkTLink cval r) = do
+toXML' (priv__mkTLink cval r d) = do
        (_,ids) <- get
        let id = lookup (getReqTitle r) ids
-       let e = mkSimpleElement "affect"
+       let e = case d of
+           Nothing => mkNode "affect"
+           Just d' => "affect" <+=> d'
        let idval = cast {to=Int} $ fromMaybe 0 id
        pure $ (setAttribute "cvalue" (cast cval)
               (setAttribute "linksTo" (cast idval) e))
 
 toXML' (priv__mkTrait ty t d s rs) = do
-       let e  = addScore $ mkNode "trait"
+       let e  = addScore $ mkNode (toLower $ show ty)
        let e' = setAttribute "svalue" (cast s) e
        -- <mess>
        let rs' = toLDP rs

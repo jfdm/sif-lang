@@ -7,6 +7,7 @@ module Sif.Options
 
 import ArgParse
 import Sif.Pattern
+import Effect.Logging.Level
 
 -- ----------------------------------------------------------------- [ Options ]
 
@@ -39,39 +40,58 @@ record SifOpts where
   to         : Maybe SifOutFormat
   prelude    : Maybe String
   banner     : Bool
-
+  loglvl     : LogLevel n
 
 defOpts : SifOpts
 defOpts = MkSOpts
     Nothing Nothing (Just REPL) Nothing Nothing Nothing
-    True
+    True OFF
 
 instance Default SifOpts where
   default = defOpts
 
--- instance Eq SifOpts where
---   (==) (MkSOpts a b c d e f g h) (MkSOpts a' b' c' d' e' f' g' h') =
---     a' == a && b' == b && c' == c && d' == d &&
---     e' == e && f' == f && g' == g && h' == h
+strToLog : String -> (n ** LogLevel n)
+strToLog s =
+  case s of
+    "1" => (_ ** TRACE)
+    "2" => (_ ** DEBUG)
+    "3" => (_ ** INFO)
+    "4" => (_ ** WARN)
+    "5" => (_ ** FATAL)
+    "6" => (_ ** ERROR)
+    "trace"   => (_ ** TRACE)
+    "debug"   => (_ ** DEBUG)
+    "info"    => (_ ** INFO)
+    "warn"    => (_ ** WARN)
+    "fatal"   => (_ ** FATAL)
+    "error"   => (_ ** ERROR)
+    otherwise => (_ ** OFF)
 
 convOpts : Arg -> SifOpts -> Maybe SifOpts
 convOpts (Files xs)     o = Nothing
 convOpts (KeyValue k v) o =
   case k of
-    "prelude"    => Just $ record {prelude    = Just v}       o
-    "problem"    => Just $ record {pSpec      = Just v}       o
-    "solution"   => Just $ record {sSpec      = Just v}       o
-    "out"        => Just $ record {out        = Just v}       o
-    "to"         => Just $ record {to         = readOutFMT v} o
+    "prelude"    => Just $ record {prelude = Just v}                o
+    "problem"    => Just $ record {pSpec   = Just v}                o
+    "solution"   => Just $ record {sSpec   = Just v}                o
+    "out"        => Just $ record {out     = Just v}                o
+    "to"         => Just $ record {to      = readOutFMT v}          o
+    "log"        => Just $ record {loglvl  = getProof $ strToLog v} o
     otherwise    => Nothing
 convOpts (Flag x) o =
   case x of
-    "help"     => Just $ record {mode    = Just HELP}  o
-    "version"  => Just $ record {mode    = Just VERS}  o
-    "check"    => Just $ record {mode    = Just Check} o
-    "eval"     => Just $ record {mode    = Just Eval}  o
-    "conv"     => Just $ record {mode    = Just Conv}  o
-    "nobanner" => Just $ record {banner  = False}      o
+    "help"     => Just $ record {mode   = Just HELP}  o
+    "version"  => Just $ record {mode   = Just VERS}  o
+    "check"    => Just $ record {mode   = Just Check} o
+    "eval"     => Just $ record {mode   = Just Eval}  o
+    "conv"     => Just $ record {mode   = Just Conv}  o
+    "nobanner" => Just $ record {banner = False}      o
+    "logtrace" => Just $ record {loglvl = TRACE}      o
+    "logdebug" => Just $ record {loglvl = DEBUG}      o
+    "loginfo"  => Just $ record {loglvl = INFO}       o
+    "logwarn"  => Just $ record {loglvl = WARN}       o
+    "logfatal" => Just $ record {loglvl = FATAL}      o
+    "logerror" => Just $ record {loglvl = ERROR}      o
     otherwise => Nothing
 
 helpStr : String
@@ -86,6 +106,9 @@ Flag                 | Description
 --solution="<fname"  | A solution specification.
 --out="<fname>"      | File name to save things to.
 --to="<fmt>"         | The output format.
+--log="<num|word>"   | Set logging levels
+                     | [1,     2,     3,    4,    5,     6]
+                     | [trace, debug, info, warn, fatal, error]
 
 --help               | Display help
 --version            | Display version
@@ -93,6 +116,13 @@ Flag                 | Description
 --eval               | Evaluate problem solution pairing
 --conv               | Convert problem solution pairing
 --nobanner           | Don't display banner
+
+--logtrace
+--logdebug
+--loginfo
+--logwarn
+--logfatal
+--logerror
 """
 
 -- --------------------------------------------------------------------- [ EOF ]

@@ -5,6 +5,19 @@ import Lightyear.Strings
 
 %access public
 
+eol : Parser Char
+eol = char '\n'
+
+indent1 : Parser ()
+indent1 = skip $ string "  "
+
+indent2 : Parser ()
+indent2 = indent1 *> indent1
+
+indent3 : Parser ()
+indent3 = indent2 *> indent1
+
+
 anyChar : Parser Char
 anyChar = satisfy (const True)
 
