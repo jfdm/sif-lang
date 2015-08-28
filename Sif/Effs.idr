@@ -3,7 +3,6 @@
 -- Copyright : (c) Jan de Muijnck-Hughes
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
-
 module Sif.Effs
 
 import public Effects
@@ -16,9 +15,11 @@ import public Effect.Logging.Default
 
 import public ArgParse
 
-import Sif.Pattern
-import Sif.Parser.State
+import Sif.Types
+import Sif.DSL.State
 import Sif.Error
+import Sif.Pattern
+import Sif.Builder.AbsInterp
 import Sif.Library
 import Sif.Options
 
@@ -29,9 +30,13 @@ record SifState where
   opts : SifOpts
   lib  : SifLib
   benv : BuildState
+  inst : (i ** SifBuilder i)
 
 instance Default SifState where
-  default = MkSifState defOpts defaultLib defBuildSt
+  default = MkSifState defOpts
+                       defaultLib
+                       defBuildSt
+                       (_ ** defBuilder)
 
 SifEffs : List EFFECT
 SifEffs = [ FILE_IO ()
@@ -68,7 +73,13 @@ putLibrary : SifLib -> Eff () ['sstate ::: STATE SifState]
 putLibrary l = 'sstate :- update (\st => record {lib = l} st)
 
 updateLibrary : (SifLib -> SifLib) -> Eff () ['sstate ::: STATE SifState]
-updateLibrary f = 'sstate :- update (\st => record {lib = f (lib st)} st)
+updateLibrary u = 'sstate :- update (\st => record {lib = u (lib st)} st)
+
+getSifBuilder : Eff (l ** SifBuilder l) ['sstate ::: STATE SifState]
+getSifBuilder = pure $ inst !('sstate :- get)
+
+putSifBuilder : (SifBuilder l) -> Eff () ['sstate ::: STATE SifState]
+putSifBuilder l = 'sstate :- update (\st => record {inst = (_ ** l)} st)
 
 getBuildState : Eff BuildState ['sstate ::: STATE SifState]
 getBuildState = pure $ benv !('sstate :- get)

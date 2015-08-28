@@ -1,4 +1,10 @@
-module Sif.Parser.Utils
+-- --------------------------------------------------------------- [ Utils.idr ]
+-- Module    : Utils.idr
+-- Copyright : (c) Jan de Muijnck-Hughes
+-- License   : see LICENSE
+-- --------------------------------------------------------------------- [ EOH ]
+||| Things that should be in Lightyear but are Not.
+module Sif.DSL.Parser.Utils
 
 import Lightyear
 import Lightyear.Strings

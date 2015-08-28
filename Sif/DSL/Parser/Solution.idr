@@ -1,47 +1,30 @@
--- -------------------------------------------------------- [ Problem.idr<Sif> ]
--- Module    : Problem.idr<Sif>
+-- ------------------------------------------------------------ [ Solution.idr ]
+-- Module    : Solution.idr
 -- Copyright : (c) Jan de Muijnck-Hughes
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
 ||| Parser problem specifications
-module Sif.Parser.Problem
+module Sif.DSL.Parser.Solution
 
+-- ----------------------------------------------------------------- [ Imports ]
 import Lightyear
 import Lightyear.Strings
 
-import Sif.Parser.Utils
-import Sif.Parser.Common
-import Sif.Parser.Problem
+import GRL.Lang.GLang
 
-import Sif.Pattern
+import Sif.Types
+import Sif.AbsSyntax
 
+import Sif.DSL.Parser.Utils
+import Sif.DSL.Parser.Common
+import Sif.DSL.Parser.Problem
+
+-- -------------------------------------------------------------- [ Directives ]
 %default partial
--- --------------------------------------------------------------------- [ AST ]
-
-data SolASTty = SolTy | PropTy | TraitTy | AffectTy
-
-data SolAST : SolASTty -> Type where
-  Affects : (value : CValue)
-         -> (id : String)
-         -> (desc : Maybe String)
-         -> SolAST AffectTy
-  Trait : TTy
-       -> (title : String)
-       -> (value : SValue)
-       -> (desc  : Maybe String)
-       -> (affects : List (SolAST AffectTy) )
-       -> SolAST TraitTy
-  Property : (title : String)
-          -> (desc : Maybe String)
-          -> (traits : List (SolAST TraitTy))
-          -> SolAST PropTy
-  Solution : (title : String)
-          -> (probID : String)
-          -> (desc : Maybe String)
-          -> (properties : List (SolAST PropTy))
-          -> SolAST SolTy
+%access private
 
 -- ----------------------------------------------------------------- [ Parsers ]
+
 traitTy : Parser TTy
 traitTy = (keyword "Advantage"    *> return ADV)
       <|> (keyword "Disadvantage" *> return DIS)
@@ -67,17 +50,17 @@ sValue = (keyword "Denied"    *> return DENIED)
      <|> (keyword "None"      *> return NONE)
      <?> "Trait Type"
 
-affect : Parser $ SolAST AffectTy
+affect : Parser $ SifAST tyAFFECTS
 affect = do
     c <- cValue
     space
     i <- ident
     space
     d <- opt $ (keyword "by" *> descString)
-    pure $ Affects c i d
+    pure $ AST.Affect c i d
   <?> "Affects"
 
-trait : Parser $ SolAST TraitTy
+trait : Parser $ SifAST tyTRAIT
 trait = do
       ty <- traitTy
       t <- title
@@ -85,10 +68,10 @@ trait = do
       s <- sValue
       (d,as) <- braces body
       space
-      pure $ Trait ty t s d as
+      pure $ AST.Trait ty t s d as
     <?> "Trait"
   where
-    body : Parser (Maybe String, List $ SolAST AffectTy)
+    body : Parser (Maybe String, List $ SifAST tyAFFECTS)
     body = do
         d <- opt desc
         keyword "Affects"
@@ -98,16 +81,16 @@ trait = do
       <?> "Affects"
 
 
-property : Parser $ SolAST PropTy
+property : Parser $ SifAST tyPROPERTY
 property = do
       keyword "Property"
       t <- title
       (d,ts) <- braces body
       space
-      pure $ Property t d ts
+      pure $ AST.Property t d ts
     <?> "Property"
   where
-    body : Parser (Maybe String, List $ SolAST TraitTy)
+    body : Parser (Maybe String, List $ SifAST tyTRAIT)
     body = do
         d <- opt desc
         ts <- some trait
@@ -115,7 +98,8 @@ property = do
         pure (d, ts)
       <?> "Property Body"
 
-solution : Parser $ (Maybe String, SolAST SolTy)
+public
+solution : Parser $ (SifAST tySOLUTION)
 solution = do
       keyword "sif"
       space
@@ -129,16 +113,16 @@ solution = do
       space
       pID <- ident
       (d,ps) <- braces $ body
-      pure $ (pd, Solution t pID d ps)
+      pure $ AST.Solution t (pID,pd) d ps
     <?> "Solution"
   where
-    body : Parser (Maybe String, List $ SolAST PropTy)
+    body : Parser (Maybe String, List $ SifAST tyPROPERTY)
     body = do
         d <- opt desc
         ps <- some property
         space
         pure (d, ps)
-      <?> "Solutino Body"
+      <?> "Solution Body"
 
 
 

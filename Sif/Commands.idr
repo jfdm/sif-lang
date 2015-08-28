@@ -9,12 +9,14 @@ module Sif.Commands
 import Lightyear
 import Lightyear.Strings
 
-import Sif.Parser.Common
-import Sif.Parser.Utils
+import Sif.Types
+import Sif.DSL.Parser.Common
+import Sif.DSL.Parser.Utils
 
-import Sif.Pattern
+-- -------------------------------------------------------------- [ DIrectives ]
 
 %access public
+
 -- ---------------------------------------------------------------- [ Commands ]
 
 public

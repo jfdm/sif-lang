@@ -5,16 +5,21 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Sif.Main
 
-import System.
+import System
 
-import Sif.Parser
+import Sif.Types
+import Sif.AbsSyntax
 import Sif.Pattern
-import Sif.API
-import Sif.REPL
-import Sif.Options
 import Sif.Effs
 import Sif.Error
 import Sif.Library
+import Sif.DSL.Parser.Problem
+import Sif.DSL.Parser.Solution
+import Sif.DSL.Parser
+import Sif.DSL
+import Sif.Options
+import Sif.API
+import Sif.REPL
 
 runMode : Maybe SifMode -> Eff () SifEffs
 runMode Nothing     = sifREPL
@@ -36,7 +41,7 @@ runMode (Just Check) = do
 runMode (Just Conv) = do
     os <- getOptions
     putStrLn "Converting Pattern"
-    p <- buildPattern (pSpec os) (sSpec os)
+    (_ ** p) <- buildPatternE (pSpec os) (sSpec os)
     case out os of
       Nothing => printPattern p (to os)
       Just _  => printLn FeatureNotImpl

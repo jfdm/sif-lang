@@ -3,13 +3,13 @@
 -- Copyright : (c) Jan de Muijnck-Hughes
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
-
-module Sif.Parser.Common
+||| Sif Specific Parsing Utils
+module Sif.DSL.Parser.Common
 
 import Lightyear
 import Lightyear.Strings
 
-import Sif.Parser.Utils
+import Sif.DSL.Parser.Utils
 
 descString : Parser String
 descString = literal
@@ -18,7 +18,7 @@ descString = literal
          <?> "Description Block"
 
 keyword : String -> Parser ()
-keyword s = lexeme $ string s *> pure ()
+keyword s = string s *> space *> pure ()
 
 desc : Parser $ String
 desc = do

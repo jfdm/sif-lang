@@ -9,26 +9,32 @@ executable = sifc
 modules = Effect.Logging.Level
         , Effect.Logging.Default
 
-        , Sif.Pattern.Utils
-        , Sif.Pattern.Common
-        , Sif.Pattern.Model
-        , Sif.Pattern
+        , Sif.Types
+        , Sif.AbsSyntax
 
-        , Sif.PModel
+        , Sif.Pattern
+        , Sif.Builder.Utils
+        , Sif.Builder.AbsInterp
+        -- , Sif.PModel
 
         , Sif.Library
 
-        , Sif.Parser.Utils
-        , Sif.Parser.Common
-        , Sif.Parser.Problem
-        , Sif.Parser.Pattern
-        , Sif.Parser
-
-        , Sif.REPL
-        , Sif.Commands
+        , Sif.DSL.State
         , Sif.Options
-        , Sif.API
-        , Sif.Error
+
         , Sif.Effs
+        , Sif.Error
+
+        , Sif.DSL.Parser.Utils
+        , Sif.DSL.Parser.Common
+        , Sif.DSL.Parser.Problem
+        , Sif.DSL.Parser.Solution
+        , Sif.DSL.Parser
+        , Sif.DSL
+
+        , Sif.API
+
+        , Sif.Commands
+        , Sif.REPL
 
         , Sif.Main

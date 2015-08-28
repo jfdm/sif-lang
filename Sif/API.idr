@@ -1,9 +1,8 @@
--- ------------------------------------------------------------ [ API.idr<Sif> ]
--- Module    : API.idr<Sif>
+-- ----------------------------------------------------------------- [ API.idr ]
+-- Module    : API.idr
 -- Copyright : (c) Jan de Muijnck-Hughes
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
-
 module Sif.API
 
 import public Config.Error
@@ -12,11 +11,16 @@ import public Config.YAML
 import Data.GraphViz.SimpleDot
 import XML.DOM
 
+import Sif.Types
+import Sif.AbsSyntax
+import Sif.Pattern
 import Sif.Effs
 import Sif.Error
-import Sif.Pattern
 import Sif.Library
-import Sif.Parser
+import Sif.DSL.Parser.Problem
+import Sif.DSL.Parser.Solution
+import Sif.DSL.Parser
+import Sif.DSL
 import Sif.Options
 
 %default partial
@@ -24,32 +28,16 @@ import Sif.Options
 %access public
 
 
-||| COnv and SHow -- horrible horrible code.
-partial covering
-showConvTo : PATTERN -> (fmt : SifOutFormat) -> Maybe String
-showConvTo p GRL = Just $ show (the (convTy GRL) (convTo p GRL))
-showConvTo p DOT = Just $ show (the (convTy DOT) (convTo p DOT))
-showConvTo p XML = Just $ show @{xml} $ (the (convTy XML) (convTo p XML))
-showConvTo p ORG = Just $ (the (convTy ORG) (convTo p ORG))
-showConvTo p COMPACT = Just $ (the (convTy COMPACT) (convTo p COMPACT))
-showConvTo p IDRIS   = Nothing
-showConvTo p EDDA = Nothing
-
-
 ||| Print results of evaluation
 printResults : EvalResult -> Eff () SifEffs
-printResults BadModel = Sif.raise ResultInvalid
-printResults res      =
-    case EvalResult.toString res printNode of
-      Nothing    => Sif.raise ResultInvalid
-      (Just str) => putStrLn str
+printResults Bad        = Sif.raise ResultInvalid
+printResults (Good is)  = do
+    let is' = map (\(t,s) => unwords [showSValue s,"\t==>\t", t]) is
+    putStrLn $ unlines is'
   where
     showSValue : Maybe SValue -> String
     showSValue Nothing  = "Nothing"
     showSValue (Just x) = show x
-
-    printNode : GoalNode -> String
-    printNode x = unwords [ showSValue (getSValue x), "==>\t", getNodeTitle x]
 
 ||| Syntax check a Problem or a solution pairing.
 doSyntaxCheck : Maybe String -> Maybe String -> Eff () SifEffs
@@ -70,31 +58,34 @@ doSyntaxCheck (Nothing) (Just y) = do
 doSyntaxCheck (Nothing) (Nothing) = Sif.raise NoFileGiven
 
 
-evalAndPrintPattern : PATTERN -> Eff () SifEffs
+evalAndPrintPattern : (PATTERN impl) -> Eff () SifEffs
 evalAndPrintPattern p = do
-  putStrLn $ unwords ["evaluating pattern", getPatternTitle p]
+  putStrLn $ unwords ["evaluating pattern", fromMaybe "" $ getTitle p]
   let eRes = evalPattern p
   printResults eRes
 
-buildPattern : Maybe String -> Maybe String -> Eff PATTERN SifEffs
-buildPattern Nothing Nothing   = Sif.raise NoFileGiven
-buildPattern Nothing  _        = Sif.raise (FileMissing ("Solution File "))
-buildPattern _        Nothing  = Sif.raise (FileMissing ("Problem File "))
-buildPattern (Just p) (Just s) = buildPatternFromFile p s
+buildPatternE : Maybe String -> Maybe String -> Eff (impl ** PATTERN impl) SifEffs
+buildPatternE Nothing Nothing   = Sif.raise NoFileGiven
+buildPatternE Nothing  _        = Sif.raise (FileMissing ("Solution File "))
+buildPatternE _        Nothing  = Sif.raise (FileMissing ("Problem File "))
+buildPatternE (Just p) (Just s) = do
+  (_ ** bob) <- getSifBuilder
+  patt <- patternFromFile bob p s
+  pure $ (_ ** patt)
 
 
 evalPatternFromFile : Maybe String -> Maybe String -> Eff () SifEffs
 evalPatternFromFile p' s' = do
-  p <- buildPattern p' s'
-  putStrLn $ unwords ["loaded", getPatternTitle p]
+  (_ ** p) <- buildPatternE p' s'
+  putStrLn $ unwords ["loaded", fromMaybe "" $ getTitle p]
   evalAndPrintPattern p
 
 
-printPattern : PATTERN -> Maybe SifOutFormat -> Eff () SifEffs
+printPattern : PATTERN impl -> Maybe SifOutFormat -> Eff () SifEffs
 printPattern _ Nothing        = printLn NoFormatSpecified
-printPattern p (Just COMPACT) = printLn p
-printPattern p (Just fmt) = do
-    case showConvTo p fmt of
+printPattern p (Just COMPACT) = putStrLn $ toString p
+printPattern p (Just fmt)     = do
+    case showConvPattern p fmt of
       Nothing      => printLn UnSuppFormat
       Just res     => putStrLn res
 
@@ -160,7 +151,8 @@ importPreludeIDX nspace ((p,s)::ps) = do
     info $ unlines [ "Trying to build:"
                    , "\tProblem File: "  ++ show (pDir p)
                    , "\tSolution File: " ++ show (pDir s)]
-    patt <- buildPatternFromFile (pDir p) (pDir s)
+    (_ ** bob)  <- getSifBuilder
+    patt <- patternFromFile bob (pDir p) (pDir s)
     updateLibrary (\idx => addToLibrary patt idx)
     importPreludeIDX nspace ps
   where
@@ -183,13 +175,13 @@ loadPrelude = do
 
 listLibrary : Eff () SifEffs
 listLibrary = do
-    lib <- getLibrary
-    let idx = (getLibraryIndex lib)
+    l <- getLibrary
+    let idx = (getLibraryIndex l)
     putStrLn "Patterns"
     putStrLn (indexToString idx)
 
 
-getPatternByIndexEff : Nat -> Eff PATTERN SifEffs
+getPatternByIndexEff : Nat -> Eff (impl ** PATTERN impl) SifEffs
 getPatternByIndexEff n =
   case getPatternByIndex n !getLibrary of
     Nothing => Sif.raise NoSuchPattern
@@ -197,12 +189,12 @@ getPatternByIndexEff n =
 
 getAndEvalPattern : Nat -> Eff () SifEffs
 getAndEvalPattern n = do
-  p <- getPatternByIndexEff n
+  (_ ** p) <- getPatternByIndexEff n
   evalAndPrintPattern p
 
 getAndPrintPattern : Nat -> Maybe SifOutFormat -> Eff () SifEffs
 getAndPrintPattern n fmt = do
-  p <- getPatternByIndexEff n
+  (_ ** p) <- getPatternByIndexEff n
   printPattern p fmt
 
 -- --------------------------------------------------------------------- [ EOF ]

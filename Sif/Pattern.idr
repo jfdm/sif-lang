@@ -1,272 +1,17 @@
 module Sif.Pattern
 
-import Data.Sigma.DList
-import Data.AVL.Dict
 import Data.GraphViz.SimpleDot
 
 import public GRL.Lang.GLang
-import public GRL.Eval
-
 import Edda
-import Edda.Reader.Org
-
 import XML.DOM
 
-import public Sif.Pattern.Common
+import Sif.Types
 
-import Sif.Pattern.Model
-import Sif.Pattern.Utils
-
-import Debug.Trace
-
-%default total
+%default partial
 %access public
 
 -- --------------------------------------------------- [ Public Data Structure ]
-
-abstract
-data SifExpr : SifTy -> Type where
-  MkExpr  : {i : InterpRes ty} -> SifPriv i ty-> SifExpr ty
-
-
-private partial
-showSifExpr : SifExpr ty -> String
-showSifExpr (MkExpr e) = showSifPriv e
-
-instance Show (SifExpr ty) where
-  show x = showSifExpr x
-
--- ----------------------------------------------------------- [ Type Synonyms ]
-
-FUNCTIONAL : Type
-FUNCTIONAL = SifExpr tyREQ
-
-USABILITY : Type
-USABILITY = SifExpr tyREQ
-
-RELIABILITY : Type
-RELIABILITY = SifExpr tyREQ
-
-PERFORMANCE : Type
-PERFORMANCE = SifExpr tyREQ
-
-SUPPORTABILITY : Type
-SUPPORTABILITY = SifExpr tyREQ
-
-REQUIREMENT : Type
-REQUIREMENT = SifExpr tyREQ
-
-REQUIREMENTS : Type
-REQUIREMENTS = List (SifExpr tyREQ)
-
-PROBLEM : Type
-PROBLEM = SifExpr tyPROBLEM
-
-ADVANTAGE : Type
-ADVANTAGE = SifExpr tyTRAIT
-
-DISADVANTAGE : Type
-DISADVANTAGE = SifExpr tyTRAIT
-
-TRAIT : Type
-TRAIT = SifExpr tyTRAIT
-
-TRAITS : Type
-TRAITS = List (SifExpr tyTRAIT)
-
-TLINK : Type
-TLINK = SifExpr tyTRAITend
-
-TLINKS : Type
-TLINKS = List (SifExpr tyTRAITend)
-
-PROPERTY : Type
-PROPERTY = SifExpr tyPROPERTY
-
-PROPERTIES : Type
-PROPERTIES = List (SifExpr tyPROPERTY)
-
-SOLUTION : Type
-SOLUTION = SifExpr tySOLUTION
-
-PATTERN : Type
-PATTERN = SifExpr tyPATTERN
-
--- Public Constructors
-
-private
-conv : List (SifExpr ty)
-    -> (xs ** DList (InterpRes ty) (\x => SifPriv x ty) xs)
-conv xs = fromLDP $ map (\(MkExpr x) => (_ ** x)) xs
-
--- ---------------------------------------------------------------- [ Problems ]
-
-mkFunctional : String -> Maybe String -> FUNCTIONAL
-mkFunctional s desc = MkExpr $ priv__mkReq FUNC s desc
-
-mkUsability : String -> Maybe String-> USABILITY
-mkUsability s desc = MkExpr $ priv__mkReq USAB s desc
-
-mkReliability : String -> Maybe String -> RELIABILITY
-mkReliability s desc = MkExpr $ priv__mkReq RELI s desc
-
-mkPerformance : String -> Maybe String -> PERFORMANCE
-mkPerformance s desc = MkExpr $ priv__mkReq PERF s desc
-
-mkSupportability : String -> Maybe String -> SUPPORTABILITY
-mkSupportability s desc = MkExpr $ priv__mkReq SUPP s desc
-
-private
-convR : SifExpr tyREQ -> (r : InterpRes tyREQ ** SifPriv r tyREQ)
-convR (MkExpr res) = (_ ** res)
-
-partial
-mkProblem : String
-         -> Maybe String
-         -> (ls : List (SifExpr tyREQ))
-  --       -> {auto prf : NonEmpty ls}
-         -> PROBLEM
-mkProblem s d rs = MkExpr $ priv__mkProb s d (Sigma.getProof $ conv rs)
-
-partial
-getProblemTitle : PROBLEM -> String
-getProblemTitle (MkExpr p) = doGet p
-  where
-    partial
-    doGet : {i : InterpRes tyPROBLEM} -> SifPriv i tyPROBLEM -> String
-    doGet (priv__mkProb t _ _) = t
-
--- --------------------------------------------------------------- [ Solutions ]
-
-mkLink : CValue -> REQUIREMENT -> Maybe String ->  TLINK
-mkLink c r d = MkExpr $ priv__mkTLink c (Sigma.getProof $ convR r) d
-
-mkTrait : String
-       -> Maybe String
-       -> SValue
-       -> (ts : TLINKS)
-       -> TRAIT
-mkTrait t d s rs =
-    MkExpr $ priv__mkTrait GEN t d s (Sigma.getProof $ conv rs)
-
-mkAdvantage : String
-           -> Maybe String
-           -> SValue
-           -> (ts : TLINKS)
- --          -> {auto prf : NonEmpty ts}
-           -> ADVANTAGE
-mkAdvantage t d s rs =
-    MkExpr $ priv__mkTrait ADV t d s (Sigma.getProof $ conv rs)
-
-mkDisadvantage : String
-              -> Maybe String
-              -> SValue
-              -> (ts : TLINKS)
---              -> {auto prf : NonEmpty ts}
-              -> DISADVANTAGE
-mkDisadvantage t d s rs =
-    MkExpr $ priv__mkTrait DIS t d s (Sigma.getProof $ conv rs)
-
-mkProperty : String
-          -> Maybe String
-          -> (ts : TRAITS)
---          -> {auto prf : NonEmpty ts}
-          -> PROPERTY
-mkProperty t d ts = MkExpr $ priv__mkProp t d (Sigma.getProof $ conv ts)
-
-mkSolution : String
-          -> Maybe String
-          -> (ps : PROPERTIES)
- --         -> {auto prf : NonEmpty ps}
-          -> SOLUTION
-mkSolution s d ps = MkExpr $ priv__mkSolt s d (Sigma.getProof $ conv ps)
-
-getSolutionTitle : SOLUTION -> String
-getSolutionTitle (MkExpr p) = doGet p
-  where
-    doGet : {i : InterpRes tySOLUTION} -> SifPriv i tySOLUTION -> String
-    doGet (priv__mkSolt t _ _) = t
-
--- ---------------------------------------------------------------- [ Patterns ]
-
-mkPattern : String -> Maybe String -> PROBLEM -> SOLUTION -> PATTERN
-mkPattern t d (MkExpr p) (MkExpr s) = MkExpr $ priv__mkPatt t d p s
-
-getModel : PATTERN -> GModel
-getModel (MkExpr p) = doGetModel p
-  where
-    extract : InterpRes tyPATTERN -> GModel
-    extract (IPatt m) = m
-
-    doGetModel : {i : InterpRes tyPATTERN} -> SifPriv i tyPATTERN -> GModel
-    doGetModel {i} _ = extract i
-
-partial
-evalPattern : PATTERN -> EvalResult
-evalPattern p = evalModel (getModel p) Nothing
-
-getPatternTitle : PATTERN -> String
-getPatternTitle (MkExpr p) = doGet p
-  where
-    doGet : {i : InterpRes tyPATTERN} -> SifPriv i tyPATTERN -> String
-    doGet (priv__mkPatt t _ _ _) = t
-
--- ------------------------------------------------------------- [ Conversions ]
-
-data SifOutFormat = ORG | XML | DOT | GRL | EDDA | COMPACT | IDRIS
-
-instance Eq SifOutFormat where
-  (==) ORG     ORG     = True
-  (==) XML     XML     = True
-  (==) DOT     DOT     = True
-  (==) GRL     GRL     = True
-  (==) EDDA    EDDA    = True
-  (==) COMPACT COMPACT = True
-  (==) IDRIS   IDRIS   = True
-  (==) _       _       = False
-
-instance Show SifOutFormat where
-  show ORG = "Org"
-  show XML = "XML"
-  show DOT = "dot"
-  show GRL = "GRL"
-  show EDDA = "Edda"
-  show COMPACT = "Compact"
-  show IDRIS   = "Idris"
-
-readOutFMT : String -> Maybe SifOutFormat
-readOutFMT s =
-  case s of
-    "org" => Just ORG
-    "xml" => Just XML
-    "dot" => Just DOT
-    "grl" => Just GRL
-    "compact" => Just COMPACT
-    "idris"   => Nothing
-    "edda" => Nothing -- TODO Just EDDA
-    otherwise => Nothing
-
-partial
-toEdda : SifExpr tyPATTERN -> Maybe $ Edda PRIME MODEL
-toEdda expr =
-    case parse parseOrg (showSifExpr expr) of
-      Left  err => Nothing
-      Right doc => Just (refineEdda doc)
-
-partial
-toString : SifExpr tyPATTERN -> String
-toString (MkExpr p) = toOrg p
-
-partial
-toXML : SifExpr tyPATTERN -> Document DOCUMENT
-toXML (MkExpr x) = setRoot root $ mkDocument (mkQName "pattern") Nothing
-  where
-    partial
-    root : Document ELEMENT
-    root = Model.toXML x
-
-toDot : SifExpr tyPATTERN -> SimpleDot GRAPH
-toDot p = grlToDot $ getModel p
 
 covering
 convTy : SifOutFormat -> Type
@@ -274,19 +19,248 @@ convTy ORG     = String
 convTy XML     = Document DOCUMENT
 convTy DOT     = SimpleDot GRAPH
 convTy GRL     = GModel
-convTy EDDA    = Maybe $ Edda PRIME MODEL
+convTy EDDA    = Edda PRIME MODEL
 convTy COMPACT = String
-convTy IDRIS   = Maybe String
+convTy IDRIS   = String
 
-covering partial
-convTo : SifExpr tyPATTERN -> (fmt : SifOutFormat) -> convTy fmt
-convTo p ORG     = Pattern.toString p
-convTo p XML     = toXML p
-convTo p DOT     = toDot p
-convTo p GRL     = Pattern.getModel p
-convTo p EDDA    = toEdda p
-convTo p COMPACT = show p
-convTo p IDRIS   = Nothing
+namespace Sif
+  data EvalResult : Type where
+    Good : List (String, Maybe SValue) -> EvalResult
+    Bad  : EvalResult
 
+||| The Representation API
+class SifRepAPI (impl : SifTy -> Type) where
+    getTitle    : impl ty -> Maybe String
+    evalPattern : impl tyPATTERN -> Sif.EvalResult
+    toString    : impl ty -> String
+    convTo      : impl tyPATTERN -> (ty : SifOutFormat) -> Maybe $ convTy ty
+
+data SifExpr : (impl : SifTy -> Type) -> SifTy -> Type where
+  MkExpr : SifRepAPI impl => impl ty -> SifExpr impl ty
+
+instance SifRepAPI (\ty => SifExpr l ty) where
+  getTitle (MkExpr x) = getTitle x
+  evalPattern (MkExpr x) = evalPattern x
+  toString (MkExpr x)    = toString x
+  convTo (MkExpr x) fmt  = convTo x fmt
+
+instance Show (SifExpr l ty) where
+  show x = toString x
+
+||| o'rrible code
+covering
+showConvPattern : SifExpr impl tyPATTERN -> SifOutFormat -> Maybe String
+showConvPattern p GRL =
+  case (the (Maybe (convTy GRL)) (convTo p GRL)) of
+    Nothing => Nothing
+    Just r  => Just (show r)
+showConvPattern p DOT =
+  case (the (Maybe (convTy DOT)) (convTo p DOT)) of
+    Nothing => Nothing
+    Just r  => Just (show r)
+showConvPattern p XML =
+  case (the (Maybe (convTy XML)) (convTo p XML)) of
+    Nothing => Nothing
+    Just r  => Just (show r)
+showConvPattern p ORG =
+  case (the (Maybe (convTy ORG)) (convTo p ORG)) of
+    Nothing => Nothing
+    Just r  => Just (show r)
+showConvPattern p COMPACT =
+  case (the (Maybe (convTy COMPACT)) (convTo p COMPACT)) of
+    Nothing => Nothing
+    Just r  => Just (show r)
+showConvPattern p IDRIS =
+  case (the (Maybe (convTy IDRIS)) (convTo p IDRIS)) of
+    Nothing => Nothing
+    Just r  => Just (show r)
+showConvPattern p EDDA =
+  case (the (Maybe (convTy EDDA)) (convTo p EDDA)) of
+    Nothing => Nothing
+    Just r  => Nothing
+showConvPattern _ _ = Nothing
+
+-- ----------------------------------------------------------- [ Type Synonyms ]
+
+FUNCTIONAL : (impl : SifTy -> Type) -> Type
+FUNCTIONAL impl = SifExpr impl tyREQ
+
+USABILITY :  (impl : SifTy -> Type) -> Type
+USABILITY impl = SifExpr impl tyREQ
+
+RELIABILITY :  (impl : SifTy -> Type) -> Type
+RELIABILITY impl = SifExpr impl tyREQ
+
+PERFORMANCE :  (impl : SifTy -> Type) -> Type
+PERFORMANCE impl = SifExpr impl tyREQ
+
+SUPPORTABILITY :  (impl : SifTy -> Type) -> Type
+SUPPORTABILITY impl = SifExpr impl tyREQ
+
+REQUIREMENT :  (impl : SifTy -> Type) -> Type
+REQUIREMENT impl = SifExpr impl tyREQ
+
+REQUIREMENTS :  (impl : SifTy -> Type) -> Type
+REQUIREMENTS impl = List (REQUIREMENT impl)
+
+PROBLEM :  (impl : SifTy -> Type) -> Type
+PROBLEM impl = SifExpr impl tyPROBLEM
+
+ADVANTAGE :  (impl : SifTy -> Type) -> Type
+ADVANTAGE impl = SifExpr impl tyTRAIT
+
+DISADVANTAGE :  (impl : SifTy -> Type) -> Type
+DISADVANTAGE impl = SifExpr impl tyTRAIT
+
+TRAIT :  (impl : SifTy -> Type) -> Type
+TRAIT impl = SifExpr impl tyTRAIT
+
+TRAITS :  (impl : SifTy -> Type) -> Type
+TRAITS impl = List (TRAIT impl)
+
+AFFECT :  (impl : SifTy -> Type) -> Type
+AFFECT impl = SifExpr impl tyAFFECTS
+
+AFFECTS :  (impl : SifTy -> Type) -> Type
+AFFECTS impl = List (AFFECT impl)
+
+PROPERTY :  (impl : SifTy -> Type) -> Type
+PROPERTY impl = SifExpr impl tyPROPERTY
+
+PROPERTIES :  (impl : SifTy -> Type) -> Type
+PROPERTIES impl = List (PROPERTY impl)
+
+SOLUTION :  (impl : SifTy -> Type) -> Type
+SOLUTION impl = SifExpr impl tySOLUTION
+
+PATTERN :  (impl : SifTy -> Type) -> Type
+PATTERN impl = SifExpr impl tyPATTERN
+
+-- ------------------------------------------------------ [ Factory Definition ]
+
+||| Factories for building concrete representations
+record SifBuilder (impl : SifTy -> Type) where
+  constructor MkSifBuilder
+  buildReq     : RTy -> String -> Maybe String -> REQUIREMENT impl
+  buildProblem : String -> Maybe String -> REQUIREMENTS impl -> PROBLEM impl
+
+  buildAffect   : CValue -> REQUIREMENT impl -> Maybe String -> AFFECT impl
+  buildTrait    : TTy -> String -> Maybe String -> SValue -> AFFECTS impl -> TRAIT impl
+  buildProperty : String -> Maybe String -> TRAITS impl -> PROPERTY impl
+  buildSolution : String -> Maybe String -> PROPERTIES impl -> SOLUTION impl
+
+  buildPattern  : String -> Maybe String -> PROBLEM impl -> SOLUTION impl -> PATTERN impl
+
+-- ------------------------------------------------------------- [ Problem API ]
+
+mkRequirement : SifBuilder i
+             -> RTy
+             -> String
+             -> Maybe String
+             -> REQUIREMENT i
+mkRequirement impl ty s desc = (buildReq impl) ty s desc
+
+mkFunctional : SifBuilder i
+            -> String
+            -> Maybe String
+            -> FUNCTIONAL i
+mkFunctional impl s desc = (buildReq impl) FUNC s desc
+
+mkUsability : SifBuilder i
+           -> String
+           -> Maybe String
+           -> USABILITY i
+mkUsability impl s desc = (buildReq impl) USAB s desc
+
+mkReliability : SifBuilder i
+             -> String
+             -> Maybe String
+             -> RELIABILITY i
+mkReliability impl s desc = (buildReq impl) RELI s desc
+
+mkPerformance : SifBuilder i
+             -> String
+             -> Maybe String
+             -> PERFORMANCE i
+mkPerformance impl s desc = (buildReq impl) PERF s desc
+
+mkSupportability : SifBuilder i
+                -> String
+                -> Maybe String
+                -> SUPPORTABILITY i
+mkSupportability impl s desc = (buildReq impl) SUPP s desc
+
+mkProblem : SifBuilder i
+         -> String
+         -> Maybe String
+         -> REQUIREMENTS i
+         -> PROBLEM i
+mkProblem impl s d rs = (buildProblem impl) s d rs
+
+-- ------------------------------------------------------------ [ Solution API ]
+
+mkAffect : SifBuilder i
+        -> CValue
+        -> REQUIREMENT i
+        -> Maybe String
+        -> AFFECT i
+mkAffect impl c r d = (buildAffect impl) c r d
+
+mkTrait : SifBuilder i
+       -> TTy
+       -> String
+       -> Maybe String
+       -> SValue
+       -> AFFECTS i
+       -> TRAIT i
+mkTrait impl ty t d s rs = (buildTrait impl) ty t d s rs
+
+mkAspect : SifBuilder i
+       -> String
+       -> Maybe String
+       -> SValue
+       -> AFFECTS i
+       -> TRAIT i
+mkAspect impl t d s rs = (buildTrait impl) GEN t d s rs
+
+mkAdvantage : SifBuilder i
+           -> String
+           -> Maybe String
+           -> SValue
+           -> AFFECTS i
+           -> ADVANTAGE i
+mkAdvantage impl t d s rs = (buildTrait impl) ADV t d s rs
+
+mkDisadvantage : SifBuilder i
+              -> String
+              -> Maybe String
+              -> SValue
+              -> AFFECTS i
+              -> DISADVANTAGE i
+mkDisadvantage impl t d s rs = (buildTrait impl) DIS t d s rs
+
+mkProperty : SifBuilder i
+          -> String
+          -> Maybe String
+          -> TRAITS i
+          -> PROPERTY i
+mkProperty impl t d ts = (buildProperty impl) t d ts
+
+mkSolution : SifBuilder i
+          -> String
+          -> Maybe String
+          -> PROPERTIES i
+          -> SOLUTION i
+mkSolution impl s d ps = (buildSolution impl) s d ps
+
+-- ------------------------------------------------------------- [ Pattern API ]
+
+mkPattern : SifBuilder i
+         -> String
+         -> Maybe String
+         -> PROBLEM i
+         -> SOLUTION i
+         -> PATTERN i
+mkPattern impl t d p s = (buildPattern impl) t d p s
 
 -- --------------------------------------------------------------------- [ EOF ]

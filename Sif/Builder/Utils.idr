@@ -3,8 +3,7 @@
 -- Copyright : (c) Jan de Muijnck-Hughes
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
-
-module Sif.Pattern.Utils
+module Sif.Builder.Utils
 
 import XML.DOM
 

@@ -8,15 +8,22 @@ module Sif.REPL
 
 import System
 
-import Sif.Commands
-import Sif.Parser
+import Sif.Types
+import Sif.AbsSyntax
 import Sif.Pattern
-import Sif.API
-import Sif.Options
-import Sif.Error
 import Sif.Effs
+import Sif.Error
 import Sif.Library
+import Sif.DSL.Parser.Problem
+import Sif.DSL.Parser.Solution
+import Sif.DSL.Parser
+import Sif.DSL
+import Sif.Options
+import Sif.API
 
+import Sif.Commands
+
+%default partial
 %access public
 -- -------------------------------------------------------------------- [ Effs ]
 
@@ -49,7 +56,7 @@ fetchCMD = do
           Nothing => pure cmd
           Just n  => do
             lib <- getLibrary
-            if n < (size $ patts lib)
+            if n < (length $ patts lib)
               then pure cmd
               else do
                printLn IndexOutOfBounds
@@ -87,6 +94,7 @@ doCommand (EvalPattern n) = do
 doCommand (CheckExtPattern p s) = do
   putStrLn "Importing..."
   evalPatternFromFile (Just p) (Just s)
+doCommand _ = printLn NoSuchCommand
 
 
 runREPL : Eff () SifEffs

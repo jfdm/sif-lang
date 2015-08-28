@@ -6,7 +6,9 @@
 module Sif.Options
 
 import ArgParse
-import Sif.Pattern
+
+import Sif.Types
+
 import Effect.Logging.Level
 
 -- ----------------------------------------------------------------- [ Options ]
