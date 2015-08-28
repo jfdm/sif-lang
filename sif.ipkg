@@ -2,11 +2,12 @@ package sif
 
 opts = "-p effects -p containers -p grl -p config -p edda -p xml -p test -p graphviz --typeintype"
 
-modules = Sif.Pattern
-        , Sif.Pattern.Model
-        , Sif.Pattern.Utils
-        , Sif.Pattern.Common
+modules = Sif.Types
+        , Sif.AbsSyntax
 
+        , Sif.Pattern
+        , Sif.Builder.Utils
+        , Sif.Builder.AbsInterp
         , Sif.PModel
 
         , Sif.Library

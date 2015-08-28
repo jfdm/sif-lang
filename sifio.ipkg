@@ -2,18 +2,23 @@ package sifio
 
 opts = "-p effects -p containers -p grl -p edda -p graphviz -p xml -p lightyear -p argparse -p config -p test -p sif --typeintype"
 
-modules = Sif.Parser.Utils
-        , Sif.Parser.Common
-        , Sif.Parser.Problem
-        , Sif.Parser.Pattern
-        , Sif.Parser
-
-        , Sif.REPL
-        , Sif.Commands
+modules = Sif.DSL.State
         , Sif.Options
-        , Sif.API
-        , Sif.Error
+
         , Sif.Effs
+        , Sif.Error
+
+        , Sif.DSL.Parser.Utils
+        , Sif.DSL.Parser.Common
+        , Sif.DSL.Parser.Problem
+        , Sif.DSL.Parser.Solution
+        , Sif.DSL.Parser
+        , Sif.DSL
+
+        , Sif.API
+
+        , Sif.Commands
+        , Sif.REPL
 
         , Sif.Test.Commands
 

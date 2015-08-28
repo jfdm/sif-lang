@@ -95,7 +95,7 @@ convOpts (Flag x) o =
     "logwarn"  => Just $ record {loglvl = WARN}       o
     "logfatal" => Just $ record {loglvl = FATAL}      o
     "logerror" => Just $ record {loglvl = ERROR}      o
-    "logerror" => Just $ record {loglvl = ALL}        o
+    "logall"   => Just $ record {loglvl = ALL}        o
     otherwise => Nothing
 
 helpStr : String

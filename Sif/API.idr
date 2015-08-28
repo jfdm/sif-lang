@@ -147,10 +147,9 @@ filterPreludeIDX doc = mapMaybe (getPSPair) $ getPatternKVPairs doc
 importPreludeIDX : String -> List (String, String) -> Eff () SifEffs
 importPreludeIDX _      Nil         = pure ()
 importPreludeIDX nspace ((p,s)::ps) = do
-    putStrLn $ unwords ["Importing Prelude:", nspace]
-    info $ unlines [ "Trying to build:"
-                   , "\tProblem File: "  ++ show (pDir p)
-                   , "\tSolution File: " ++ show (pDir s)]
+    trace $ unlines [ "Trying to build:"
+                    , "\tProblem File: "  ++ show (pDir p)
+                    , "\tSolution File: " ++ show (pDir s)]
     (_ ** bob)  <- getSifBuilder
     patt <- patternFromFile bob (pDir p) (pDir s)
     updateLibrary (\idx => addToLibrary patt idx)
@@ -166,6 +165,7 @@ loadPrelude = do
     case (prelude opts) of
       Nothing   => pure ()
       Just pdir => do
+        putStrLn $ unwords ["Importing Prelude:", pdir]
         case !(readYAMLConfig (pdir ++ "/index.yaml")) of
           Left err   => printLn err
           Right pIDX =>

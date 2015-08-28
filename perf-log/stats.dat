@@ -1,5 +1,6 @@
 x       Date            commit  LoC     tyCHK   CodeGen Mono    exe       Comment
-1       2015-09-12      c88abac 2917    156.85  197.58  340     5662007   {Initial measurement}
-2       2015-09-12      f883f0f 2955    154.03  199.43  337.13  5681726   {Namespace cleanup}
-3       2015-09-24      a77d3bc 3017    102.25  180.61  275.02  5690867   {Removed prelude}
-4       2015-09-27      81407d0 3443    111.22  108.81  285.73  5703068   {Added logging and syntax changes.}
+1       2015-08-12      c88abac 2917    156.85  197.58  340     5662007   {Initial measurement}
+2       2015-08-12      f883f0f 2955    154.03  199.43  337.13  5681726   {Namespace cleanup}
+3       2015-08-24      a77d3bc 3017    102.25  180.61  275.02  5690867   {Removed prelude}
+4       2015-08-27      81407d0 3443    111.22  108.81  285.73  5703068   {Added logging and syntax changes.}
+5       2015-08-28      41d2a55 3408    81.49   160.44  234.38  5321407   {Rewrite and Design Patterns removed tree...}
