@@ -5,6 +5,13 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Sif.Types
 
+-- ----------------------------------------------- [ Problems and Requirements ]
+
+-- Encoding of CONTROL | CODE | ACTION ??
+-- Encoding of Categories => Security, Access Control, HCI...
+
+-- These internal types are not used. How to use them?
+
 data RTy = FUNC | USAB | RELI | PERF | SUPP
 
 instance Cast RTy String where

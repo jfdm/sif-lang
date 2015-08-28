@@ -67,6 +67,7 @@ strToLog s =
     "warn"    => (_ ** WARN)
     "fatal"   => (_ ** FATAL)
     "error"   => (_ ** ERROR)
+    "all"     => (_ ** ALL)
     otherwise => (_ ** OFF)
 
 convOpts : Arg -> SifOpts -> Maybe SifOpts
@@ -94,6 +95,7 @@ convOpts (Flag x) o =
     "logwarn"  => Just $ record {loglvl = WARN}       o
     "logfatal" => Just $ record {loglvl = FATAL}      o
     "logerror" => Just $ record {loglvl = ERROR}      o
+    "logerror" => Just $ record {loglvl = ALL}        o
     otherwise => Nothing
 
 helpStr : String
