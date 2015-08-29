@@ -61,7 +61,7 @@ showConvPattern p DOT =
 showConvPattern p XML =
   case (the (Maybe (convTy XML)) (convTo p XML)) of
     Nothing => Nothing
-    Just r  => Just (show r)
+    Just r  => Just (show @{xml} r)
 showConvPattern p ORG =
   case (the (Maybe (convTy ORG)) (convTo p ORG)) of
     Nothing => Nothing
@@ -151,6 +151,11 @@ record SifBuilder (impl : SifTy -> Type) where
 
   buildPattern  : String -> Maybe String -> PROBLEM impl -> SOLUTION impl -> PATTERN impl
 
+record SifBackend where
+    constructor MkBackend
+    name    : String
+    builder : (SifBuilder impl)
+
 -- ------------------------------------------------------------- [ Problem API ]
 
 mkRequirement : SifBuilder i
@@ -213,7 +218,10 @@ mkTrait : SifBuilder i
        -> SValue
        -> AFFECTS i
        -> TRAIT i
-mkTrait impl ty t d s rs = (buildTrait impl) ty t d s rs
+mkTrait impl ty t d s rs = (buildTrait impl) ty t d s' rs
+  where
+    s' : SValue
+    s' = case ty of {GEN => s; ADV => s; DIS => invertEval s}
 
 mkAspect : SifBuilder i
        -> String
@@ -237,7 +245,7 @@ mkDisadvantage : SifBuilder i
               -> SValue
               -> AFFECTS i
               -> DISADVANTAGE i
-mkDisadvantage impl t d s rs = (buildTrait impl) DIS t d s rs
+mkDisadvantage impl t d s rs = (buildTrait impl) DIS t d (invertEval s) rs
 
 mkProperty : SifBuilder i
           -> String

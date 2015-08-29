@@ -15,6 +15,7 @@ modules = Effect.Logging.Level
         , Sif.Pattern
         , Sif.Builder.Utils
         , Sif.Builder.AbsInterp
+        , Sif.Builder.DirectRep
         -- , Sif.PModel
 
         , Sif.Library

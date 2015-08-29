@@ -20,12 +20,17 @@ import Sif.Pattern
 
 import Sif.Builder.Utils
 
+-- -------------------------------------------------------------- [ Directives ]
+
+%access private
 %default partial
+
+-- --------------------------------------------------- [ Interpretation Result ]
 
 data InterpRes : SifTy -> Type where
   IReq    : GLang ELEM -> InterpRes tyREQ
   IProb   : GLang ELEM -> GModel               -> InterpRes tyPROBLEM
-  ITraitL : GLang ELEM -> CValue               -> InterpRes tyTRAITend
+  ITraitL : GLang ELEM -> CValue               -> InterpRes tyAFFECTS
   ITrait  : GLang ELEM -> List (GLang INTENT)  -> InterpRes tyTRAIT
   IProp   : GLang ELEM -> DList GTy GLang es   -> InterpRes tyPROPERTY
   ISolt   : GLang ELEM -> DList GTy GLang ss   -> InterpRes tySOLUTION
@@ -52,12 +57,12 @@ interpProb s ps = IProb root (model' \= (root &= cs))
     model' : GModel
     model' = insertMany cs model
 
-interpTLink : CValue -> InterpRes tyREQ -> InterpRes tyTRAITend
+interpTLink : CValue -> InterpRes tyREQ -> InterpRes tyAFFECTS
 interpTLink c (IReq r) = ITraitL r c
 
 interpTrait : String
            -> SValue
-           -> List (InterpRes tyTRAITend)
+           -> List (InterpRes tyAFFECTS)
            -> TTy
            -> InterpRes tyTRAIT
 interpTrait s m es ty = ITrait node cs
@@ -66,7 +71,7 @@ interpTrait s m es ty = ITrait node cs
     sVal v = case ty of  -- Disadvantages...
                GEN => v
                ADV => v
-               DIS => invertEval v
+               DIS => v -- invertEval v
 
     tVal : String
     tVal = case ty of
@@ -136,47 +141,47 @@ interpPatt (IProb rP m) (ISolt rS is) = IPatt (DList.foldl (flip $ insert) m (ge
 
 -- ----------------------------------------- [ Private Internal Data Structure ]
 
-data SifPriv : InterpRes ty -> SifTy -> Type where
+data AbsInterpPriv : InterpRes ty -> SifTy -> Type where
   priv__mkReq : (ty   : RTy)
              -> (t    : String)
              -> (desc : Maybe String)
-             -> SifPriv (interpReq t) tyREQ
+             -> AbsInterpPriv (interpReq t) tyREQ
 
   priv__mkProb : (title : String)
               -> (desc  : Maybe String)
-              -> DList (InterpRes tyREQ) (\x => SifPriv x tyREQ) xs
-              -> SifPriv (interpProb title xs) tyPROBLEM
+              -> DList (InterpRes tyREQ) (\x => AbsInterpPriv x tyREQ) xs
+              -> AbsInterpPriv (interpProb title xs) tyPROBLEM
 
   priv__mkTLink : (cval : CValue)
-               -> (req : SifPriv r tyREQ)
+               -> (req : AbsInterpPriv r tyREQ)
                -> (desc : Maybe String)
-               -> SifPriv (interpTLink cval r) tyTRAITend
+               -> AbsInterpPriv (interpTLink cval r) tyAFFECTS
 
   priv__mkTrait : (ty : TTy)
                -> (title : String)
                -> (desc  : Maybe String)
                -> (sval  : SValue)
-               -> DList (InterpRes tyTRAITend) (\x => SifPriv x tyTRAITend) rs
-               -> SifPriv (interpTrait title sval rs ty) tyTRAIT
+               -> DList (InterpRes tyAFFECTS) (\x => AbsInterpPriv x tyAFFECTS) rs
+               -> AbsInterpPriv (interpTrait title sval rs ty) tyTRAIT
 
   priv__mkProp : (title : String)
               -> (desc : Maybe String)
-              -> DList (InterpRes tyTRAIT) (\x => SifPriv x tyTRAIT) ts
-              -> SifPriv (interpProp title ts) tyPROPERTY
+              -> DList (InterpRes tyTRAIT) (\x => AbsInterpPriv x tyTRAIT) ts
+              -> AbsInterpPriv (interpProp title ts) tyPROPERTY
 
   priv__mkSolt : (title : String)
               -> (desc : Maybe String)
-              -> DList (InterpRes tyPROPERTY) (\x => SifPriv x tyPROPERTY) ps
-              -> SifPriv (interpSolt title ps) tySOLUTION
+              -> DList (InterpRes tyPROPERTY) (\x => AbsInterpPriv x tyPROPERTY) ps
+              -> AbsInterpPriv (interpSolt title ps) tySOLUTION
 
   priv__mkPatt : (title : String)
               -> (desc : Maybe String)
-              -> SifPriv p tyPROBLEM
-              -> SifPriv s tySOLUTION
-              -> SifPriv (interpPatt p s) tyPATTERN
+              -> AbsInterpPriv p tyPROBLEM
+              -> AbsInterpPriv s tySOLUTION
+              -> AbsInterpPriv (interpPatt p s) tyPATTERN
 
 covering
-getPrivTitle : SifPriv i ty -> Maybe String
+getPrivTitle : AbsInterpPriv i ty -> Maybe String
 getPrivTitle (priv__mkReq _ t _)       = Just t
 getPrivTitle (priv__mkProb t _ _)      = Just t
 getPrivTitle (priv__mkTrait _ t _ _ _) = Just t
@@ -185,53 +190,53 @@ getPrivTitle (priv__mkSolt t _ _)      = Just t
 getPrivTitle (priv__mkPatt t _ _ _)    = Just t
 getPrivTitle _                         = Nothing
 
-getReqTitle : SifPriv i tyREQ -> String
+getReqTitle : AbsInterpPriv i tyREQ -> String
 getReqTitle (priv__mkReq ty t d) = t
 getReqTitle _                    = ""
 
 -- -------------------------------------------------------------------- [ Show ]
 
 covering
-showSifPriv : SifPriv i ty -> String
-showSifPriv (priv__mkReq ty t d) = with List
+showAbsInterpPriv : AbsInterpPriv i ty -> String
+showAbsInterpPriv (priv__mkReq ty t d) = with List
     unwords ["   ", show ty, show t]
 
-showSifPriv (priv__mkProb t d rs) = with List
+showAbsInterpPriv (priv__mkProb t d rs) = with List
     unwords [ "  Problem:", show t, "\n"
-            , unlines $ mapDList (\x => showSifPriv x) rs
+            , unlines $ mapDList (\x => showAbsInterpPriv x) rs
             , "\n"]
 
-showSifPriv (priv__mkTLink cval r d) = with List
+showAbsInterpPriv (priv__mkTLink cval r d) = with List
     unwords ["       ", show cval, (getReqTitle r), "\n"]
 
-showSifPriv (priv__mkTrait ty t d s rs) = with List
+showAbsInterpPriv (priv__mkTrait ty t d s rs) = with List
     unwords [
         "     ", show ty, ":" , show t , "is", show s , "\n"
-      , concat (mapDList (showSifPriv) rs)
+      , concat (mapDList (showAbsInterpPriv) rs)
       , "\n"]
 
-showSifPriv (priv__mkProp t d ts) = with List
+showAbsInterpPriv (priv__mkProp t d ts) = with List
     unwords [
         "     Property: " , t , "\n"
-     , concat (mapDList (showSifPriv) ts)
+     , concat (mapDList (showAbsInterpPriv) ts)
      , "\n"]
 
-showSifPriv (priv__mkSolt t d ps) = with List
+showAbsInterpPriv (priv__mkSolt t d ps) = with List
     unwords [
          "  Solution: " , t , "\n"
-      , Foldable.concat (mapDList showSifPriv ps)
+      , Foldable.concat (mapDList showAbsInterpPriv ps)
       , "\n"]
 
-showSifPriv (priv__mkPatt t d p s) = with List
+showAbsInterpPriv (priv__mkPatt t d p s) = with List
     unwords [
          "Pattern:" , show t , "\n"
-      , showSifPriv p
-      , showSifPriv s]
+      , showAbsInterpPriv p
+      , showAbsInterpPriv s]
 
 -- ------------------------------------------------------------------- [ toORG ]
 
 covering
-toOrg : SifPriv i ty -> String
+toOrg : AbsInterpPriv i ty -> String
 toOrg (priv__mkReq _ t d) = with List
     unwords [
          "** Requirement:", t, "\n\n",
@@ -284,7 +289,7 @@ XEffs : List EFFECT
 XEffs = [STATE (Nat, Dict String Nat)]
 
 covering
-toXML' : SifPriv i ty -> Eff (Document ELEMENT) XEffs
+toXML' : AbsInterpPriv i ty -> Eff (Document ELEMENT) XEffs
 toXML' (priv__mkReq ty t d) = do
        let e  = addScore $ mkNDNode (cast ty) t d
        (idGen,_) <- get
@@ -372,18 +377,16 @@ toXML' (priv__mkPatt t d p s) = do
 toXML' _ = pure $ mkSimpleElement "bug"
 
 partial
-toXML : SifPriv i ty -> Document DOCUMENT
+toXML : AbsInterpPriv i ty -> Document DOCUMENT
 toXML p = setRoot root $ mkDocument (mkQName "pattern") Nothing
   where
     partial
     root : Document ELEMENT
     root = runPureInit [(Z,Dict.empty)] (toXML' p)
 
-
-
 -- -------------------------------------------------------------------- [ Edda ]
 
-toEdda : SifPriv i tyPATTERN -> Maybe $ Edda PRIME MODEL
+toEdda : AbsInterpPriv i tyPATTERN -> Maybe $ Edda PRIME MODEL
 toEdda expr =
     case parse parseOrg (toOrg expr) of
       Left  err => Nothing
@@ -392,7 +395,7 @@ toEdda expr =
 -- ----------------------------------------------------- [ Instances and Stuff ]
 
 
-getModel : {x : InterpRes tyPATTERN} -> SifPriv x tyPATTERN -> GModel
+getModel : {x : InterpRes tyPATTERN} -> AbsInterpPriv x tyPATTERN -> GModel
 getModel {x} _ = extract x
   where
     extract : InterpRes tyPATTERN -> GModel
@@ -401,12 +404,14 @@ getModel {x} _ = extract x
 
 -- --------------------------------------------------------------------- [ DOT ]
 
-toDot : {i : InterpRes tyPATTERN} -> SifPriv i tyPATTERN -> SimpleDot GRAPH
+toDot : {i : InterpRes tyPATTERN} -> AbsInterpPriv i tyPATTERN -> SimpleDot GRAPH
 toDot p = grlToDot $ getModel p
+
+-- ------------------------------------------------------ [ Builder Definition ]
 
 covering partial
 convPriv : {i : InterpRes tyPATTERN}
-        -> SifPriv i tyPATTERN
+        -> AbsInterpPriv i tyPATTERN
         -> (fmt : SifOutFormat)
         -> Maybe (convTy fmt)
 convPriv p ORG     = Just $ toOrg p
@@ -414,17 +419,16 @@ convPriv p XML     = Just $ toXML p
 convPriv p DOT     = Just $ toDot p
 convPriv p GRL     = Just $ getModel p
 convPriv p EDDA    = toEdda p
-convPriv p COMPACT = Just $ showSifPriv p
+convPriv p COMPACT = Just $ showAbsInterpPriv p
 convPriv p IDRIS   = Nothing
 
+data AbsInterpRep : SifTy -> Type where
+  MkWrapper : {i : InterpRes ty} -> AbsInterpPriv i ty -> AbsInterpRep ty
 
-data SifWrapper : SifTy -> Type where
-  MkWrapper : {i : InterpRes ty} -> SifPriv i ty -> SifWrapper ty
+instance Show (AbsInterpPriv i ty) where
+  show = showAbsInterpPriv
 
-instance Show (SifPriv i ty) where
-  show = showSifPriv
-
-instance SifRepAPI SifWrapper where
+instance SifRepAPI AbsInterpRep where
   getTitle (MkWrapper i) = getPrivTitle i
 
 
@@ -433,44 +437,44 @@ instance SifRepAPI SifWrapper where
         BadModel  => Bad
         Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) gs
 
-  toString (MkWrapper p)      = showSifPriv p
+  toString (MkWrapper p)      = showAbsInterpPriv p
   convTo (MkWrapper   x) fmt  = convPriv x fmt
 
 -- ------------------------------------------------------------- [ The Builder ]
 
-buildReqAbs : RTy -> String -> Maybe String -> REQUIREMENT SifWrapper
+buildReqAbs : RTy -> String -> Maybe String -> REQUIREMENT AbsInterpRep
 buildReqAbs ty s d = MkExpr $ MkWrapper $ priv__mkReq ty s d
 
-conv : List (SifExpr SifWrapper ty)
-    -> (xs ** DList (InterpRes ty) (\x => SifPriv x ty) xs)
+conv : List (SifExpr AbsInterpRep ty)
+    -> (xs ** DList (InterpRes ty) (\x => AbsInterpPriv x ty) xs)
 conv xs = fromLDP $ map (\(MkExpr (MkWrapper x)) => (_ ** x)) xs
 
-convR : SifExpr SifWrapper tyREQ -> (r : InterpRes tyREQ ** SifPriv r tyREQ)
+convR : SifExpr AbsInterpRep tyREQ -> (r : InterpRes tyREQ ** AbsInterpPriv r tyREQ)
 convR (MkExpr (MkWrapper res)) = (_ ** res)
 
 
-buildProblemAbs : String -> Maybe String -> REQUIREMENTS SifWrapper -> PROBLEM SifWrapper
+buildProblemAbs : String -> Maybe String -> REQUIREMENTS AbsInterpRep -> PROBLEM AbsInterpRep
 buildProblemAbs t d rs =
     MkExpr $ MkWrapper $ priv__mkProb t d (Sigma.getProof $ conv rs)
 
-buildAffectAbs : CValue -> REQUIREMENT SifWrapper -> Maybe String -> AFFECT SifWrapper
+buildAffectAbs : CValue -> REQUIREMENT AbsInterpRep -> Maybe String -> AFFECT AbsInterpRep
 buildAffectAbs c r d = MkExpr $ MkWrapper $ priv__mkTLink c (Sigma.getProof $ convR r) d
 
 buildTraitAbs : TTy
              -> String
              -> Maybe String
              -> SValue
-             -> AFFECTS SifWrapper
-             -> TRAIT SifWrapper
+             -> AFFECTS AbsInterpRep
+             -> TRAIT AbsInterpRep
 buildTraitAbs ty t d s rs =
     MkExpr $ MkWrapper $ priv__mkTrait ty t d s (Sigma.getProof $ conv rs)
 
 
-buildPropertyAbs : String -> Maybe String -> TRAITS SifWrapper -> PROPERTY SifWrapper
+buildPropertyAbs : String -> Maybe String -> TRAITS AbsInterpRep -> PROPERTY AbsInterpRep
 buildPropertyAbs t d ts =
     MkExpr $ MkWrapper $ priv__mkProp t d (Sigma.getProof $ conv ts)
 
-buildSolutionAbs : String -> Maybe String -> PROPERTIES SifWrapper -> SOLUTION SifWrapper
+buildSolutionAbs : String -> Maybe String -> PROPERTIES AbsInterpRep -> SOLUTION AbsInterpRep
 buildSolutionAbs s d ps =
     MkExpr $ MkWrapper $ priv__mkSolt s d (Sigma.getProof $ conv ps)
 
@@ -481,12 +485,12 @@ buildSolutionAbs s d ps =
 
 -}
 
-buildPatternAbs  : String -> Maybe String -> PROBLEM SifWrapper -> SOLUTION SifWrapper -> PATTERN SifWrapper
+buildPatternAbs  : String -> Maybe String -> PROBLEM AbsInterpRep -> SOLUTION AbsInterpRep -> PATTERN AbsInterpRep
 buildPatternAbs t d (MkExpr (MkWrapper p)) (MkExpr (MkWrapper s)) = MkExpr $ MkWrapper $ priv__mkPatt t d p s
 
 
-defBuilder : SifBuilder SifWrapper
-defBuilder = MkSifBuilder
+absInterpBuilder : SifBuilder AbsInterpRep
+absInterpBuilder = MkSifBuilder
     buildReqAbs
     buildProblemAbs
     buildAffectAbs
@@ -494,5 +498,9 @@ defBuilder = MkSifBuilder
     buildPropertyAbs
     buildSolutionAbs
     buildPatternAbs
+
+public
+backendAbsInterp : SifBackend
+backendAbsInterp = MkBackend "interp" absInterpBuilder
 
 -- --------------------------------------------------------------------- [ EOF ]

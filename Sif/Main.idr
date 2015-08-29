@@ -10,6 +10,8 @@ import System
 import Sif.Types
 import Sif.AbsSyntax
 import Sif.Pattern
+import Sif.Builder.AbsInterp
+import Sif.Builder.DirectRep
 import Sif.Effs
 import Sif.Error
 import Sif.Library
@@ -51,6 +53,7 @@ sifMain = do
     opts <- parseOptions
     putOptions opts
     setLogLvl (loglvl opts)
+    setSifBackend (backend opts)
     loadPrelude
     runMode (mode opts)
 

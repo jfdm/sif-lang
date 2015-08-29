@@ -43,11 +43,12 @@ record SifOpts where
   prelude    : Maybe String
   banner     : Bool
   loglvl     : LogLevel n
+  backend    : Maybe String
 
 defOpts : SifOpts
 defOpts = MkSOpts
     Nothing Nothing (Just REPL) Nothing Nothing Nothing
-    True OFF
+    True OFF (Just "interp")
 
 instance Default SifOpts where
   default = defOpts
@@ -80,6 +81,7 @@ convOpts (KeyValue k v) o =
     "out"        => Just $ record {out     = Just v}                o
     "to"         => Just $ record {to      = readOutFMT v}          o
     "log"        => Just $ record {loglvl  = getProof $ strToLog v} o
+    "backend"    => Just $ record {backend = Just v}                o
     otherwise    => Nothing
 convOpts (Flag x) o =
   case x of
@@ -113,7 +115,7 @@ Flag                 | Description
 --log="<num|word>"   | Set logging levels
                      | [1,     2,     3,    4,    5,     6]
                      | [trace, debug, info, warn, fatal, error]
-
+--backend="<naam>"   | Change meta-model [interp|direct]
 --help               | Display help
 --version            | Display version
 --check              | Check problem solution pairing.
@@ -121,12 +123,7 @@ Flag                 | Description
 --conv               | Convert problem solution pairing
 --nobanner           | Don't display banner
 
---logtrace
---logdebug
---loginfo
---logwarn
---logfatal
---logerror
+--logtrace, --logdebug, --loginfo, --logwarn, --logfatal, --logerror
 """
 
 -- --------------------------------------------------------------------- [ EOF ]

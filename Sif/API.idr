@@ -69,8 +69,8 @@ buildPatternE Nothing Nothing   = Sif.raise NoFileGiven
 buildPatternE Nothing  _        = Sif.raise (FileMissing ("Solution File "))
 buildPatternE _        Nothing  = Sif.raise (FileMissing ("Problem File "))
 buildPatternE (Just p) (Just s) = do
-  (_ ** bob) <- getSifBuilder
-  patt <- patternFromFile bob p s
+  bob <- getSifBackend
+  patt <- patternFromFile (builder bob) p s
   pure $ (_ ** patt)
 
 
@@ -150,8 +150,8 @@ importPreludeIDX nspace ((p,s)::ps) = do
     trace $ unlines [ "Trying to build:"
                     , "\tProblem File: "  ++ show (pDir p)
                     , "\tSolution File: " ++ show (pDir s)]
-    (_ ** bob)  <- getSifBuilder
-    patt <- patternFromFile bob (pDir p) (pDir s)
+    bob  <- getSifBackend
+    patt <- patternFromFile (builder bob) (pDir p) (pDir s)
     updateLibrary (\idx => addToLibrary patt idx)
     importPreludeIDX nspace ps
   where

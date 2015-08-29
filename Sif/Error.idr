@@ -18,11 +18,12 @@ data SifError : Type where
   NoFormatSpecified : SifError
   FeatureNotImpl    : SifError
 
+  NoSuchBackend  : String -> SifError
   IDMissing      : String -> SifError
   ProblemMissing : String -> SifError
-  DuplicateID   : String -> SifError
-  FileMissing   : String -> SifError
-  ParseError    : String -> String -> SifError
+  DuplicateID    : String -> SifError
+  FileMissing    : String -> SifError
+  ParseError     : String -> String -> SifError
 
 instance Show SifError where
   show IndexOutOfBounds = "Index Out of Bounds"
@@ -44,5 +45,5 @@ instance Show SifError where
   show (ParseError fn err) =
       unlines [ unwords ["Error Parsing file", show fn, "error was:"]
               , err]
-
+  show (NoSuchBackend b)    = unwords ["No Such Backend", show b]
 -- --------------------------------------------------------------------- [ EOF ]

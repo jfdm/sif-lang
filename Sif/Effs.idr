@@ -20,6 +20,7 @@ import Sif.DSL.State
 import Sif.Error
 import Sif.Pattern
 import Sif.Builder.AbsInterp
+import Sif.Builder.DirectRep
 import Sif.Library
 import Sif.Options
 
@@ -27,16 +28,19 @@ import Sif.Options
 
 record SifState where
   constructor MkSifState
-  opts : SifOpts
-  lib  : SifLib
-  benv : BuildState
-  inst : (i ** SifBuilder i)
+  opts    : SifOpts
+  lib     : SifLib
+  benv    : BuildState
+  bends   : List SifBackend
+  builder : SifBackend
 
 instance Default SifState where
-  default = MkSifState defOpts
-                       defaultLib
-                       defBuildSt
-                       (_ ** defBuilder)
+  default = MkSifState
+      defOpts
+      defaultLib
+      defBuildSt
+      [backendAbsInterp,backendDirectRep]
+      backendAbsInterp
 
 SifEffs : List EFFECT
 SifEffs = [ FILE_IO ()
@@ -75,11 +79,25 @@ putLibrary l = 'sstate :- update (\st => record {lib = l} st)
 updateLibrary : (SifLib -> SifLib) -> Eff () ['sstate ::: STATE SifState]
 updateLibrary u = 'sstate :- update (\st => record {lib = u (lib st)} st)
 
-getSifBuilder : Eff (l ** SifBuilder l) ['sstate ::: STATE SifState]
-getSifBuilder = pure $ inst !('sstate :- get)
+getSifBackend : Eff SifBackend ['sstate ::: STATE SifState]
+getSifBackend = pure $ (builder !('sstate :- get))
 
-putSifBuilder : (SifBuilder l) -> Eff () ['sstate ::: STATE SifState]
-putSifBuilder l = 'sstate :- update (\st => record {inst = (_ ** l)} st)
+setSifBackend : Maybe String -> Eff () SifEffs
+setSifBackend Nothing = do
+    putStrLn $ unwords ["Using Default Backend"]
+    'sstate :- update (\st => record {builder = backendAbsInterp} st)
+setSifBackend (Just n) = do
+    st <- 'sstate :- get
+    case find (\x => name x == n) (bends st) of
+      Nothing => do
+        printLn (NoSuchBackend n)
+        setSifBackend Nothing
+      Just x  => do
+        putStrLn $ unwords ["Using backend", show n]
+        'sstate :- update (\st => record {builder = x} st)
+
+addSifBackend : SifBackend -> Eff () ['sstate ::: STATE SifState]
+addSifBackend b = 'sstate :- update (\st => record {bends = (b::bends st)} st)
 
 getBuildState : Eff BuildState ['sstate ::: STATE SifState]
 getBuildState = pure $ benv !('sstate :- get)
