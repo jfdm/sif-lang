@@ -22,8 +22,8 @@ import Sif.Builder.Utils
 
 -- -------------------------------------------------------------- [ Directives ]
 
-%access private
-%default partial
+-- %access private
+%default total
 
 -- --------------------------------------------------- [ Interpretation Result ]
 
@@ -386,6 +386,7 @@ toXML p = setRoot root $ mkDocument (mkQName "pattern") Nothing
 
 -- -------------------------------------------------------------------- [ Edda ]
 
+covering
 toEdda : AbsInterpPriv i tyPATTERN -> Maybe $ Edda PRIME MODEL
 toEdda expr =
     case parse parseOrg (toOrg expr) of
@@ -409,6 +410,15 @@ toDot p = grlToDot $ getModel p
 
 -- ------------------------------------------------------ [ Builder Definition ]
 
+covering
+evalPatternAbs : {i : InterpRes tyPATTERN}
+              -> AbsInterpPriv i tyPATTERN
+              -> Sif.EvalResult
+evalPatternAbs p =
+    case evalModel (getModel p) Nothing of
+      BadModel  => Bad
+      Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) gs
+
 covering partial
 convPriv : {i : InterpRes tyPATTERN}
         -> AbsInterpPriv i tyPATTERN
@@ -428,38 +438,40 @@ data AbsInterpRep : SifTy -> Type where
 instance Show (AbsInterpPriv i ty) where
   show = showAbsInterpPriv
 
+
+
 instance SifRepAPI AbsInterpRep where
-  getTitle (MkWrapper i) = getPrivTitle i
-
-
-  evalPattern (MkWrapper p) =
-      case evalModel (getModel p) Nothing of
-        BadModel  => Bad
-        Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) gs
-
+  getTitle (MkWrapper i)      = getPrivTitle i
+  evalPattern (MkWrapper p)   = evalPatternAbs p
   toString (MkWrapper p)      = showAbsInterpPriv p
   convTo (MkWrapper   x) fmt  = convPriv x fmt
 
 -- ------------------------------------------------------------- [ The Builder ]
 
+covering
 buildReqAbs : RTy -> String -> Maybe String -> REQUIREMENT AbsInterpRep
 buildReqAbs ty s d = MkExpr $ MkWrapper $ priv__mkReq ty s d
 
+%inline covering
 conv : List (SifExpr AbsInterpRep ty)
     -> (xs ** DList (InterpRes ty) (\x => AbsInterpPriv x ty) xs)
 conv xs = fromLDP $ map (\(MkExpr (MkWrapper x)) => (_ ** x)) xs
 
+%inline covering
 convR : SifExpr AbsInterpRep tyREQ -> (r : InterpRes tyREQ ** AbsInterpPriv r tyREQ)
 convR (MkExpr (MkWrapper res)) = (_ ** res)
 
 
+covering
 buildProblemAbs : String -> Maybe String -> REQUIREMENTS AbsInterpRep -> PROBLEM AbsInterpRep
 buildProblemAbs t d rs =
     MkExpr $ MkWrapper $ priv__mkProb t d (Sigma.getProof $ conv rs)
 
+covering
 buildAffectAbs : CValue -> REQUIREMENT AbsInterpRep -> Maybe String -> AFFECT AbsInterpRep
 buildAffectAbs c r d = MkExpr $ MkWrapper $ priv__mkTLink c (Sigma.getProof $ convR r) d
 
+covering
 buildTraitAbs : TTy
              -> String
              -> Maybe String
@@ -469,26 +481,21 @@ buildTraitAbs : TTy
 buildTraitAbs ty t d s rs =
     MkExpr $ MkWrapper $ priv__mkTrait ty t d s (Sigma.getProof $ conv rs)
 
-
+covering
 buildPropertyAbs : String -> Maybe String -> TRAITS AbsInterpRep -> PROPERTY AbsInterpRep
 buildPropertyAbs t d ts =
     MkExpr $ MkWrapper $ priv__mkProp t d (Sigma.getProof $ conv ts)
 
+covering
 buildSolutionAbs : String -> Maybe String -> PROPERTIES AbsInterpRep -> SOLUTION AbsInterpRep
 buildSolutionAbs s d ps =
     MkExpr $ MkWrapper $ priv__mkSolt s d (Sigma.getProof $ conv ps)
 
-
-{-
-
-  buildPattern  : String -> Maybe String -> PROBLEM -> SOLUTION -> PATTERN
-
--}
-
+covering
 buildPatternAbs  : String -> Maybe String -> PROBLEM AbsInterpRep -> SOLUTION AbsInterpRep -> PATTERN AbsInterpRep
 buildPatternAbs t d (MkExpr (MkWrapper p)) (MkExpr (MkWrapper s)) = MkExpr $ MkWrapper $ priv__mkPatt t d p s
 
-
+covering
 absInterpBuilder : SifBuilder AbsInterpRep
 absInterpBuilder = MkSifBuilder
     buildReqAbs
@@ -499,7 +506,7 @@ absInterpBuilder = MkSifBuilder
     buildSolutionAbs
     buildPatternAbs
 
-public
+covering
 backendAbsInterp : SifBackend
 backendAbsInterp = MkBackend "interp" absInterpBuilder
 

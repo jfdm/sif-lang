@@ -22,7 +22,7 @@ import Sif.Builder.Utils
 
 -- -------------------------------------------------------------- [ Directives ]
 
-%access private
+%access public
 %default partial
 
 -- ----------------------------------------- [ Private Internal Data Structure ]
@@ -165,108 +165,6 @@ toOrg (DirectMkPatt t d p s) = with List
       , toOrg p , "\n\n"
       , toOrg s , "\n\n"]
 
--- --------------------------------------------------------------------- [ XML ]
-
-{-
-XEffs : List EFFECT
-XEffs = [STATE (Nat, Dict String Nat)]
-
-covering
-toXML' : DirectRep ty -> Eff (Document ELEMENT) XEffs
-toXML' (DirectMkReq ty t d) = do
-       let e  = addScore $ mkNDNode (cast ty) t d
-       (idGen,_) <- get
-       let idVal = cast {to=Int} (S idGen)
-       let e' = setAttribute "id" (cast idVal) e
-       update (\(idGen,ids) => ((S idGen), insert t (S idGen) ids))
-       pure $ e'
-
-toXML' (DirectMkProb t d rs) = do
-       let e = addScore $ mkNode "problem"
-       -- The following mess is because I could get Effectful HOFs for DList to work.
-       -- <mess>
-       let rs' = toLDP rs
-       rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
-       let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "requirements") rs''
-       -- </mess>
-       pure $ e
-         <++> rNodes
-         <++> (addScore $ mkDescNode d)
-         <++> ("name" <+=> t)
-
-toXML' (DirectMkAffect cval r d) = do
-       (_,ids) <- get
-       let id = lookup (getReqTitle r) ids
-       let e = case d of
-           Nothing => mkNode "affect"
-           Just d' => "affect" <+=> d'
-       let idval = cast {to=Int} $ fromMaybe 0 id
-       pure $ (setAttribute "cvalue" (cast cval)
-              (setAttribute "linksTo" (cast idval) e))
-
-toXML' (DirectMkTrait ty t d s rs) = do
-       let e  = addScore $ mkNode (toLower $ show ty)
-       let e' = setAttribute "svalue" (cast s) e
-       -- <mess>
-       let rs' = toLDP rs
-       rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
-       let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "affects") rs''
-       -- </mess>
-       pure $ e'
-         <++> (rNodes)
-         <++> (mkDescNode d)
-         <++> ("name" <+=> t)
-
-toXML' (DirectMkProp t d rs) = do
-       let e = addScore $ mkNode "property"
-       -- <mess>
-       let rs' = toLDP rs
-       rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
-       let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "traits") rs''
-       -- </mess>
-       pure $ e
-         <++> rNodes
-         <++> (mkDescNode d)
-         <++> ("name" <+=> t)
-
-toXML' (DirectMkSolt t d rs) = do
-       let e = addScore $ mkNode "solution"
-       -- <mess>
-       let rs' = toLDP rs
-       rs'' <- mapE (\r => toXML' (Sigma.getProof r)) rs'
-       let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "properties") rs''
-       -- </mess>
-       pure $ e
-         <++> (addScore rNodes)
-         <++> mkStructure
-         <++> mkDynamics
-         <++> (mkDescNode d)
-         <++> ("name" <+=> t)
-
-toXML' (DirectMkPatt t d p s) = do
-       let e = mkNode "pattern"
-       pNode <- toXML' p
-       sNode <- toXML' s
-       pure $ e <++> mkRels
-                <++> mkStudies
-                <++> (addScore $ mkEmptyNode "evidence")
-                <++> sNode
-                <++> pNode
-                <++> (addScore $ mkEmptyNode "context")
-                <++> mkMdata
-                <++> (mkDescNode d)
-                <++> ("name" <+=> t)
-
-toXML' _ = pure $ mkSimpleElement "bug"
-
-partial
-toXML : DirectRep ty -> Document DOCUMENT
-toXML p = setRoot root $ mkDocument (mkQName "pattern") Nothing
-  where
-    partial
-    root : Document ELEMENT
-    root = runPureInit [(Z,Dict.empty)] (toXML' p)
--}
 -- -------------------------------------------------------------------- [ Edda ]
 
 toEdda : DirectRep tyPATTERN -> Maybe $ Edda PRIME MODEL
@@ -278,7 +176,7 @@ toEdda expr =
 -- --------------------------------------------------------------------- [ GRL ]
 
 data InterpRes : SifTy -> Type where
-  IReq    : GLang ELEM -> InterpRes tyREQ
+  IReq    : GLang ELEM                         -> InterpRes tyREQ
   IProb   : GLang ELEM -> GModel               -> InterpRes tyPROBLEM
   IAffect : GLang ELEM -> CValue               -> InterpRes tyAFFECTS
   ITrait  : GLang ELEM -> List (GLang INTENT)  -> InterpRes tyTRAIT
@@ -327,7 +225,7 @@ toGRL (DirectMkTrait ty t d s rs) = ITrait node cs
     es' = map toGRL rs
 
     cs : List (GLang INTENT)
-    cs = map (\(IAffect r c) => node ==> r | c) es'
+    cs = map (\(IAffect r c) => (node ==> r | c)) es'
 
 toGRL (DirectMkProp t d ts) = IProp pelem (Sigma.getProof elems)
   where
@@ -384,14 +282,17 @@ toGRL (DirectMkPatt t d p s) = IPatt $ mkModel (toGRL p) (toGRL s)
 
 -- ----------------------------------------------------- [ Instances and Stuff ]
 
--- --------------------------------------------------------------------- [ DOT ]
-
-toDot : DirectRep tyPATTERN -> SimpleDot GRAPH
-toDot p = grlToDot $ extract (toGRL p)
+getGModel : DirectRep tyPATTERN -> GModel
+getGModel p = extract (toGRL p)
   where
     extract : InterpRes tyPATTERN -> GModel
     extract (IPatt m) = m
-    extract _         = emptyModel
+
+
+-- --------------------------------------------------------------------- [ DOT ]
+
+toDot : DirectRep tyPATTERN -> SimpleDot GRAPH
+toDot p = grlToDot $ getGModel p
 
 -- ------------------------------------------------------ [ Builder Definition ]
 
@@ -402,7 +303,7 @@ convPriv : DirectRep tyPATTERN
 convPriv p ORG     = Just $ toOrg p
 convPriv p XML     = Nothing -- Just $ toXML p
 convPriv p DOT     = Just $ toDot p
-convPriv p GRL     = Just $ (\(IPatt m) => m) (toGRL p)
+convPriv p GRL     = Just $ getGModel p
 convPriv p EDDA    = toEdda p
 convPriv p COMPACT = Just $ showDirectRep p
 convPriv p IDRIS   = Nothing
@@ -413,8 +314,8 @@ instance Show (DirectRep ty) where
 instance SifRepAPI DirectRep where
   getTitle = getDirectRepTitle
 
-  evalPattern p = let (IPatt p') = toGRL p  in
-      case evalModel p' Nothing of
+  evalPattern p =
+      case evalModel (getGModel p) Nothing of
         BadModel  => Bad
         Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) gs
 
@@ -423,6 +324,7 @@ instance SifRepAPI DirectRep where
 
 -- ------------------------------------------------------------- [ The Builder ]
 
+%inline
 conv : SifExpr DirectRep ty -> DirectRep ty
 conv (MkExpr x) = x
 
@@ -467,7 +369,6 @@ directBuilder = MkSifBuilder
     buildSolutionDir
     buildPatternDir
 
-public
 backendDirectRep : SifBackend
 backendDirectRep = MkBackend "direct" directBuilder
 

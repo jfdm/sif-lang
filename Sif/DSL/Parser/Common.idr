@@ -18,7 +18,10 @@ descString = literal
          <?> "Description Block"
 
 keyword : String -> Parser ()
-keyword s = string s *> space *> pure ()
+keyword s = do
+  string s
+  space
+  pure ()
 
 desc : Parser $ String
 desc = do
@@ -32,7 +35,7 @@ ident : Parser String
 ident = lexeme (map pack $ some (satisfy isAlphaNum) ) <?> "Identity"
 
 title : Parser String
-title = literallyBetween '"' <?> "Title"
+title = literallyBetween '"'  <?> "Title"
 
 
 -- --------------------------------------------------------------------- [ EOF ]

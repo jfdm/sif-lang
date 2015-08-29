@@ -9,6 +9,7 @@ module Sif.DSL.Parser.Utils
 import Lightyear
 import Lightyear.Strings
 
+%default partial
 %access public
 
 eol : Parser Char

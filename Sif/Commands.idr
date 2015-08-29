@@ -15,6 +15,7 @@ import Sif.DSL.Parser.Utils
 
 -- -------------------------------------------------------------- [ DIrectives ]
 
+%default partial
 %access public
 
 -- ---------------------------------------------------------------- [ Commands ]

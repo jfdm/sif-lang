@@ -23,6 +23,8 @@ import Sif.Options
 import Sif.API
 import Sif.REPL
 
+%default partial
+
 runMode : Maybe SifMode -> Eff () SifEffs
 runMode Nothing     = sifREPL
 runMode (Just VERS) = printLn FeatureNotImpl
@@ -48,6 +50,7 @@ runMode (Just Conv) = do
       Nothing => printPattern p (to os)
       Just _  => printLn FeatureNotImpl
 
+covering
 sifMain : Eff () SifEffs
 sifMain = do
     opts <- parseOptions
