@@ -26,11 +26,13 @@ import Sif.REPL
 %default partial
 
 runMode : Maybe SifMode -> Eff () SifEffs
-runMode Nothing     = sifREPL
+runMode Nothing     = putStrLn helpStr
 runMode (Just VERS) = printLn FeatureNotImpl
 runMode (Just HELP) = putStrLn helpStr
 
-runMode (Just REPL) = sifREPL
+runMode (Just REPL) = do
+    loadPrelude
+    sifREPL
 
 runMode (Just Eval) = do
     os <- getOptions
@@ -59,7 +61,6 @@ sifMain = do
     setLogLvl (loglvl opts)
     perfSetup
     setSifBackend (backend opts)
-    loadPrelude
     runMode (mode opts)
     displayPerfMetrics
 

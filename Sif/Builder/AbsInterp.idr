@@ -434,6 +434,7 @@ convPriv p GRL     = Just $ getModel p
 convPriv p EDDA    = toEdda p
 convPriv p COMPACT = Just $ showAbsInterpPriv p
 convPriv p IDRIS   = Nothing
+convPriv p STRING  = Just $ GLang.toString (getModel p)
 
 data AbsInterpRep : SifTy -> Type where
   MkWrapper : {i : InterpRes ty} -> AbsInterpPriv i ty -> AbsInterpRep ty

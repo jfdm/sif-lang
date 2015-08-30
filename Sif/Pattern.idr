@@ -22,6 +22,7 @@ convTy GRL     = GModel
 convTy EDDA    = Edda PRIME MODEL
 convTy COMPACT = String
 convTy IDRIS   = String
+convTy STRING  = String
 
 namespace Sif
   data EvalResult : Type where
@@ -53,7 +54,7 @@ showConvPattern : SifExpr impl tyPATTERN -> SifOutFormat -> Maybe String
 showConvPattern p GRL =
   case (the (Maybe (convTy GRL)) (convTo p GRL)) of
     Nothing => Nothing
-    Just r  => Just (show r)
+    Just r  => Just (GLang.toString r)
 showConvPattern p DOT =
   case (the (Maybe (convTy DOT)) (convTo p DOT)) of
     Nothing => Nothing
@@ -76,6 +77,10 @@ showConvPattern p IDRIS =
     Just r  => Just (show r)
 showConvPattern p EDDA =
   case (the (Maybe (convTy EDDA)) (convTo p EDDA)) of
+    Nothing => Nothing
+    Just r  => Nothing
+showConvPattern p STRING =
+  case (the (Maybe (convTy STRING)) (convTo p STRING)) of
     Nothing => Nothing
     Just r  => Nothing
 showConvPattern _ _ = Nothing

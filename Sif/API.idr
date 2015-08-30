@@ -89,17 +89,16 @@ evalPatternFromFile p' s' = do
 
 
 printPattern : PATTERN impl -> Maybe SifOutFormat -> Eff () SifEffs
-printPattern _ Nothing        = printLn NoFormatSpecified
-printPattern p (Just COMPACT) = putStrLn $ toString p
-printPattern p (Just fmt)     = do
-    let tname = unwords ["Converting for", show $ getTitle p]
+printPattern _ Nothing    = printLn NoFormatSpecified
+printPattern p (Just fmt) = do
+    let tname = unwords ["Converting", show $ getTitle p,"to", show fmt]
     mkTimer tname
     startTimer tname
     let res = showConvPattern p fmt
     stopTimer tname
     case res of
-      Nothing      => printLn UnSuppFormat
-      Just res     => putStrLn res
+      Nothing  => printLn UnSuppFormat
+      Just res => putStrLn res
 
 -- ------------------------------------------------------------ [ YAML Parsing ]
 

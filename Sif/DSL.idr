@@ -45,6 +45,7 @@ buildProblemE : SifBuilder impl
 buildProblemE bob (Problem i t d rs) = do
     trace "Building problem specification"
     rs' <- mapE (\r => buildReqE bob r) rs
+    splitTimerMsg (getPFName !getBuildState) "Building Requirements"
     let p = mkProblem bob t d rs'
     updateBuildState (\st => record { getProb   = Just i
                                     , pattTitle = t} st)
@@ -53,14 +54,17 @@ buildProblemE bob (Problem i t d rs) = do
 problemFromFile : SifBuilder impl
                -> String
                -> Eff (PROBLEM impl) SifEffs
-problemFromFile bob s = do
+problemFromFile bob f = do
     trace "Fetching problem specification"
-    past <- readSifFile problem s
+    mkTimer f
+    startTimer f
+    past <- readSifFile problem f
+    splitTimerMsg f "Finished Parsing now building"
     rval <- buildProblemE bob past
+    stopTimer f
     pure $ rval
 
 -- ---------------------------------------------------------- [ Build Solution ]
-
 
 buildAffectE : SifBuilder impl
             -> SifAST tyAFFECTS
@@ -80,6 +84,7 @@ buildTraitE : SifBuilder impl
 buildTraitE bob (Trait ty t v d as) = do
   debug $ unwords ["Building Trait", show t]
   as' <- mapE (\x => buildAffectE bob x) as
+  splitTimerMsg (getSFName !getBuildState) "Building Affects"
   pure $ mkTrait bob ty t d v as'
 
 buildPropertyE : SifBuilder impl
@@ -88,6 +93,7 @@ buildPropertyE : SifBuilder impl
 buildPropertyE bob (Property t d ts) = do
   debug $ unwords ["Building Property", show t]
   ts' <- mapE (\x => buildTraitE bob x) ts
+  splitTimerMsg (getSFName !getBuildState) "Building Traits"
   pure $ mkProperty bob t d ts'
 
 buildSolutionE : SifBuilder impl
@@ -104,8 +110,11 @@ buildSolutionE bob (Solution t (pID,pDesc) d ps) = do
         then Sif.raise (ProblemMissing pID')
         else do
           ps' <- mapE (\p => buildPropertyE bob p) ps
-          updateBuildState (\st => record {pattTitle = unwords [pattTitle st, "through",t]} st)
-          updateBuildState (\st => record {pattDesc = pDesc} st)
+          splitTimerMsg (getSFName !getBuildState) "Building Properties"
+          updateBuildState (\st => record
+              { pattTitle = unwords [pattTitle st, "through",t]
+              , pattDesc = pDesc
+              } st)
           pure $ mkSolution bob t d ps'
 
 solutionFromFile : SifBuilder impl
@@ -113,11 +122,29 @@ solutionFromFile : SifBuilder impl
                 -> Eff (SOLUTION impl) SifEffs
 solutionFromFile bob f = do
     trace "Fetching Solution Specification"
+    mkTimer f
+    startTimer f
     sast <- readSifFile solution f
+    splitTimerMsg f "Finished Parsing now building"
     sval <- buildSolutionE bob sast
+    stopTimer f
     pure sval
 
 -- ----------------------------------------------------------------- [ Pattern ]
+
+buildPatternE : SifBuilder impl
+             -> PROBLEM impl
+             -> SOLUTION impl
+             -> Eff (PATTERN impl) SifEffs
+buildPatternE bob p s = do
+    st <- getBuildState
+    trace $ unwords ["Building Pattern", show $ pattTitle st]
+    let res = mkPattern bob (pattTitle st) (pattDesc st) p s
+    splitTimerMsg (unwords [ "Building for "
+                           , getPFName st
+                           , "&"
+                           , getSFName st]) "Finished Pattern"
+    pure res
 
 public
 patternFromFile : SifBuilder impl
@@ -125,11 +152,13 @@ patternFromFile : SifBuilder impl
                -> String
                -> Eff (PATTERN impl) SifEffs
 patternFromFile bob p s = do
-  putBuildState (defBuildSt)
+  putBuildState (defBuildSt p s)
   p' <- problemFromFile bob p
+  splitTimerMsg (unwords ["Building for ", p, "&", s])
+                "Finished Problem now Solution"
   s' <- solutionFromFile bob s
-  st <- getBuildState
-  trace $ unwords ["Building Pattern", show $ pattTitle st]
-  pure $ mkPattern bob (pattTitle st) (pattDesc st) p' s'
+  splitTimerMsg (unwords ["Building for ", p, "&", s])
+                "Finished Solution now Pattern"
+  buildPatternE bob p' s'
 
 -- --------------------------------------------------------------------- [ EOF ]

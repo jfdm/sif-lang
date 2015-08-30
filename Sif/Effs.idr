@@ -42,7 +42,7 @@ instance Default SifState where
   default = MkSifState
       defOpts
       defaultLib
-      defBuildSt
+      (defBuildSt "" "")
       [backendAbsInterp,backendDirectRep]
       backendAbsInterp
 
@@ -133,14 +133,15 @@ parseOptions = parseArgs defOpts convOpts !getArgs
 perfSetup : Eff () SifEffs
 perfSetup = do
     os <- getOptions
-    if (perf os)
-      then turnOnAndShow
+    let (gather,display) = perf os
+    if gather
+      then collectPMetrics display
       else pure ()
 
 displayPerfMetrics : Eff () SifEffs
 displayPerfMetrics = do
     os <- getOptions
-    if (perf os)
+    if fst (perf os)
       then printLn !getPerfMetrics
       else pure ()
 -- --------------------------------------------------------------------- [ EOF ]

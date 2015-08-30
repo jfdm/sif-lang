@@ -44,12 +44,12 @@ record SifOpts where
   banner     : Bool
   loglvl     : LogLevel n
   backend    : Maybe String
-  perf       : Bool
+  perf       : Pair Bool Bool
 
 defOpts : SifOpts
 defOpts = MkSOpts
     Nothing Nothing (Just REPL) Nothing Nothing Nothing
-    True OFF (Just "interp") False
+    True OFF (Just "interp") (MkPair False False)
 
 instance Default SifOpts where
   default = defOpts
@@ -86,20 +86,21 @@ convOpts (KeyValue k v) o =
     otherwise    => Nothing
 convOpts (Flag x) o =
   case x of
-    "help"     => Just $ record {mode   = Just HELP}  o
-    "version"  => Just $ record {mode   = Just VERS}  o
-    "check"    => Just $ record {mode   = Just Check} o
-    "eval"     => Just $ record {mode   = Just Eval}  o
-    "conv"     => Just $ record {mode   = Just Conv}  o
-    "nobanner" => Just $ record {banner = False}      o
-    "logtrace" => Just $ record {loglvl = TRACE}      o
-    "logdebug" => Just $ record {loglvl = DEBUG}      o
-    "loginfo"  => Just $ record {loglvl = INFO}       o
-    "logwarn"  => Just $ record {loglvl = WARN}       o
-    "logfatal" => Just $ record {loglvl = FATAL}      o
-    "logerror" => Just $ record {loglvl = ERROR}      o
-    "logall"   => Just $ record {loglvl = ALL}        o
-    "perf"     => Just $ record {perf   = True}       o
+    "help"     => Just $ record {mode   = Just HELP}         o
+    "version"  => Just $ record {mode   = Just VERS}         o
+    "check"    => Just $ record {mode   = Just Check}        o
+    "eval"     => Just $ record {mode   = Just Eval}         o
+    "conv"     => Just $ record {mode   = Just Conv}         o
+    "nobanner" => Just $ record {banner = False}             o
+    "logtrace" => Just $ record {loglvl = TRACE}             o
+    "logdebug" => Just $ record {loglvl = DEBUG}             o
+    "loginfo"  => Just $ record {loglvl = INFO}              o
+    "logwarn"  => Just $ record {loglvl = WARN}              o
+    "logfatal" => Just $ record {loglvl = FATAL}             o
+    "logerror" => Just $ record {loglvl = ERROR}             o
+    "logall"   => Just $ record {loglvl = ALL}               o
+    "perf"     => Just $ record {perf   = MkPair True False} o
+    "sperf"    => Just $ record {perf   = MkPair True True}  o
     otherwise => Nothing
 
 helpStr : String
@@ -118,6 +119,7 @@ Flag                 | Description
                      | [1,     2,     3,    4,    5,     6]
                      | [trace, debug, info, warn, fatal, error]
 --perf               | Collect and show performance metrics
+--sperf              | Collect but *not* show performance metrics
 --backend="<naam>"   | Change meta-model [interp|direct]
 --help               | Display help
 --version            | Display version

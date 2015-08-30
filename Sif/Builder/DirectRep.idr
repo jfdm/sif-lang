@@ -311,6 +311,7 @@ convPriv p GRL     = Just $ getGModel p
 convPriv p EDDA    = toEdda p
 convPriv p COMPACT = Just $ showDirectRep p
 convPriv p IDRIS   = Nothing
+convPriv p STRING  = Just $ GLang.toString $ getGModel p
 
 instance Show (DirectRep ty) where
   show = showDirectRep
@@ -332,14 +333,23 @@ instance SifRepAPI DirectRep where
 conv : SifExpr DirectRep ty -> DirectRep ty
 conv (MkExpr x) = x
 
-buildReqDir : RTy -> String -> Maybe String -> REQUIREMENT DirectRep
+buildReqDir : RTy
+           -> String
+           -> Maybe String
+           -> REQUIREMENT DirectRep
 buildReqDir ty s d = MkExpr $ DirectMkReq ty s d
 
-buildProblemDir : String -> Maybe String -> REQUIREMENTS DirectRep -> PROBLEM DirectRep
+buildProblemDir : String
+               -> Maybe String
+               -> REQUIREMENTS DirectRep
+               -> PROBLEM DirectRep
 buildProblemDir t d rs =
     MkExpr $ DirectMkProb t d (map conv rs)
 
-buildAffectDir : CValue -> REQUIREMENT DirectRep -> Maybe String -> AFFECT DirectRep
+buildAffectDir : CValue
+              -> REQUIREMENT DirectRep
+              -> Maybe String
+              -> AFFECT DirectRep
 buildAffectDir c r d = MkExpr $ DirectMkAffect c (conv r) d
 
 buildTraitDir : TTy
@@ -352,15 +362,25 @@ buildTraitDir ty t d s rs =
     MkExpr $ DirectMkTrait ty t d s (map conv rs)
 
 
-buildPropertyDir : String -> Maybe String -> TRAITS DirectRep -> PROPERTY DirectRep
+buildPropertyDir : String
+                -> Maybe String
+                -> TRAITS DirectRep
+                -> PROPERTY DirectRep
 buildPropertyDir t d ts =
     MkExpr $ DirectMkProp t d (map conv ts)
 
-buildSolutionDir : String -> Maybe String -> PROPERTIES DirectRep -> SOLUTION DirectRep
+buildSolutionDir : String
+                -> Maybe String
+                -> PROPERTIES DirectRep
+                -> SOLUTION DirectRep
 buildSolutionDir s d ps =
     MkExpr $ DirectMkSolt s d (map conv ps)
 
-buildPatternDir  : String -> Maybe String -> PROBLEM DirectRep -> SOLUTION DirectRep -> PATTERN DirectRep
+buildPatternDir  : String
+                -> Maybe String
+                -> PROBLEM DirectRep
+                -> SOLUTION DirectRep
+                -> PATTERN DirectRep
 buildPatternDir t d p s= MkExpr $ DirectMkPatt t d (conv p) (conv s)
 
 directBuilder : SifBuilder DirectRep

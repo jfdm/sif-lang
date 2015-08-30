@@ -18,7 +18,7 @@ record Timer where
   desc   : String
   start  : Integer
   stop   : Integer
-  splits : List Integer
+  splits : List (Integer, Maybe String)
 
 instance Show Timer where
   show (MkTimer d a z bcd) = unlines
@@ -28,15 +28,16 @@ instance Show Timer where
       , "\tDifference:\t" ++ show (z - a)
       ]
     where
-      showSplit : Integer -> String
-      showSplit s = concat ["\tSplit:\t",show s]
+      showSplit : (Integer, Maybe String) -> String
+      showSplit (v, Nothing)  = with List unwords ["\tSplit:\t",show v]
+      showSplit (v, Just msg) = with List unwords ["\tSplit:\t",show v, show msg]
 
-      doShow : List Integer -> List String
+      doShow : List (Integer, Maybe String) -> List String
       doShow ss = map showSplit $ reverse ss
 
-      showSplits : List Integer -> String
+      showSplits : List (Integer, Maybe String) -> String
       showSplits Nil = ""
-      showSplits ss  = unlines $ ("\n" :: doShow ss)
+      showSplits ss  = unlines $ ("" :: doShow ss)
 
 defTimer : String -> Timer
 defTimer n = MkTimer n 0 0 Nil
@@ -83,8 +84,8 @@ instance Show TOpt where
   show STOP  = "Stopping"
   show SPLIT = "Splitting"
 
-timerStuff' : TOpt -> Integer -> String -> PMetrics -> PMetrics
-timerStuff' opt val x st = record {timers = ts} st
+timerStuff' : TOpt -> Integer -> String -> Maybe String -> PMetrics -> PMetrics
+timerStuff' opt val x msg st = record {timers = ts} st
   where
     doThing : (String,Timer) -> (String,Timer)
     doThing (y,t) =
@@ -93,7 +94,7 @@ timerStuff' opt val x st = record {timers = ts} st
         else case opt of
           START => MkPair y $ record {start  = val} t
           STOP  => MkPair y $ record {stop   = val} t
-          SPLIT => MkPair y $ record {splits = val :: splits t} t
+          SPLIT => MkPair y $ record {splits = (val, msg) :: splits t} t
 
     ts : List (String, Timer)
     ts = map doThing (timers st)
@@ -114,7 +115,7 @@ data Perf : Effect where
   IncCounter  : String -> sig Perf () (PMetrics) (PMetrics)
   Timestamp   : String -> sig Perf () (PMetrics) (PMetrics)
   MkStopWatch : String -> sig Perf () (PMetrics) (PMetrics)
-  TimerStuff  : TOpt -> String -> sig Perf () (PMetrics) (PMetrics)
+  TimerStuff  : TOpt -> String -> Maybe String -> sig Perf () (PMetrics) (PMetrics)
 
 -- ---------------------------------------------------------- [ Handler for IO ]
 
@@ -151,13 +152,13 @@ instance Handler Perf IO where
           perfLog res' $ unwords ["Creating Timer:", show n]
           k () (res')
 
-  handle res (TimerStuff opt n) k = do
+  handle res (TimerStuff opt n msg) k = do
       v <- time
       if not (canPerf res)
         then k () res
         else do
-          let res' = timerStuff' opt v n res
-          perfLog res' $ unwords [show opt, "timer", show n, "at", show v]
+          let res' = timerStuff' opt v n msg res
+          perfLog res' $ unwords [show opt, "timer", show n, "at", show v, fromMaybe "" msg]
           k () (res')
 
   handle res (Timestamp s) k = do
@@ -180,12 +181,15 @@ PERF = MkEff PMetrics Perf
 -- --------------------------------------------------------------------- [ API ]
 
 ||| Turn on performance metrics.
-turnOn : Eff () [PERF]
-turnOn = call $ TurnOn False
+collectPMetricsOnly : Eff () [PERF]
+collectPMetricsOnly = call $ TurnOn False
+
+collectPMetrics : Bool -> Eff () [PERF]
+collectPMetrics b = call $ TurnOn b
 
 ||| Turn on performance metrics and show during operation
-turnOnAndShow : Eff () [PERF]
-turnOnAndShow = call $ TurnOn True
+collectPMetricsAndShow : Eff () [PERF]
+collectPMetricsAndShow = call $ TurnOn True
 
 ||| Return gatheres metrics
 getPerfMetrics : Eff PMetrics [PERF]
@@ -204,15 +208,18 @@ mkTimer n = call $ MkStopWatch n
 
 ||| Stop a timer
 stopTimer : String -> Eff () [PERF]
-stopTimer n = call $ TimerStuff STOP n
+stopTimer n = call $ TimerStuff STOP n Nothing
 
 ||| Start a timer
 startTimer : String -> Eff () [PERF]
-startTimer n = call $ TimerStuff START n
+startTimer n = call $ TimerStuff START n Nothing
 
 ||| Split a timer
 splitTimer : String -> Eff () [PERF]
-splitTimer n = call $ TimerStuff SPLIT n
+splitTimer n = call $ TimerStuff SPLIT n Nothing
+
+splitTimerMsg : String -> String -> Eff () [PERF]
+splitTimerMsg n msg = call $ TimerStuff SPLIT n (Just msg)
 
 ||| Create a time stamp.
 timestamp : String -> Eff () [PERF]
