@@ -44,11 +44,12 @@ record SifOpts where
   banner     : Bool
   loglvl     : LogLevel n
   backend    : Maybe String
+  perf       : Bool
 
 defOpts : SifOpts
 defOpts = MkSOpts
     Nothing Nothing (Just REPL) Nothing Nothing Nothing
-    True OFF (Just "interp")
+    True OFF (Just "interp") False
 
 instance Default SifOpts where
   default = defOpts
@@ -98,6 +99,7 @@ convOpts (Flag x) o =
     "logfatal" => Just $ record {loglvl = FATAL}      o
     "logerror" => Just $ record {loglvl = ERROR}      o
     "logall"   => Just $ record {loglvl = ALL}        o
+    "perf"     => Just $ record {perf   = True}       o
     otherwise => Nothing
 
 helpStr : String
@@ -115,6 +117,7 @@ Flag                 | Description
 --log="<num|word>"   | Set logging levels
                      | [1,     2,     3,    4,    5,     6]
                      | [trace, debug, info, warn, fatal, error]
+--perf               | Collect and show performance metrics
 --backend="<naam>"   | Change meta-model [interp|direct]
 --help               | Display help
 --version            | Display version

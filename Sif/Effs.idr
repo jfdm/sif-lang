@@ -12,6 +12,7 @@ import public Effect.Exception
 import public Effect.File
 import public Effect.StdIO
 import public Effect.Logging.Default
+import public Effect.Perf
 
 import public ArgParse
 
@@ -52,6 +53,7 @@ SifEffs = [ FILE_IO ()
           , SYSTEM
           , STDIO
           , LOG
+          , PERF -- Not unifiable
           , 'sif      ::: EXCEPTION SifError
           , 'argparse ::: EXCEPTION ArgParseError
           , 'sstate   ::: STATE SifState
@@ -128,4 +130,17 @@ updateBuildState f = 'sstate :- update (\st => record {benv = f (benv st)} st)
 parseOptions : Eff SifOpts SifEffs
 parseOptions = parseArgs defOpts convOpts !getArgs
 
+perfSetup : Eff () SifEffs
+perfSetup = do
+    os <- getOptions
+    if (perf os)
+      then turnOnAndShow
+      else pure ()
+
+displayPerfMetrics : Eff () SifEffs
+displayPerfMetrics = do
+    os <- getOptions
+    if (perf os)
+      then printLn !getPerfMetrics
+      else pure ()
 -- --------------------------------------------------------------------- [ EOF ]

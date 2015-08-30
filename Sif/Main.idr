@@ -45,7 +45,8 @@ runMode (Just Check) = do
 runMode (Just Conv) = do
     os <- getOptions
     putStrLn "Converting Pattern"
-    (_ ** p) <- buildPatternE (pSpec os) (sSpec os)
+    bob <- getSifBackend
+    p <- buildPatternE (builder bob) (pSpec os) (sSpec os)
     case out os of
       Nothing => printPattern p (to os)
       Just _  => printLn FeatureNotImpl
@@ -56,9 +57,11 @@ sifMain = do
     opts <- parseOptions
     putOptions opts
     setLogLvl (loglvl opts)
+    perfSetup
     setSifBackend (backend opts)
     loadPrelude
     runMode (mode opts)
+    displayPerfMetrics
 
 main : IO ()
 main = do

@@ -264,21 +264,25 @@ toGRL (DirectMkSolt t d ps) = ISolt root (Sigma.getProof elems)
     cs : GLang STRUCT
     cs = (root &= map (\(IProp x ys) => x) ps')
 
-    doGet : InterpRes tyPROPERTY
-         -> (is ** DList GTy GLang is)
+    doGet : (is ** DList GTy GLang is)
+         -> InterpRes tyPROPERTY
          -> (xs ** DList GTy GLang xs)
-    doGet (IProp x ys) (is ** res) = (_ ** ys ++ res)
+    doGet (is ** res) (IProp x ys) = (_ ** ys ++ res)
 
     getDecls : (as ** DList GTy GLang as)
-    getDecls = foldr (\e,res => doGet e res) (_ ** DList.Nil)  ps'
+    getDecls = foldl doGet (_ ** DList.Nil)  ps'
 
     elems : (es ** DList GTy GLang es)
     elems = (_ ** [root, cs] ++ (Sigma.getProof getDecls))
 
 toGRL (DirectMkPatt t d p s) = IPatt $ mkModel (toGRL p) (toGRL s)
   where
+    doInsert : GModel -> GLang ty -> GModel
+    doInsert m d = insert d m
+
     mkModel : InterpRes tyPROBLEM -> InterpRes tySOLUTION -> GModel
-    mkModel (IProb rP m) (ISolt rS is) = (DList.foldl (flip $ insert) m (getProof $ groupDecls is))
+    mkModel (IProb rP m) (ISolt rS is) =
+      DList.foldl doInsert m (getProof $ groupDecls is)
 
 -- ----------------------------------------------------- [ Instances and Stuff ]
 

@@ -5,6 +5,9 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Sif.Builder.AbsInterp
 
+import Effects
+import Effect.State
+
 import Data.AVL.Dict
 import Data.GraphViz.SimpleDot
 

@@ -39,7 +39,7 @@ data SifExpr : (impl : SifTy -> Type) -> SifTy -> Type where
   MkExpr : SifRepAPI impl => impl ty -> SifExpr impl ty
 
 instance SifRepAPI (\ty => SifExpr l ty) where
-  getTitle (MkExpr x) = getTitle x
+  getTitle (MkExpr x)    = getTitle x
   evalPattern (MkExpr x) = evalPattern x
   toString (MkExpr x)    = toString x
   convTo (MkExpr x) fmt  = convTo x fmt
