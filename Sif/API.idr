@@ -64,14 +64,14 @@ evalAndPrintPattern p = do
   let eRes = evalPattern p
   printResults eRes
 
-buildPatternE : SifBuilder impl
+tryToBuildPatternE : SifBuilder impl
              -> Maybe String
              -> Maybe String
              -> Eff (PATTERN impl) SifEffs
-buildPatternE bob Nothing Nothing   = Sif.raise NoFileGiven
-buildPatternE bob Nothing  _        = Sif.raise (FileMissing ("Solution File "))
-buildPatternE bob _        Nothing  = Sif.raise (FileMissing ("Problem File "))
-buildPatternE bob (Just p) (Just s) = do
+tryToBuildPatternE bob Nothing Nothing   = Sif.raise NoFileGiven
+tryToBuildPatternE bob Nothing  _        = Sif.raise (FileMissing ("Solution File "))
+tryToBuildPatternE bob _        Nothing  = Sif.raise (FileMissing ("Problem File "))
+tryToBuildPatternE bob (Just p) (Just s) = do
   let tname = unwords ["Building for ", p, "&", s]
   mkTimer tname
   startTimer tname
@@ -83,10 +83,9 @@ buildPatternE bob (Just p) (Just s) = do
 evalPatternFromFile : Maybe String -> Maybe String -> Eff () SifEffs
 evalPatternFromFile p' s' = do
   bob <- getSifBackend
-  p <- buildPatternE (builder bob) p' s'
+  p <- tryToBuildPatternE (builder bob) p' s'
   putStrLn $ unwords ["loaded", fromMaybe "" $ getTitle p]
   evalAndPrintPattern p
-
 
 printPattern : PATTERN impl -> Maybe SifOutFormat -> Eff () SifEffs
 printPattern _ Nothing    = printLn NoFormatSpecified
@@ -99,6 +98,21 @@ printPattern p (Just fmt) = do
     case res of
       Nothing  => printLn UnSuppFormat
       Just res => putStrLn res
+
+
+convPatternFromFile : Maybe String
+                   -> Maybe String
+                   -> Maybe String
+                   -> Maybe SifOutFormat
+                   -> Eff () SifEffs
+convPatternFromFile p s fname fmt = do
+    bob <- getSifBackend
+    p <- tryToBuildPatternE (builder bob) p s
+    case fname of
+      Nothing => printPattern p fmt
+      Just _  => printLn FeatureNotImpl
+
+
 
 -- ------------------------------------------------------------ [ YAML Parsing ]
 
@@ -162,7 +176,7 @@ importPreludeIDX nspace ((p,s)::ps) = do
                     , "\tProblem File: "  ++ show (pDir p)
                     , "\tSolution File: " ++ show (pDir s)]
     bob <- getSifBackend
-    patt <- buildPatternE (builder bob) (pDir p) (pDir s)
+    patt <- tryToBuildPatternE (builder bob) (pDir p) (pDir s)
     updateLibrary (\idx => addToLibrary patt idx)
     importPreludeIDX nspace ps
   where

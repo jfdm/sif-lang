@@ -47,11 +47,7 @@ runMode (Just Check) = do
 runMode (Just Conv) = do
     os <- getOptions
     putStrLn "Converting Pattern"
-    bob <- getSifBackend
-    p <- buildPatternE (builder bob) (pSpec os) (sSpec os)
-    case out os of
-      Nothing => printPattern p (to os)
-      Just _  => printLn FeatureNotImpl
+    convPatternFromFile (pSpec os) (sSpec os) (out os) (to os)
 
 covering
 sifMain : Eff () SifEffs
