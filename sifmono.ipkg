@@ -1,6 +1,6 @@
 package sifmono
 
-opts = "-p effects -p containers -p grl -p lightyear -p config -p edda -p graphviz -p xml -p argparse --typeintype"
+opts = "-p effects -p containers -p grl -p lightyear -p config -p edda -p graphviz -p xml -p argparse"
 
 main = Sif.Main
 executable = sifc

@@ -1,6 +1,6 @@
 package sif
 
-opts = "-p effects -p containers -p grl -p config -p edda -p xml -p test -p graphviz --typeintype"
+opts = "-p effects -p containers -p grl -p config -p edda -p xml -p test -p graphviz"
 
 modules = Sif.Types
         , Sif.AbsSyntax

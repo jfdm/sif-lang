@@ -1,6 +1,6 @@
 package sifexe
 
-opts = "-p effects -p containers -p grl -p lightyear -p config -p edda -p graphviz -p xml -p argparse -p sif -p sifprelude -p sifio --typeintype"
+opts = "-p effects -p containers -p grl -p lightyear -p config -p edda -p graphviz -p xml -p argparse -p sif -p sifprelude -p sifio"
 
 modules = Sif.Main
 
