@@ -87,12 +87,12 @@ perfSetup = do
 displayPerfMetrics : Eff () SifEffs
 displayPerfMetrics = do
     os <- getOptions
-    if fst (perf os)
-      then do
-          mdata <- getPerfMetrics
-          let mdatayaml = toYAML mdata
+    mdata <- getPerfMetrics
+    case perf os of
+      (True, True)  => writeFile "perf.yaml" (YAML.toString . toYAML mdata)
+      (True, False) => do
           printLn $ mdata
-          writeFile "perf.yaml" (YAML.toString mdatayaml)
-      else pure ()
+          writeFile "perf.yaml" (YAML.toString . toYAML mdata)
+      otherwise => pure ()
 
 -- --------------------------------------------------------------------- [ EOF ]
