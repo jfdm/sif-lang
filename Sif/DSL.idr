@@ -106,9 +106,9 @@ buildSolutionE bob (Solution t (pID,pDesc) d ps) = do
   case getProb st of
     Nothing => Sif.raise (ProblemMissing "")
     Just pID' => do
-      if not (pID' == pID)
-        then Sif.raise (ProblemMissing pID')
-        else do
+      case not (pID' == pID) of
+        True  => Sif.raise (ProblemMissing pID')
+        False => do
           ps' <- mapE (\p => buildPropertyE bob p) ps
           splitTimerMsg (getSFName !getBuildState) "Building Properties"
           updateBuildState (\st => record

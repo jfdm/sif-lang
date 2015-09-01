@@ -130,18 +130,4 @@ updateBuildState f = 'sstate :- update (\st => record {benv = f (benv st)} st)
 parseOptions : Eff SifOpts SifEffs
 parseOptions = parseArgs defOpts convOpts !getArgs
 
-perfSetup : Eff () SifEffs
-perfSetup = do
-    os <- getOptions
-    let (gather,display) = perf os
-    if gather
-      then collectPMetrics display
-      else pure ()
-
-displayPerfMetrics : Eff () SifEffs
-displayPerfMetrics = do
-    os <- getOptions
-    if fst (perf os)
-      then printLn !getPerfMetrics
-      else pure ()
 -- --------------------------------------------------------------------- [ EOF ]

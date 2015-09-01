@@ -22,6 +22,7 @@ import Sif.DSL
 import Sif.Options
 import Sif.API
 import Sif.REPL
+import Sif.Perf
 
 %default partial
 

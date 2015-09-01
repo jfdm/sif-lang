@@ -99,8 +99,8 @@ convOpts (Flag x) o =
     "logfatal" => Just $ record {loglvl = FATAL}             o
     "logerror" => Just $ record {loglvl = ERROR}             o
     "logall"   => Just $ record {loglvl = ALL}               o
-    "perf"     => Just $ record {perf   = MkPair True False} o
-    "sperf"    => Just $ record {perf   = MkPair True True}  o
+    "perf"     => Just $ record {perf   = MkPair True True} o
+    "sperf"    => Just $ record {perf   = MkPair True False}  o
     otherwise => Nothing
 
 helpStr : String

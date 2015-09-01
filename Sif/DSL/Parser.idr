@@ -11,6 +11,8 @@ import Lightyear.Strings
 
 import Sif.Effs
 
+import Sif.FileIO
+
 import Sif.DSL.Parser.Problem
 import Sif.DSL.Parser.Solution
 
@@ -28,21 +30,11 @@ import Sif.Error
 readSifFile : Parser a
            -> String
            -> Eff a SifEffs
-readSifFile p f = do
-    trace $ unwords ["Reading file:", f]
-    case !(open f Read) of
-      True => do
-        src <- readAcc ""
-        close
-        trace "Parsing File"
-        case parse p src of
-          Left err  => Sif.raise (ParseError f err)
-          Right res => pure res
-      False => Sif.raise (FileMissing f)
-  where
-    readAcc : String -> Eff String [FILE_IO (OpenFile Read)]
-    readAcc acc = if (not !(eof))
-                     then readAcc (acc ++ !(readLine))
-                     else pure acc
+readSifFile p fname = do
+    trace $ unwords ["Parsing file:", show fname]
+    src <- readFile fname
+    case parse p src of
+      Left err  => Sif.raise (ParseError fname err)
+      Right res => pure res
 
 -- --------------------------------------------------------------------- [ EOF ]

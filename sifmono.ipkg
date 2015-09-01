@@ -24,8 +24,11 @@ modules = Effect.Logging.Level
         , Sif.DSL.State
         , Sif.Options
 
-        , Sif.Effs
         , Sif.Error
+        , Sif.Effs
+
+        , Sif.FileIO
+        , Sif.Perf
 
         , Sif.DSL.Parser.Utils
         , Sif.DSL.Parser.Common
@@ -33,7 +36,6 @@ modules = Effect.Logging.Level
         , Sif.DSL.Parser.Solution
         , Sif.DSL.Parser
         , Sif.DSL
-
         , Sif.API
 
         , Sif.Commands

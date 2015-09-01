@@ -18,6 +18,7 @@ data SifError : Type where
   NoFormatSpecified : SifError
   FeatureNotImpl    : SifError
 
+  CannotWriteFile : String -> SifError
   NoSuchBackend  : String -> SifError
   IDMissing      : String -> SifError
   ProblemMissing : String -> SifError
@@ -38,6 +39,7 @@ instance Show SifError where
   show FeatureNotImpl    = "Feature Not Implemented"
   show InternalErr       = "Internal Error"
 
+  show (CannotWriteFile f) = "Cannot write file, " ++ show f
   show (IDMissing id)      = "Identifier Missing: " ++ show id
   show (ProblemMissing id) = "Problem Doesn't Exist: " ++ show id
   show (DuplicateID id)    = "Identifier already Exists: " ++ show id

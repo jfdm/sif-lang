@@ -60,8 +60,12 @@ doSyntaxCheck (Nothing) (Nothing) = Sif.raise NoFileGiven
 
 evalAndPrintPattern : (PATTERN impl) -> Eff () SifEffs
 evalAndPrintPattern p = do
-  putStrLn $ unwords ["evaluating pattern", fromMaybe "" $ getTitle p]
+  let tname = unwords ["Evaluating:", fromMaybe "" $ getTitle p]
+  trace tname
+  mkTimer tname
+  startTimer tname
   let eRes = evalPattern p
+  stopTimer tname
   printResults eRes
 
 tryToBuildPatternE : SifBuilder impl
