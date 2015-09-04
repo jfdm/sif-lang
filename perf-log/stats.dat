@@ -4,3 +4,4 @@ x       Date            commit  LoC     tyCHK   CodeGen Mono    exe       Commen
 3       2015-08-24      a77d3bc 3017    102.25  180.61  275.02  5690867   {Removed prelude}
 4       2015-08-27      81407d0 3443    111.22  108.81  285.73  5703068   {Added logging and syntax changes.}
 5       2015-08-28      41d2a55 3408    81.49   160.44  234.38  5321407   {Rewrite and Design Patterns removed tree...}
+6       2015-09-04      3fbdc5f 3829    126.34  181.29  294.13  5560718   {Rewrite again and made doc converstion generic from backend.}

@@ -21,7 +21,7 @@ import Sif.Pattern.Convert.String
 covering
 convTy : SifOutFormat -> Type
 convTy LATEX   = String -- This should be a data structure...
-convTv CMARK   = String -- This should be a data structure...
+convTy CMARK   = String -- This should be a data structure...
 convTy ORG     = String -- This should be a data structure...
 convTy XML     = Document DOCUMENT
 convTy DOT     = SimpleDot GRAPH
@@ -61,17 +61,17 @@ showConvPattern XML p =
 showConvPattern ORG p =
   case (the (Maybe (convTy ORG)) (convTo ORG p)) of
     Nothing => Nothing
-    Just r  => Just (show r)
+    Just r  => Just r
 
 showConvPattern CMARK p =
   case (the (Maybe (convTy CMARK)) (convTo CMARK p)) of
     Nothing => Nothing
-    Just r  => Just (show r)
+    Just r  => Just r
 
 showConvPattern LATEX p =
   case (the (Maybe (convTy LATEX)) (convTo LATEX p)) of
     Nothing => Nothing
-    Just r  => Just (show r)
+    Just r  => Just r
 
 showConvPattern IDRIS p =
   case (the (Maybe (convTy IDRIS)) (convTo IDRIS p)) of
