@@ -50,9 +50,11 @@ data HasMData : SifTy -> Type where
   HMT : HasMData tyTRAIT
 
 
-data SifOutFormat = ORG | XML | DOT | EDDA | COMPACT | IDRIS | STRING
+data SifOutFormat = ORG | LATEX | CMARK | XML | DOT | EDDA | COMPACT | IDRIS | STRING
 
 instance Eq SifOutFormat where
+  (==) LATEX   LATEX   = True
+  (==) CMARK   CMARK   = True
   (==) ORG     ORG     = True
   (==) XML     XML     = True
   (==) DOT     DOT     = True
@@ -63,6 +65,8 @@ instance Eq SifOutFormat where
   (==) _       _       = False
 
 instance Show SifOutFormat where
+  show LATEX = "LaTeX"
+  show CMARK = "CommonMark"
   show ORG = "Org"
   show XML = "XML"
   show DOT = "dot"
@@ -74,6 +78,8 @@ instance Show SifOutFormat where
 readOutFMT : String -> Maybe SifOutFormat
 readOutFMT s =
   case toLower s of
+    "latex"    => Just LATEX
+    "markdown" => Just CMARK
     "org"     => Just ORG
     "xml"     => Just XML
     "dot"     => Just DOT

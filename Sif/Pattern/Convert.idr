@@ -20,7 +20,9 @@ import Sif.Pattern.Convert.String
 
 covering
 convTy : SifOutFormat -> Type
-convTy ORG     = String
+convTy LATEX   = String -- This should be a data structure...
+convTv CMARK   = String -- This should be a data structure...
+convTy ORG     = String -- This should be a data structure...
 convTy XML     = Document DOCUMENT
 convTy DOT     = SimpleDot GRAPH
 convTy EDDA    = Edda PRIME MODEL
@@ -34,6 +36,8 @@ convTo XML     p = Just $ toXML p
 
 convTo EDDA    p = Just $ toEdda p
 convTo ORG     p = Just $ org $ toEdda p
+convTo LATEX   p = Just $ latex $ toEdda p
+convTo CMARK   p = Just $ markdown $ toEdda p
 
 convTo DOT     p = Nothing -- Just $ toDot p
 convTo COMPACT p = Just $ toString p
@@ -59,6 +63,16 @@ showConvPattern ORG p =
     Nothing => Nothing
     Just r  => Just (show r)
 
+showConvPattern CMARK p =
+  case (the (Maybe (convTy CMARK)) (convTo CMARK p)) of
+    Nothing => Nothing
+    Just r  => Just (show r)
+
+showConvPattern LATEX p =
+  case (the (Maybe (convTy LATEX)) (convTo LATEX p)) of
+    Nothing => Nothing
+    Just r  => Just (show r)
+
 showConvPattern IDRIS p =
   case (the (Maybe (convTy IDRIS)) (convTo IDRIS p)) of
     Nothing => Nothing
@@ -73,6 +87,7 @@ showConvPattern COMPACT p =
   case (the (Maybe (convTy COMPACT)) (convTo COMPACT p)) of
     Nothing => Nothing
     Just r  => Just r
+
 showConvPattern STRING p =
   case (the (Maybe (convTy STRING)) (convTo STRING p)) of
     Nothing => Nothing
