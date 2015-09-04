@@ -89,10 +89,10 @@ displayPerfMetrics = do
     os <- getOptions
     mdata <- getPerfMetrics
     case perf os of
-      (True, True)  => writeFile "perf.yaml" (YAML.toString . toYAML mdata)
+      (True, True)  => writeFile "perf.yaml" (YAML.toString $ toYAML mdata)
       (True, False) => do
           printLn $ mdata
-          writeFile "perf.yaml" (YAML.toString . toYAML mdata)
+          writeFile "perf.yaml" (YAML.toString $ toYAML mdata)
       otherwise => pure ()
 
 -- --------------------------------------------------------------------- [ EOF ]

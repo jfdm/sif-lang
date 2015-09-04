@@ -5,94 +5,128 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Sif.Builder.Utils
 
-import XML.DOM
-
 import GRL.Lang.GLang
 
-import Data.GraphViz.SimpleDot
+import Sif.Types
+import Sif.Pattern
 
+-- -------------------------------------------------------------- [ Directives ]
 
-mkNode : String -> Document ELEMENT
-mkNode = mkSimpleElement
+%access public
+%default partial
 
-mkPCNode : String -> String -> Document ELEMENT
-mkPCNode p c = mkNode p <++> (c <+=> "TO BE DETERMIND")
+-- --------------------------------------------------- [ Interpretation Result ]
 
-mkEmptyNode : String -> Document ELEMENT
-mkEmptyNode s = (s <+=> "TO BE DETERMIND")
+data InterpRes : SifTy -> Type where
+  IReq    : GLang ELEM -> InterpRes tyREQ
+  IProb   : GLang ELEM -> GModel               -> InterpRes tyPROBLEM
+  IAffect : GLang ELEM -> CValue               -> InterpRes tyAFFECTS
+  ITrait  : GLang ELEM -> List (GLang INTENT)  -> InterpRes tyTRAIT
+  IProp   : GLang ELEM -> DList GTy GLang es   -> InterpRes tyPROPERTY
+  ISolt   : GLang ELEM -> DList GTy GLang ss   -> InterpRes tySOLUTION
+  IPatt   : GModel                             -> InterpRes tyPATTERN
 
-addScore : Document ELEMENT -> Document ELEMENT
-addScore = setAttribute "score" "TO BE DETERMINED"
-
-mkDescNode : Maybe String -> Document ELEMENT
-mkDescNode Nothing  = "description" <+=> "TO BE DETERMINED"
-mkDescNode (Just d) = "description" <+=> d
-
-mkNDNode : String -> String -> Maybe String -> Document ELEMENT
-mkNDNode n t d = (addScore $ mkNode n)
-            <++> (addScore $ mkDescNode d)
-            <++> (addScore $ "name" <+=> t)
-
---addND : Document ELEMENT -> String -> Maybe String -> Document ELEMENT
---addND n t d =
-
-mkMdata : Document ELEMENT
-mkMdata = mkNode "metadata"
-     <++> mkPCNode "auditors" "auditor"
-     <++> mkPCNode "authors" "author"
-     <++> mkEmptyNode "evaluated"
-     <++> mkEmptyNode "modified"
-     <++> mkEmptyNode "created"
-     <++> mkPCNode "tags" "tag"
-     <++> mkPCNode "aliases" "alias"
-
-mkStudies : Document ELEMENT
-mkStudies = addScore $ mkNode "studies"
-    <++> (addScore $ (mkNode "study"
-          <++> mkNode "after"
-          <++> mkNode "before"))
-
-mkModel : Document ELEMENT
-mkModel = setAttribute
-    "modelTy"
-    "class | component | sequence | deployment" $
-    ((mkNode "model") <++> mkDescNode Nothing <++> CData "TO BE DETERMINED")
-
-mkStructure : Document ELEMENT
-mkStructure = addScore $ mkNode "structure"
-    <++> (addScore $ mkDescNode Nothing)
-    <++> mkModel
-
-mkDynamics : Document ELEMENT
-mkDynamics = addScore $ mkNode "dynamics"
-    <++> (addScore $ mkDescNode Nothing)
-    <++> mkModel
-
-mkRels : Document ELEMENT
-mkRels = addScore $ mkNode "relations"
-    <++> (setAttribute "patternID" "TO BE DETERMINED" $ setAttribute "relationship" "specialises | implements | uses | linkedTo" (mkNode "link"))
-
-
-grlToDot : GModel -> SimpleDot GRAPH
-grlToDot g = Digraph (nodes (verticesID g)) (edges' (edges g))
+interpReq : String -> InterpRes tyREQ
+interpReq s = IReq root
   where
+    root : GLang ELEM
+    root = mkGoal ("Requirement: " ++ s)
 
-    f : NodeID -> String
-    f n = case getValueByID n g of
-        Nothing => ""
-        Just u  => getNodeTitle u
+interpProb : String -> List (InterpRes tyREQ) -> InterpRes tyPROBLEM
+interpProb s ps = IProb root (model' \= (root &= cs))
+  where
+    root : GLang ELEM
+    root = mkGoal ("Problem: " ++ s)
 
-    nodes : List NodeID -> List (SimpleDot NODE)
-    nodes vs = map (\x => Node (x) [("label", (f x))]) vs
+    cs : List (GLang ELEM)
+    cs = map (\(IReq x) => x) ps
 
-    convEdge : Edge GoalEdge -> SimpleDot EDGE
-    convEdge (x,y, Nothing)     = Edge (y) (x) Nil
-    convEdge (x,y, Just Decomp) = Edge (y) (x) [("label", "Decomp FIX")]
-    convEdge (x,y, Just (Contribution l)) = Edge (x) (y) [("label", "Impacts " ++ show l)]
-    convEdge (x,y, Just (Correlation  l)) = Edge (x) (y) [("label", "Affects " ++ show l)]
+    model : GModel
+    model = (emptyModel \= root)
 
-    edges' : List (Edge GoalEdge) -> List (SimpleDot EDGE)
-    edges' es = map (convEdge) es
+    model' : GModel
+    model' = insertMany cs model
+
+interpAffect : CValue -> InterpRes tyREQ -> InterpRes tyAFFECTS
+interpAffect c (IReq r) = IAffect r c
+
+interpTrait : String
+           -> SValue
+           -> List (InterpRes tyAFFECTS)
+           -> TTy
+           -> InterpRes tyTRAIT
+interpTrait s m es ty = ITrait node cs
+  where
+    sVal : SValue -> SValue
+    sVal v = case ty of  -- Disadvantages...
+               GEN => v
+               ADV => v
+               DIS => v -- invertEval v
+
+    tVal : String
+    tVal = case ty of
+             GEN => "Trait General:"
+             ADV => "Trait Advantage: "
+             DIS => "Trait Disadvantage: "
+
+    node : GLang ELEM
+    node = mkSatTask (tVal ++ s) (sVal m)
+
+    cs : List (GLang INTENT)
+    cs = map (\(IAffect r c) => node ==> r | c) es
+
+interpProp : String
+          -> List (InterpRes tyTRAIT)
+          -> InterpRes tyPROPERTY
+interpProp s ts = IProp pelem (Sigma.getProof elems)
+  where
+    pelem : GLang ELEM
+    pelem = mkTask ("Property: " ++ s)
+
+    newTS : List (GLang ELEM, List (GLang INTENT))
+    newTS = map (\(ITrait x ys) => (x, ys)) ts
+
+    newCS : GLang STRUCT
+    newCS = (pelem &= map fst newTS)
+
+    newIS : (is ** DList GTy GLang is)
+    newIS = fromList $ concat $ map snd newTS
+
+    newES : (es ** DList GTy GLang es)
+    newES = fromList $ map fst newTS
+
+    elems : (fs ** DList GTy GLang fs)
+    elems =  (_ ** [pelem]
+                ++ Sigma.getProof newES
+                ++ Sigma.getProof newIS
+                ++ [newCS])
+
+interpSolt : String
+          -> List (InterpRes tyPROPERTY)
+          -> InterpRes tySOLUTION
+interpSolt s ps = ISolt root (Sigma.getProof elems)
+  where
+    root : GLang ELEM
+    root = mkTask ("Solution: " ++ s)
+
+    cs : GLang STRUCT
+    cs = (root &= map (\(IProp x ys) => x) ps)
+
+    doGet : InterpRes tyPROPERTY
+         -> (is ** DList GTy GLang is)
+         -> (xs ** DList GTy GLang xs)
+    doGet (IProp x ys) (is ** res) = (_ ** ys ++ res)
+
+    getDecls : (as ** DList GTy GLang as)
+    getDecls = foldr (\e,res => doGet e res) (_ ** DList.Nil)  ps
+
+    elems : (es ** DList GTy GLang es)
+    elems = (_ ** [root, cs] ++ (Sigma.getProof getDecls))
+
+interpPatt : InterpRes tyPROBLEM
+          -> InterpRes tySOLUTION
+          -> InterpRes tyPATTERN
+interpPatt (IProb rP m) (ISolt rS is) = IPatt (insertDecls is m)
 
 
 -- --------------------------------------------------------------------- [ EOF ]

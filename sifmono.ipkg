@@ -13,7 +13,15 @@ modules = Effect.Logging.Level
         , Sif.Types
         , Sif.AbsSyntax
 
+        , Sif.Pattern.Model
+        , Sif.Pattern.API
+        , Sif.Pattern.Convert.XML
+        , Sif.Pattern.Convert.Edda
+        , Sif.Pattern.Convert.String
+
+        , Sif.Pattern.Convert
         , Sif.Pattern
+
         , Sif.Builder.Utils
         , Sif.Builder.AbsInterp
         , Sif.Builder.DirectRep
@@ -36,6 +44,7 @@ modules = Effect.Logging.Level
         , Sif.DSL.Parser.Solution
         , Sif.DSL.Parser
         , Sif.DSL
+        , Sif.Prelude
         , Sif.API
 
         , Sif.Commands

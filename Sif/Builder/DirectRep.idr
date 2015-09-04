@@ -17,7 +17,6 @@ import XML.DOM
 
 import Sif.Types
 import Sif.Pattern
-
 import Sif.Builder.Utils
 
 -- -------------------------------------------------------------- [ Directives ]
@@ -66,223 +65,68 @@ data DirectRep : SifTy -> Type where
               -> DirectRep tySOLUTION
               -> DirectRep tyPATTERN
 
-covering
-getDirectRepTitle : DirectRep ty -> Maybe String
-getDirectRepTitle (DirectMkReq _ t _)       = Just t
-getDirectRepTitle (DirectMkProb t _ _)      = Just t
-getDirectRepTitle (DirectMkTrait _ t _ _ _) = Just t
-getDirectRepTitle (DirectMkProp t _ _)      = Just t
-getDirectRepTitle (DirectMkSolt t _ _)      = Just t
-getDirectRepTitle (DirectMkPatt t _ _ _)    = Just t
-getDirectRepTitle _                         = Nothing
+getDirectTitle : DirectRep ty -> String
+getDirectTitle (DirectMkReq _ t _)       = t
+getDirectTitle (DirectMkProb t _ _)      = t
+getDirectTitle (DirectMkTrait _ t _ _ _) = t
+getDirectTitle (DirectMkProp t _ _)      = t
+getDirectTitle (DirectMkSolt t _ _)      = t
+getDirectTitle (DirectMkPatt t _ _ _)    = t
 
--- -------------------------------------------------------------------- [ Show ]
 
-covering
-showDirectRep : DirectRep ty -> String
-showDirectRep (DirectMkReq ty t d) = with List
-    unwords ["   ", show ty, show t]
+getDirectDesc : DirectRep ty -> Maybe String
+getDirectDesc (DirectMkReq _ _ d)       = d
+getDirectDesc (DirectMkProb _ d rs)     = d
+getDirectDesc (DirectMkAffect _ _ d)    = d
+getDirectDesc (DirectMkTrait _ _ d _ _) = d
+getDirectDesc (DirectMkProp _ d _)      = d
+getDirectDesc (DirectMkSolt _ d _)      = d
+getDirectDesc (DirectMkPatt _ d _ _)    = d
 
-showDirectRep (DirectMkProb t d rs) = with List
-    unwords [ "  Problem:", show t, "\n"
-            , unlines $ map (showDirectRep) rs
-            , "\n"]
+getDirectRTy : DirectRep tyREQ -> RTy
+getDirectRTy (DirectMkReq ty _ _) = ty
 
-showDirectRep (DirectMkAffect cval r d) = with List
-    unwords ["       ", show cval, fromMaybe "Missing" (getDirectRepTitle r), "\n"]
+getDirectTTy : DirectRep tyTRAIT -> TTy
+getDirectTTy (DirectMkTrait ty _ _ _ _) = ty
 
-showDirectRep (DirectMkTrait ty t d s rs) = with List
-    unwords [
-        "     ", show ty, ":" , show t , "is", show s , "\n"
-      , concat (map (showDirectRep) rs)
-      , "\n"]
+getDirectSValue : DirectRep tyTRAIT -> SValue
+getDirectSValue (DirectMkTrait _ _ _ sval _) = sval
 
-showDirectRep (DirectMkProp t d ts) = with List
-    unwords [
-        "     Property: " , t , "\n"
-     , concat (map (showDirectRep) ts)
-     , "\n"]
+getDirectCValue : DirectRep tyAFFECTS -> CValue
+getDirectCValue (DirectMkAffect cval _ _) = cval
 
-showDirectRep (DirectMkSolt t d ps) = with List
-    unwords [
-         "  Solution: " , t , "\n"
-      , Foldable.concat (map showDirectRep ps)
-      , "\n"]
+getDirectProblem : DirectRep tyPATTERN -> (DirectRep tyPROBLEM)
+getDirectProblem (DirectMkPatt _ _ p _) = p
 
-showDirectRep (DirectMkPatt t d p s) = with List
-    unwords [
-         "Pattern:" , show t , "\n"
-      , showDirectRep p
-      , showDirectRep s]
+getDirectSolution : DirectRep tyPATTERN -> DirectRep tySOLUTION
+getDirectSolution (DirectMkPatt _ _ _ s) = s
 
--- ------------------------------------------------------------------- [ toORG ]
+getDirectReqs : DirectRep tyPROBLEM -> List $ DirectRep tyREQ
+getDirectReqs (DirectMkProb _ _ rs) = rs
 
-covering
-toOrg : DirectRep ty -> String
-toOrg (DirectMkReq _ t d) = with List
-    unwords [
-         "** Requirement:", t, "\n\n",
-         fromMaybe "" d, "\n"]
+getDirectProperties : DirectRep tySOLUTION -> List $ DirectRep tyPROPERTY
+getDirectProperties (DirectMkSolt _ _ ps) = ps
 
-toOrg (DirectMkProb t d rs) = with List
-    unwords [
-        "* Problem:", t, "\n\n",
-        fromMaybe "" d, "\n\n",
-        (concat $ intersperse "\n" (map (\x => toOrg x) rs)), "\n\n"]
+getDirectTraits : DirectRep tyPROPERTY -> List $ DirectRep tyTRAIT
+getDirectTraits (DirectMkProp _ _ ts) = ts
 
-toOrg (DirectMkAffect cval r d) = with List
-    unlines [ unwords ["****", concat ["/",show cval, "/"], fromMaybe "" (getDirectRepTitle r)]
-            , fromMaybe "" d, "\n\n"]
+getDirectAffects : DirectRep tyTRAIT -> List $ DirectRep tyAFFECTS
+getDirectAffects (DirectMkTrait _ _ _ _ as) = as
 
-toOrg (DirectMkTrait ty t d s rs) = with List
-    unwords [
-        "*** Trait:", show ty, t , "\n\n"
-      , "+ Evaluation Value :: " , show s , "\n\n"
-      , fromMaybe "" d , "\n\n"
-      , concat (map (toOrg) rs)
-      , "\n\n"]
-
-toOrg (DirectMkProp t d ts) = with List
-    unwords [
-        "** Property: " , t , "\n\n"
-     , fromMaybe "" d , "\n\n"
-     , concat (map (toOrg) ts)
-     , "\n\n"]
-
-toOrg (DirectMkSolt t d ps) = with List
-    unwords [
-         "* Solution: " , t , "\n\n"
-      , fromMaybe "" d , "\n\n"
-      , concat (map toOrg ps)
-      , "\n\n"]
-
-toOrg (DirectMkPatt t d p s) = with List
-    unwords [
-         "#+TITLE: " , t , "\n"
-      , "#+AUTHOR: Unknown\n"
-      , "#+DATE:   Unknown\n"
-      , fromMaybe "" d , "\n\n"
-      , toOrg p , "\n\n"
-      , toOrg s , "\n\n"]
-
--- -------------------------------------------------------------------- [ Edda ]
-
-toEdda : DirectRep tyPATTERN -> Maybe $ Edda PRIME MODEL
-toEdda expr =
-    case parse parseOrg (toOrg expr) of
-      Left  err => Nothing
-      Right doc => Just (refineEdda doc)
+getDirectReq : DirectRep tyAFFECTS -> DirectRep tyREQ
+getDirectReq (DirectMkAffect _ r _) = r
 
 -- --------------------------------------------------------------------- [ GRL ]
 
-data InterpRes : SifTy -> Type where
-  IReq    : GLang ELEM                         -> InterpRes tyREQ
-  IProb   : GLang ELEM -> GModel               -> InterpRes tyPROBLEM
-  IAffect : GLang ELEM -> CValue               -> InterpRes tyAFFECTS
-  ITrait  : GLang ELEM -> List (GLang INTENT)  -> InterpRes tyTRAIT
-  IProp   : GLang ELEM -> DList GTy GLang es   -> InterpRes tyPROPERTY
-  ISolt   : GLang ELEM -> DList GTy GLang ss   -> InterpRes tySOLUTION
-  IPatt   : GModel                             -> InterpRes tyPATTERN
-
 covering
 toGRL : DirectRep ty -> InterpRes ty
-toGRL (DirectMkReq ty t d)  = IReq (mkGoal ("Requirement: " ++ t))
-
-toGRL (DirectMkProb t d rs) = IProb root (model' \= (root &= cs))
-  where
-    root : GLang ELEM
-    root = mkGoal ("Problem: " ++ t)
-
-    cs' : List (InterpRes tyREQ)
-    cs' = map toGRL rs
-
-    cs : List (GLang ELEM)
-    cs = map (\(IReq x) => x) cs'
-
-    model : GModel
-    model = (emptyModel \= root)
-
-    model' : GModel
-    model' = insertMany cs model
-
-toGRL (DirectMkAffect cval r d) = IAffect (req $ toGRL r) cval
-  where
-    req : InterpRes tyREQ -> GLang ELEM
-    req (IReq x) = x
-
-toGRL (DirectMkTrait ty t d s rs) = ITrait node cs
-  where
-    tVal : String
-    tVal = case ty of
-             GEN => "Trait General:"
-             ADV => "Trait Advantage: "
-             DIS => "Trait Disadvantage: "
-
-    node : GLang ELEM
-    node = mkSatTask (tVal ++ t) s
-
-    es' : List (InterpRes tyAFFECTS)
-    es' = map toGRL rs
-
-    cs : List (GLang INTENT)
-    cs = map (\(IAffect r c) => (node ==> r | c)) es'
-
-toGRL (DirectMkProp t d ts) = IProp pelem (Sigma.getProof elems)
-  where
-    pelem : GLang ELEM
-    pelem = mkTask ("Property: " ++ t)
-
-    ts' : List (InterpRes tyTRAIT)
-    ts' = map toGRL ts
-
-    newTS : List (GLang ELEM, List (GLang INTENT))
-    newTS = map (\(ITrait x ys) => (x, ys)) ts'
-
-    newCS : GLang STRUCT
-    newCS = (pelem &= map fst newTS)
-
-    newIS : (is ** DList GTy GLang is)
-    newIS = fromList $ concat $ map snd newTS
-
-    newES : (es ** DList GTy GLang es)
-    newES = fromList $ map fst newTS
-
-    elems : (fs ** DList GTy GLang fs)
-    elems =  (_ ** [pelem]
-                ++ Sigma.getProof newES
-                ++ Sigma.getProof newIS
-                ++ [newCS])
-
-toGRL (DirectMkSolt t d ps) = ISolt root (Sigma.getProof elems)
-  where
-    root : GLang ELEM
-    root = mkTask ("Solution: " ++ t)
-
-    ps' : List (InterpRes tyPROPERTY)
-    ps' = map toGRL ps
-
-    cs : GLang STRUCT
-    cs = (root &= map (\(IProp x ys) => x) ps')
-
-    doGet : (is ** DList GTy GLang is)
-         -> InterpRes tyPROPERTY
-         -> (xs ** DList GTy GLang xs)
-    doGet (is ** res) (IProp x ys) = (_ ** ys ++ res)
-
-    getDecls : (as ** DList GTy GLang as)
-    getDecls = foldl doGet (_ ** DList.Nil)  ps'
-
-    elems : (es ** DList GTy GLang es)
-    elems = (_ ** [root, cs] ++ (Sigma.getProof getDecls))
-
-toGRL (DirectMkPatt t d p s) = IPatt $ mkModel (toGRL p) (toGRL s)
-  where
-    doInsert : GModel -> GLang ty -> GModel
-    doInsert m d = insert d m
-
-    mkModel : InterpRes tyPROBLEM -> InterpRes tySOLUTION -> GModel
-    mkModel (IProb rP m) (ISolt rS is) =
-      DList.foldl doInsert m (getProof $ groupDecls is)
+toGRL (DirectMkReq ty t d)        = interpReq t
+toGRL (DirectMkProb t d rs)       = interpProb t (map toGRL rs)
+toGRL (DirectMkAffect cval r d)   = interpAffect cval (toGRL r)
+toGRL (DirectMkTrait ty t d s rs) = interpTrait t s (map toGRL rs) ty
+toGRL (DirectMkProp t d ts)       = interpProp t (map toGRL ts)
+toGRL (DirectMkSolt t d ps)       = interpSolt t (map toGRL ps)
+toGRL (DirectMkPatt t d p s)      = interpPatt (toGRL p) (toGRL s)
 
 -- ----------------------------------------------------- [ Instances and Stuff ]
 
@@ -292,40 +136,36 @@ getGModel p = extract (toGRL p)
     extract : InterpRes tyPATTERN -> GModel
     extract (IPatt m) = m
 
-
--- --------------------------------------------------------------------- [ DOT ]
-
-toDot : DirectRep tyPATTERN -> SimpleDot GRAPH
-toDot p = grlToDot $ getGModel p
-
 -- ------------------------------------------------------ [ Builder Definition ]
 
-covering partial
-convPriv : DirectRep tyPATTERN
-        -> (fmt : SifOutFormat)
-        -> Maybe (convTy fmt)
-convPriv p ORG     = Just $ toOrg p
-convPriv p XML     = Nothing -- Just $ toXML p
-convPriv p DOT     = Just $ toDot p
-convPriv p GRL     = Just $ getGModel p
-convPriv p EDDA    = toEdda p
-convPriv p COMPACT = Just $ showDirectRep p
-convPriv p IDRIS   = Nothing
-convPriv p STRING  = Just $ GLang.toString $ getGModel p
-
-instance Show (DirectRep ty) where
-  show = showDirectRep
-
 instance SifRepAPI DirectRep where
-  getTitle = getDirectRepTitle
+  getTitle  x = getDirectTitle x
+  getDesc   = getDirectDesc
+  getTTy    = getDirectTTy
+  getRTy    = getDirectRTy
+  getSValue = getDirectSValue
+  getCValue = getDirectCValue
+
+  getProblem    = getDirectProblem
+  getSolution   = getDirectSolution
+  getReqs       = getDirectReqs
+  getProperties = getDirectProperties
+  getTraits     = getDirectTraits
+  getAffects    = getDirectAffects
+  getReq        = getDirectReq
 
   evalPattern p =
       case evalModel (getGModel p) Nothing of
         BadModel  => Bad
         Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) gs
 
-  toString p     = showDirectRep p
-  convTo   x fmt = convPriv x fmt
+  fetchMetaModel p = m
+      where
+        g : GModel
+        g = getGModel p
+
+        m : MetaModel
+        m = MkModel g
 
 -- ------------------------------------------------------------- [ The Builder ]
 

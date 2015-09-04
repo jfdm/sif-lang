@@ -5,8 +5,8 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Sif.API
 
-import public Config.Error
-import public Config.YAML
+import Config.Error
+import Config.YAML
 
 import Data.GraphViz.SimpleDot
 import XML.DOM
@@ -22,9 +22,9 @@ import Sif.DSL.Parser.Solution
 import Sif.DSL.Parser
 import Sif.DSL
 import Sif.Options
+import Sif.Prelude
 
 %default partial
-
 %access public
 
 
@@ -60,7 +60,7 @@ doSyntaxCheck (Nothing) (Nothing) = Sif.raise NoFileGiven
 
 evalAndPrintPattern : (PATTERN impl) -> Eff () SifEffs
 evalAndPrintPattern p = do
-  let tname = unwords ["Evaluating:", fromMaybe "" $ getTitle p]
+  let tname = unwords ["Evaluating:", getTitle p]
   trace tname
   mkTimer tname
   startTimer tname
@@ -88,21 +88,20 @@ evalPatternFromFile : Maybe String -> Maybe String -> Eff () SifEffs
 evalPatternFromFile p' s' = do
   bob <- getSifBackend
   p <- tryToBuildPatternE (builder bob) p' s'
-  putStrLn $ unwords ["loaded", fromMaybe "" $ getTitle p]
+  putStrLn $ unwords ["loaded", getTitle p]
   evalAndPrintPattern p
 
 printPattern : PATTERN impl -> Maybe SifOutFormat -> Eff () SifEffs
 printPattern _ Nothing    = printLn NoFormatSpecified
 printPattern p (Just fmt) = do
-    let tname = unwords ["Converting", show $ getTitle p,"to", show fmt]
+    let tname = unwords ["Converting", show $ getTitle p, "to", show fmt]
     mkTimer tname
     startTimer tname
-    let res = showConvPattern p fmt
+    let res = showConvPattern fmt p
     stopTimer tname
     case res of
       Nothing  => printLn UnSuppFormat
       Just res => putStrLn res
-
 
 convPatternFromFile : Maybe String
                    -> Maybe String
@@ -115,61 +114,6 @@ convPatternFromFile p s fname fmt = do
     case fname of
       Nothing => printPattern p fmt
       Just _  => printLn FeatureNotImpl
-
-
-
--- ------------------------------------------------------------ [ YAML Parsing ]
-
-{-
-Schema is
-
-file ::= pattern+
-pattern ::= "pattern": {"problem":!!str, "solution": (vale::!!str)}
-
--}
-
-private
-getString : YAMLNode -> Maybe String
-getString (YAMLString s) = Just s
-getString _              = Nothing
-
-private
-isPatternMap : YAMLNode -> Bool
-isPatternMap (YAMLString str) = toLower str == "pattern"
-isPatternMap _ = False
-
-private
-getPatternKVPairs : YAMLNode -> List (YAMLNode)
-getPatternKVPairs (YAMLDoc _ doc) with (doc)
-  | (YAMLMap ps) = map snd $ filter (\(x,y) => isPatternMap x) ps
-  | otherwise = Nil
-getPatternKVPairs _ = Nil
-
-private
-getStringKey : (YAMLNode, YAMLNode) -> Maybe String
-getStringKey (k,_) = getString k
-
-private
-getStringValue : (YAMLNode, YAMLNode) -> Maybe String
-getStringValue (_,v) = getString v
-
-private
-getPSPair : YAMLNode -> Maybe (String, String)
-getPSPair (YAMLMap [p,s]) =
-    case (getStringKey p, getStringKey s) of
-      (Just p', Just s') =>
-        if toLower p' == "problem" && toLower s' == "solution"
-          then case (getStringValue p, getStringValue s) of
-            (Just p'', Just s'') => Just (p'', s'')
-            otherwise            => Nothing
-          else Nothing
-      otherwise          => Nothing
-getPSPair _  = Nothing
-
-private
-filterPreludeIDX : YAMLNode -> List (String, String)
-filterPreludeIDX doc = mapMaybe (getPSPair) $ getPatternKVPairs doc
-
 
 -- ------------------------------------------------------- [ Library Functions ]
 

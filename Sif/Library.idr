@@ -11,7 +11,6 @@ import Config.YAML
 
 import Sif.Types
 import Sif.Pattern
-import Sif.Builder.AbsInterp
 
 import public Data.Sigma.DList
 import public Data.AVL.Dict
@@ -50,7 +49,7 @@ getLibraryIndex : SifLib -> Dict Nat String
 getLibraryIndex lib = Dict.fromList idx
   where
     f : LibEntry impl -> (Nat, String)
-    f (MkEntry n p) = (n, unwords ["Pattern:", fromMaybe "" $ Pattern.getTitle p])
+    f (MkEntry n p) = (n, unwords ["Pattern:", getTitle p])
 
     idx : List (Nat, String)
     idx = mapDList f (patts lib)

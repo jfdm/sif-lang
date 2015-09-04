@@ -40,13 +40,22 @@ data STy = ABSTRACT | CONCRETE
 data SifTy = tyREQ     | tyTRAIT   | tyPROPERTY | tySOLUTION
            | tyPROBLEM | tyPATTERN | tyAFFECTS
 
-data SifOutFormat = ORG | XML | DOT | GRL | EDDA | COMPACT | IDRIS | STRING
+
+data HasMData : SifTy -> Type where
+  HMR : HasMData tyREQ
+  HMP : HasMData tyPROPERTY
+  HMS : HasMData tySOLUTION
+  HMA : HasMData tyPROBLEM
+  HMB : HasMData tyPATTERN
+  HMT : HasMData tyTRAIT
+
+
+data SifOutFormat = ORG | XML | DOT | EDDA | COMPACT | IDRIS | STRING
 
 instance Eq SifOutFormat where
   (==) ORG     ORG     = True
   (==) XML     XML     = True
   (==) DOT     DOT     = True
-  (==) GRL     GRL     = True
   (==) EDDA    EDDA    = True
   (==) COMPACT COMPACT = True
   (==) IDRIS   IDRIS   = True
@@ -57,7 +66,6 @@ instance Show SifOutFormat where
   show ORG = "Org"
   show XML = "XML"
   show DOT = "dot"
-  show GRL = "GRL"
   show EDDA = "Edda"
   show COMPACT = "Compact"
   show IDRIS   = "Idris"
@@ -65,11 +73,10 @@ instance Show SifOutFormat where
 
 readOutFMT : String -> Maybe SifOutFormat
 readOutFMT s =
-  case s of
+  case toLower s of
     "org"     => Just ORG
     "xml"     => Just XML
     "dot"     => Just DOT
-    "grl"     => Just GRL
     "compact" => Just COMPACT
     "idris"   => Nothing
     "edda"    => Nothing -- TODO Just EDDA
