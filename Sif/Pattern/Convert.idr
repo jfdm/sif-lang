@@ -28,6 +28,7 @@ convTy COMPACT = String
 convTy IDRIS   = String
 convTy STRING  = String
 
+covering
 convTo : (fmt : SifOutFormat) -> PATTERN impl -> Maybe (convTy fmt)
 convTo XML     p = Just $ toXML p
 
@@ -66,7 +67,7 @@ showConvPattern IDRIS p =
 showConvPattern EDDA p =
   case (the (Maybe (convTy EDDA)) (convTo EDDA p)) of
     Nothing => Nothing
-    Just r  => Just (show r)
+    Just r  => Nothing -- TODO Just (show r)
 
 showConvPattern COMPACT p =
   case (the (Maybe (convTy COMPACT)) (convTo COMPACT p)) of

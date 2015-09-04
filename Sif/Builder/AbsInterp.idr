@@ -98,6 +98,7 @@ getPrivTitle (priv__mkTrait _ t _ _ _) = t
 getPrivTitle (priv__mkProp t _ _)      = t
 getPrivTitle (priv__mkSolt t _ _)      = t
 getPrivTitle (priv__mkPatt t _ _ _)    = t
+getPrivTitle _ = "Error"
 
 getPrivDesc : AbsInterpPriv i ty -> Maybe String
 getPrivDesc (priv__mkReq _ _ d)       = d
