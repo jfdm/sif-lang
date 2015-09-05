@@ -57,10 +57,14 @@ convertSolution s =
       , concatMap convertProperty (getProperties s)
       , "\n"]
 
+
+convertContext : DOMAIN impl -> String
+
 convertPattern : PATTERN impl -> String
 convertPattern p =
     unwords [
          "Pattern:" , show (getTitle p) , "\n"
+      , convertContext  $ getDomainPattern p
       , convertProblem  $ getProblem p
       , convertSolution $ getSolution p]
 

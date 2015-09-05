@@ -21,6 +21,7 @@ instance SifMetaModel GModel where
   toString x = GLang.toString x
 
 data InterpRes : SifTy -> Type where
+  IDomain : InterpRes tyDOMAIN
   IReq    : GLang ELEM -> InterpRes tyREQ
   IProb   : GLang ELEM -> GModel               -> InterpRes tyPROBLEM
   IAffect : GLang ELEM -> CValue               -> InterpRes tyAFFECTS
@@ -28,6 +29,9 @@ data InterpRes : SifTy -> Type where
   IProp   : GLang ELEM -> DList GTy GLang es   -> InterpRes tyPROPERTY
   ISolt   : GLang ELEM -> DList GTy GLang ss   -> InterpRes tySOLUTION
   IPatt   : GModel                             -> InterpRes tyPATTERN
+
+interpDomain : InterpRes tyDOMAIN
+interpDomain = IDomain
 
 interpReq : String -> InterpRes tyREQ
 interpReq s = IReq root

@@ -11,173 +11,173 @@ import Sif.Pattern.Model
 
 -- ----------------------------------------------------------- [ Type Synonyms ]
 
-FUNCTIONAL : (impl : SifTy -> Type) -> Type
-FUNCTIONAL impl = SifExpr impl tyREQ
+FUNCTIONAL : (impl : SifTy -> SifDomain -> Type) -> SifDomain -> Type
+FUNCTIONAL impl d = SifExpr impl tyREQ d
 
-USABILITY :  (impl : SifTy -> Type) -> Type
-USABILITY impl = SifExpr impl tyREQ
+USABILITY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+USABILITY impl d = SifExpr impl tyREQ d
 
-RELIABILITY :  (impl : SifTy -> Type) -> Type
-RELIABILITY impl = SifExpr impl tyREQ
+RELIABILITY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+RELIABILITY impl d = SifExpr impl tyREQ d
 
-PERFORMANCE :  (impl : SifTy -> Type) -> Type
-PERFORMANCE impl = SifExpr impl tyREQ
+PERFORMANCE : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+PERFORMANCE impl d = SifExpr impl tyREQ d
 
-SUPPORTABILITY :  (impl : SifTy -> Type) -> Type
-SUPPORTABILITY impl = SifExpr impl tyREQ
+SUPPORTABILITY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+SUPPORTABILITY impl d = SifExpr impl tyREQ d
 
-REQUIREMENT :  (impl : SifTy -> Type) -> Type
-REQUIREMENT impl = SifExpr impl tyREQ
+REQUIREMENT : (impl : SifTy -> SifDomain -> Type) -> SifDomain -> Type
+REQUIREMENT impl d = SifExpr impl tyREQ d
 
-REQUIREMENTS :  (impl : SifTy -> Type) -> Type
-REQUIREMENTS impl = List (REQUIREMENT impl)
+REQUIREMENTS : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+REQUIREMENTS impl d = List (REQUIREMENT impl d)
 
-PROBLEM :  (impl : SifTy -> Type) -> Type
-PROBLEM impl = SifExpr impl tyPROBLEM
+PROBLEM : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+PROBLEM impl d = SifExpr impl tyPROBLEM d
 
-ADVANTAGE :  (impl : SifTy -> Type) -> Type
-ADVANTAGE impl = SifExpr impl tyTRAIT
+ADVANTAGE : (impl : SifTy -> SifDomain -> Type) -> SifDomain -> Type
+ADVANTAGE impl d = SifExpr impl tyTRAIT d
 
-DISADVANTAGE :  (impl : SifTy -> Type) -> Type
-DISADVANTAGE impl = SifExpr impl tyTRAIT
+DISADVANTAGE : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+DISADVANTAGE impl d = SifExpr impl tyTRAIT d
 
-TRAIT :  (impl : SifTy -> Type) -> Type
-TRAIT impl = SifExpr impl tyTRAIT
+TRAIT : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+TRAIT impl d = SifExpr impl tyTRAIT d
 
-TRAITS :  (impl : SifTy -> Type) -> Type
-TRAITS impl = List (TRAIT impl)
+TRAITS : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+TRAITS impl d = List (TRAIT impl d)
 
-AFFECT :  (impl : SifTy -> Type) -> Type
-AFFECT impl = SifExpr impl tyAFFECTS
+AFFECT : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+AFFECT impl d = SifExpr impl tyAFFECTS d
 
-AFFECTS :  (impl : SifTy -> Type) -> Type
-AFFECTS impl = List (AFFECT impl)
+AFFECTS : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+AFFECTS impl d = List (AFFECT impl d)
 
-PROPERTY :  (impl : SifTy -> Type) -> Type
-PROPERTY impl = SifExpr impl tyPROPERTY
+PROPERTY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+PROPERTY impl d = SifExpr impl tyPROPERTY d
 
-PROPERTIES :  (impl : SifTy -> Type) -> Type
-PROPERTIES impl = List (PROPERTY impl)
+PROPERTIES : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+PROPERTIES impl d = List (PROPERTY impl d)
 
-SOLUTION :  (impl : SifTy -> Type) -> Type
-SOLUTION impl = SifExpr impl tySOLUTION
+SOLUTION : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+SOLUTION impl d = SifExpr impl tySOLUTION d
 
-PATTERN :  (impl : SifTy -> Type) -> Type
-PATTERN impl = SifExpr impl tyPATTERN
+PATTERN : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
+PATTERN impl d = SifExpr impl tyPATTERN d
 
 -- ------------------------------------------------------------- [ Problem API ]
 
-mkRequirement : SifBuilder i
+mkRequirement : SifBuilder i d
              -> RTy
              -> String
              -> Maybe String
-             -> REQUIREMENT i
+             -> REQUIREMENT i d
 mkRequirement impl ty s desc = (buildReq impl) ty s desc
 
-mkFunctional : SifBuilder i
+mkFunctional : SifBuilder i d
             -> String
             -> Maybe String
-            -> FUNCTIONAL i
+            -> FUNCTIONAL i d
 mkFunctional impl s desc = (buildReq impl) FUNC s desc
 
-mkUsability : SifBuilder i
+mkUsability : SifBuilder i d
            -> String
            -> Maybe String
-           -> USABILITY i
+           -> USABILITY i d
 mkUsability impl s desc = (buildReq impl) USAB s desc
 
-mkReliability : SifBuilder i
+mkReliability : SifBuilder i d
              -> String
              -> Maybe String
-             -> RELIABILITY i
+             -> RELIABILITY i d
 mkReliability impl s desc = (buildReq impl) RELI s desc
 
-mkPerformance : SifBuilder i
+mkPerformance : SifBuilder i d
              -> String
              -> Maybe String
-             -> PERFORMANCE i
+             -> PERFORMANCE i d
 mkPerformance impl s desc = (buildReq impl) PERF s desc
 
-mkSupportability : SifBuilder i
+mkSupportability : SifBuilder i d
                 -> String
                 -> Maybe String
-                -> SUPPORTABILITY i
+                -> SUPPORTABILITY i d
 mkSupportability impl s desc = (buildReq impl) SUPP s desc
 
-mkProblem : SifBuilder i
+mkProblem : SifBuilder i d
          -> String
          -> Maybe String
-         -> REQUIREMENTS i
-         -> PROBLEM i
+         -> REQUIREMENTS i d
+         -> PROBLEM i d
 mkProblem impl s d rs = (buildProblem impl) s d rs
 
 -- ------------------------------------------------------------ [ Solution API ]
 
-mkAffect : SifBuilder i
+mkAffect : SifBuilder i d
         -> CValue
-        -> REQUIREMENT i
+        -> REQUIREMENT i d
         -> Maybe String
-        -> AFFECT i
+        -> AFFECT i d
 mkAffect impl c r d = (buildAffect impl) c r d
 
-mkTrait : SifBuilder i
+mkTrait : SifBuilder i d
        -> TTy
        -> String
        -> Maybe String
        -> SValue
-       -> AFFECTS i
-       -> TRAIT i
+       -> AFFECTS i d
+       -> TRAIT i d
 mkTrait impl ty t d s rs = (buildTrait impl) ty t d s' rs
   where
     s' : SValue
     s' = case ty of {GEN => s; ADV => s; DIS => invertEval s}
 
-mkAspect : SifBuilder i
-       -> String
-       -> Maybe String
-       -> SValue
-       -> AFFECTS i
-       -> TRAIT i
+mkAspect : SifBuilder i d
+        -> String
+        -> Maybe String
+        -> SValue
+        -> AFFECTS i d
+        -> TRAIT i d
 mkAspect impl t d s rs = (buildTrait impl) GEN t d s rs
 
-mkAdvantage : SifBuilder i
+mkAdvantage : SifBuilder i d
            -> String
            -> Maybe String
            -> SValue
-           -> AFFECTS i
-           -> ADVANTAGE i
+           -> AFFECTS i d
+           -> ADVANTAGE i d
 mkAdvantage impl t d s rs = (buildTrait impl) ADV t d s rs
 
-mkDisadvantage : SifBuilder i
+mkDisadvantage : SifBuilder i d
               -> String
               -> Maybe String
               -> SValue
-              -> AFFECTS i
-              -> DISADVANTAGE i
+              -> AFFECTS i d
+              -> DISADVANTAGE i d
 mkDisadvantage impl t d s rs = (buildTrait impl) DIS t d (invertEval s) rs
 
-mkProperty : SifBuilder i
+mkProperty : SifBuilder i d
           -> String
           -> Maybe String
-          -> TRAITS i
-          -> PROPERTY i
+          -> TRAITS i d
+          -> PROPERTY i d
 mkProperty impl t d ts = (buildProperty impl) t d ts
 
-mkSolution : SifBuilder i
+mkSolution : SifBuilder i d
           -> String
           -> Maybe String
-          -> PROPERTIES i
-          -> SOLUTION i
+          -> PROPERTIES i d
+          -> SOLUTION i d
 mkSolution impl s d ps = (buildSolution impl) s d ps
 
 -- ------------------------------------------------------------- [ Pattern API ]
 
-mkPattern : SifBuilder i
+mkPattern : SifBuilder i d
          -> String
          -> Maybe String
-         -> PROBLEM i
-         -> SOLUTION i
-         -> PATTERN i
+         -> PROBLEM i d
+         -> SOLUTION i d
+         -> PATTERN i d
 mkPattern impl t d p s = (buildPattern impl) t d p s
 
 

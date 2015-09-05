@@ -46,9 +46,6 @@ mkNDNode n t d = (addScore $ mkNode n)
             <++> (addScore $ mkDescNode d)
             <++> (addScore $ "name" <+=> t)
 
---addND : Document ELEMENT -> String -> Maybe String -> Document ELEMENT
---addND n t d =
-
 mkMdata : Document ELEMENT
 mkMdata = mkNode "metadata"
      <++> mkPCNode "auditors" "auditor"
@@ -92,11 +89,11 @@ mkRels = addScore $ mkNode "relations"
 XEffs : List EFFECT
 XEffs = [STATE (Nat, Dict String Nat)]
 
-convertReq : REQUIREMENT impl -> Eff (Document ELEMENT) XEffs
+convertReq : REQUIREMENT impl c -> Eff (Document ELEMENT) XEffs
 convertReq p = do
        let ty = getRTy p
-       let t = getTitle p
-       let d = getDesc p
+       let t  = getTitle p
+       let d  = getDesc p
        let e  = addScore $ mkNDNode (cast ty) t d
        (idGen,_) <- get
        let idVal = cast {to=Int} (S idGen)
@@ -104,7 +101,7 @@ convertReq p = do
        update (\(idGen,ids) => ((S idGen), insert t (S idGen) ids))
        pure $ e'
 
-convertProblem : PROBLEM impl -> Eff (Document ELEMENT) XEffs
+convertProblem : PROBLEM impl d -> Eff (Document ELEMENT) XEffs
 convertProblem p = do
        let t = getTitle p
        let d = getDesc p
@@ -120,7 +117,7 @@ convertProblem p = do
          <++> (addScore $ mkDescNode d)
          <++> ("name" <+=> t)
 
-convertAffect : AFFECT impl -> Eff (Document ELEMENT) XEffs
+convertAffect : AFFECT impl d -> Eff (Document ELEMENT) XEffs
 convertAffect p = do
        let d = getDesc p
        let cval = Model.getCValue p
@@ -134,7 +131,7 @@ convertAffect p = do
        pure $ (setAttribute "cvalue" (cast cval)
               (setAttribute "linksTo" (cast idval) e))
 
-convertTrait : TRAIT impl -> Eff (Document ELEMENT) XEffs
+convertTrait : TRAIT impl d -> Eff (Document ELEMENT) XEffs
 convertTrait p = do
        let ty = getTTy p
        let t = getTitle p
@@ -152,7 +149,7 @@ convertTrait p = do
          <++> (mkDescNode d)
          <++> ("name" <+=> t)
 
-convertProperty : PROPERTY impl -> Eff (Document ELEMENT) XEffs
+convertProperty : PROPERTY impl d -> Eff (Document ELEMENT) XEffs
 convertProperty p = do
        let t = getTitle p
        let d = getDesc p
@@ -168,7 +165,7 @@ convertProperty p = do
          <++> ("name" <+=> t)
 
 
-convertSolution : SOLUTION impl -> Eff (Document ELEMENT) XEffs
+convertSolution : SOLUTION impl d -> Eff (Document ELEMENT) XEffs
 convertSolution p = do
        let t = getTitle p
        let d = getDesc p
@@ -185,12 +182,13 @@ convertSolution p = do
          <++> (mkDescNode d)
          <++> ("name" <+=> t)
 
-convertPattern : PATTERN impl -> Eff (Document ELEMENT) XEffs
+convertPattern : PATTERN impl d -> Eff (Document ELEMENT) XEffs
 convertPattern pat = do
        let t = getTitle pat
        let d = getDesc pat
        let p = getProblem pat
        let s = getSolution pat
+       let c = getDomain pat
 
        let e = mkNode "pattern"
        pNode <- convertProblem p
@@ -200,13 +198,13 @@ convertPattern pat = do
                 <++> (addScore $ mkEmptyNode "evidence")
                 <++> sNode
                 <++> pNode
-                <++> (addScore $ mkEmptyNode "context")
+                <++> (addScore $ mkNDNode "context" (getTitle c) (getDesc c))
                 <++> mkMdata
                 <++> (mkDescNode d)
                 <++> ("name" <+=> t)
 
 public
-toXML : PATTERN impl -> Document DOCUMENT
+toXML : PATTERN impl d -> Document DOCUMENT
 toXML p = setRoot root $ mkDocument (mkQName "pattern") Nothing
   where
     partial

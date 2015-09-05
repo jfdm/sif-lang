@@ -132,11 +132,23 @@ convertSolution s = [t,d] ++ ps
     ps : List $ Edda STAR BLOCK
     ps = concatMap (convertProperty) $ getProperties s
 
+convertDomain : DOMAIN impl -> List $ Edda STAR BLOCK
+convertDomain c = [t,d]
+  where
+    t : Edda STAR BLOCK
+    t = section' Nothing
+          (unwords ["Context:", getTitle c])
+    d : Edda STAR BLOCK
+    d = mkDescPara (getDesc c)
+
 convertPattern : PATTERN impl -> Edda STAR MODEL
 convertPattern p = EddaRaw as (intersperse (Empty STAR) body)
   where
     as : List (String, String)
     as = [MkPair "TITLE" (getTitle p)]
+
+    dom : List $ Edda STAR BLOCK
+    dom = convertDomain $ getDomainPattern p
 
     prob : List $ Edda STAR BLOCK
     prob = convertProblem $ getProblem p
@@ -145,13 +157,11 @@ convertPattern p = EddaRaw as (intersperse (Empty STAR) body)
     sol = convertSolution $ getSolution p
 
     body : List $ Edda STAR BLOCK
-    body = [mkDescPara (getDesc p)] ++ prob ++ sol
+    body = [mkDescPara (getDesc p)] ++ dom ++ prob ++ sol
 
 
 public
 toEdda : PATTERN impl -> Edda PRIME MODEL
 toEdda pdoc = refineEdda (convertPattern pdoc)
-
-
 
 -- --------------------------------------------------------------------- [ EOF ]

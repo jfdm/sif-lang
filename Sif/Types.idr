@@ -42,15 +42,17 @@ data SifTy = tyREQ     | tyTRAIT   | tyPROPERTY | tySOLUTION
 
 
 data HasMData : SifTy -> Type where
-  HMR : HasMData tyREQ
-  HMP : HasMData tyPROPERTY
-  HMS : HasMData tySOLUTION
-  HMA : HasMData tyPROBLEM
-  HMB : HasMData tyPATTERN
-  HMT : HasMData tyTRAIT
+  HMA : HasMData tyREQ
+  HMB : HasMData tyPROPERTY
+  HMC : HasMData tySOLUTION
+  HMD : HasMData tyPROBLEM
+  HME : HasMData tyPATTERN
+  HMF : HasMData tyTRAIT
+  HMG : HasMData tyDOMAIN
 
 
-data SifOutFormat = ORG | LATEX | CMARK | XML | DOT | EDDA | COMPACT | IDRIS | STRING
+data SifOutFormat = ORG  | LATEX   | CMARK | XML    | DOT
+                  | EDDA | COMPACT | IDRIS | STRING
 
 instance Eq SifOutFormat where
   (==) LATEX   LATEX   = True
@@ -65,12 +67,12 @@ instance Eq SifOutFormat where
   (==) _       _       = False
 
 instance Show SifOutFormat where
-  show LATEX = "LaTeX"
-  show CMARK = "CommonMark"
-  show ORG = "Org"
-  show XML = "XML"
-  show DOT = "dot"
-  show EDDA = "Edda"
+  show LATEX   = "LaTeX"
+  show CMARK   = "CommonMark"
+  show ORG     = "Org"
+  show XML     = "XML"
+  show DOT     = "dot"
+  show EDDA    = "Edda"
   show COMPACT = "Compact"
   show IDRIS   = "Idris"
   show STRING  = "String"
@@ -80,13 +82,13 @@ readOutFMT s =
   case toLower s of
     "latex"    => Just LATEX
     "markdown" => Just CMARK
-    "org"     => Just ORG
-    "xml"     => Just XML
-    "dot"     => Just DOT
-    "compact" => Just COMPACT
-    "idris"   => Nothing
-    "edda"    => Nothing -- TODO Just EDDA
-    "string"  => Just STRING
-    otherwise => Nothing
+    "org"      => Just ORG
+    "xml"      => Just XML
+    "dot"      => Just DOT
+    "compact"  => Just COMPACT
+    "string"   => Just STRING
+    "idris"    => Nothing -- TODO Just IDRIS
+    "edda"     => Nothing -- TODO Just EDDA
+    otherwise  => Nothing
 
 -- --------------------------------------------------------------------- [ EOF ]
