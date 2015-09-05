@@ -16,22 +16,26 @@ import Sif.Pattern.API
 %access private
 %default partial
 
-convertReq : REQUIREMENT impl -> String
-convertReq r = unwords ["   ", show (getRTy r), ":", show (getTitle r)]
+convertReq : REQUIREMENT impl d -> String
+convertReq r =
+    unwords [ "   "
+             , show (Pattern.getRTy r)
+             , ":"
+             , show (Pattern.getTitle r)]
 
-convertProblem : PROBLEM impl -> String
+convertProblem : PROBLEM impl d -> String
 convertProblem p =
     unwords [ "  problem:", show (getTitle p), "\n"
             , unlines $ map (convertReq) (getReqs p)
             , "\n"]
 
 
-convertAffect : AFFECT impl -> String
+convertAffect : AFFECT impl d -> String
 convertAffect a =
     unwords [ "       "
             , show (getCValue a), (getTitle $ getReq a), "\n"]
 
-convertTrait : TRAIT impl -> String
+convertTrait : TRAIT impl d -> String
 convertTrait t =
     unwords [
         "     "
@@ -42,7 +46,7 @@ convertTrait t =
       , concatMap (convertAffect) (getAffects t)
       , "\n"]
 
-convertProperty : PROPERTY impl -> String
+convertProperty : PROPERTY impl d -> String
 convertProperty p =
     unwords [
         "     property: " , (getTitle p) , "\n"
@@ -50,7 +54,7 @@ convertProperty p =
      , "\n"]
 
 
-convertSolution : SOLUTION impl -> String
+convertSolution : SOLUTION impl d -> String
 convertSolution s =
     unwords [
          "  solution: " , (getTitle s) , "\n"
@@ -58,18 +62,23 @@ convertSolution s =
       , "\n"]
 
 
-convertContext : DOMAIN impl -> String
+convertContext : SifDomain -> String
+convertContext d =
+    unwords [ "  context:"
+            , show (getTitle d)
+            , "\n"]
 
-convertPattern : PATTERN impl -> String
+
+convertPattern : PATTERN impl d -> String
 convertPattern p =
     unwords [
          "Pattern:" , show (getTitle p) , "\n"
-      , convertContext  $ getDomainPattern p
+      , convertContext  $ getDomain p
       , convertProblem  $ getProblem p
       , convertSolution $ getSolution p]
 
 public
-toString : PATTERN impl -> String
+toString : PATTERN impl d -> String
 toString p = convertPattern p
 
 -- --------------------------------------------------------------------- [ EOF ]

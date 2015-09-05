@@ -28,29 +28,31 @@ namespace Domain
 data MetaModel : Type where
   MkModel : SifMetaModel a => a -> MetaModel
 
-||| The Representation API
-class SifRepAPI (impl : SifTy -> SifDomain -> Type) where
-    getTitle  : impl ty d -> {auto prf : HasMData ty} -> String
-    getDesc   : impl ty d -> Maybe String
-    getRTy    : impl tyREQ     d -> RTy
-    getTTy    : impl tyTRAIT   d -> TTy
-    getSValue : impl tyTRAIT   d -> SValue
-    getCValue : impl tyAFFECTS d -> CValue
+namespace Pattern
 
-    getProblem  : impl tyPATTERN d -> impl tyPROBLEM  d
-    getSolution : impl tyPATTERN d -> impl tySOLUTION d
+  ||| The Representation API
+  class SifRepAPI (impl : SifTy -> SifDomain -> Type) where
+      getTitle  : impl ty d -> {auto prf : HasMData ty} -> String
+      getDesc   : impl ty d -> Maybe String
+      getRTy    : impl tyREQ     d -> RTy
+      getTTy    : impl tyTRAIT   d -> TTy
+      getSValue : impl tyTRAIT   d -> SValue
+      getCValue : impl tyAFFECTS d -> CValue
 
-    getReqs       : impl tyPROBLEM  d -> List (impl tyREQ      d)
-    getProperties : impl tySOLUTION d -> List (impl tyPROPERTY d)
-    getTraits     : impl tyPROPERTY d -> List (impl tyTRAIT    d)
-    getAffects    : impl tyTRAIT    d -> List (impl tyAFFECTS  d)
-    getReq        : impl tyAFFECTS  d -> impl tyREQ d
+      getProblem  : impl tyPATTERN d -> impl tyPROBLEM  d
+      getSolution : impl tyPATTERN d -> impl tySOLUTION d
 
-    evalPattern    : impl tyPATTERN d -> Sif.EvalResult
-    fetchMetaModel : impl tyPATTERN d -> MetaModel
+      getReqs       : impl tyPROBLEM  d -> List (impl tyREQ      d)
+      getProperties : impl tySOLUTION d -> List (impl tyPROPERTY d)
+      getTraits     : impl tyPROPERTY d -> List (impl tyTRAIT    d)
+      getAffects    : impl tyTRAIT    d -> List (impl tyAFFECTS  d)
+      getReq        : impl tyAFFECTS  d -> impl tyREQ d
 
-    getDomain : impl ty d -> SifDomain
-    getDomain {d} _ = d
+      evalPattern    : impl tyPATTERN d -> Sif.EvalResult
+      fetchMetaModel : impl tyPATTERN d -> MetaModel
+
+      getDomain : impl ty d -> SifDomain
+      getDomain {d} _ = d
 
 instance SifMetaModel MetaModel where
   toString (MkModel m) = toString m
