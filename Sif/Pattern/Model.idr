@@ -15,15 +15,13 @@ namespace Sif
     Good : List (String, Maybe SValue) -> EvalResult
     Bad  : EvalResult
 
-  ||| A dirty dirty dirty dirty dirty data structure
-  data MetaModel : Type where
-    MkModel   : a -> MetaModel
-    MkModel'  : {x:Type} -> (a : x -> Type) -> MetaModel
-    MkModel'' : {x:Type}
-             -> {y:Type}
-             -> (a : x -> y -> Type)
-             -> MetaModel
 
+||| The Meta Model API
+class SifMetaModel a where
+  toString : a -> String
+
+data MetaModel : Type where
+  MkModel : SifMetaModel a => a -> MetaModel
 
 ||| The Representation API
 class SifRepAPI (impl : SifTy -> Type) where
@@ -44,6 +42,10 @@ class SifRepAPI (impl : SifTy -> Type) where
 
     evalPattern    : impl tyPATTERN -> Sif.EvalResult
     fetchMetaModel : impl tyPATTERN -> MetaModel
+
+
+instance SifMetaModel MetaModel where
+  toString (MkModel m) = toString m
 
 data SifExpr : (impl : SifTy -> Type) -> SifTy -> Type where
   MkExpr : SifRepAPI impl => impl ty -> SifExpr impl ty

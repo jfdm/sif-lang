@@ -17,6 +17,9 @@ import Sif.Pattern
 
 -- --------------------------------------------------- [ Interpretation Result ]
 
+instance SifMetaModel GModel where
+  toString x = GLang.toString x
+
 data InterpRes : SifTy -> Type where
   IReq    : GLang ELEM -> InterpRes tyREQ
   IProb   : GLang ELEM -> GModel               -> InterpRes tyPROBLEM

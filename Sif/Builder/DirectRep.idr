@@ -140,11 +140,11 @@ getGModel p = extract (toGRL p)
 
 instance SifRepAPI DirectRep where
   getTitle  x = getDirectTitle x
-  getDesc   = getDirectDesc
-  getTTy    = getDirectTTy
-  getRTy    = getDirectRTy
-  getSValue = getDirectSValue
-  getCValue = getDirectCValue
+  getDesc     = getDirectDesc
+  getTTy      = getDirectTTy
+  getRTy      = getDirectRTy
+  getSValue   = getDirectSValue
+  getCValue   = getDirectCValue
 
   getProblem    = getDirectProblem
   getSolution   = getDirectSolution
@@ -159,13 +159,7 @@ instance SifRepAPI DirectRep where
         BadModel  => Bad
         Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) gs
 
-  fetchMetaModel p = m
-      where
-        g : GModel
-        g = getGModel p
-
-        m : MetaModel
-        m = MkModel g
+  fetchMetaModel p = MkModel $ getGModel p
 
 -- ------------------------------------------------------------- [ The Builder ]
 

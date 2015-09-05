@@ -40,9 +40,9 @@ convTo LATEX   p = Just $ latex $ toEdda p
 convTo CMARK   p = Just $ markdown $ toEdda p
 
 convTo DOT     p = Nothing -- Just $ toDot p
-convTo COMPACT p = Just $ toString p
+convTo COMPACT p = Just $ String.toString p
 convTo IDRIS   p = Nothing
-convTo STRING  p = Just $ toString p
+convTo STRING  p = Just $ String.toString p
 
 
 ||| o'rrible code
