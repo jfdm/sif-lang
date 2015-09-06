@@ -57,14 +57,14 @@ namespace Pattern
 instance SifMetaModel MetaModel where
   toString (MkModel m) = toString m
 
-data SifExpr : (impl : SifTy -> SifDomain -> Type)
-             -> SifTy
-             -> SifDomain
-             -> Type
+data SifExpr : SifTy
+            -> SifDomain
+            -> (impl : SifTy -> SifDomain -> Type)
+            -> Type
   where
-    MkExpr : SifRepAPI impl => impl ty d -> SifExpr impl ty d
+    MkExpr : SifRepAPI impl => impl ty d -> SifExpr ty d impl
 
-instance SifRepAPI (\ty,d => SifExpr impl ty d) where
+instance SifRepAPI (\ty,d => SifExpr ty d impl) where
   getTitle      (MkExpr x) = getTitle x
   getDesc       (MkExpr x) = getDesc x
   getTTy        (MkExpr x) = getTTy x
@@ -90,40 +90,40 @@ record SifBuilder (impl : SifTy -> SifDomain -> Type) (d : SifDomain) where
   buildReq : RTy
           -> String
           -> Maybe String
-          -> SifExpr impl tyREQ d
+          -> SifExpr tyREQ d impl
 
   buildProblem : String
               -> Maybe String
-              -> List (SifExpr impl tyREQ d)
-              -> SifExpr impl tyPROBLEM d
+              -> List (SifExpr tyREQ d impl)
+              -> SifExpr tyPROBLEM d impl
 
   buildAffect : CValue
-             -> SifExpr impl tyREQ d
+             -> SifExpr tyREQ d impl
              -> Maybe String
-             -> SifExpr impl tyAFFECTS d
+             -> SifExpr tyAFFECTS d impl
 
   buildTrait : TTy
             -> String
             -> Maybe String
             -> SValue
-            -> List $ SifExpr impl tyAFFECTS d
-            -> SifExpr impl tyTRAIT d
+            -> List $ SifExpr tyAFFECTS d impl
+            -> SifExpr tyTRAIT d impl
 
   buildProperty : String
                -> Maybe String
-               -> List $ SifExpr impl tyTRAIT d
-               -> SifExpr impl tyPROPERTY d
+               -> List $ SifExpr tyTRAIT d impl
+               -> SifExpr tyPROPERTY d impl
 
   buildSolution : String
                -> Maybe String
-               -> List $ SifExpr impl tyPROPERTY d
-               -> SifExpr impl tySOLUTION d
+               -> List $ SifExpr tyPROPERTY d impl
+               -> SifExpr tySOLUTION d impl
 
   buildPattern  : String
                -> Maybe String
-               -> SifExpr impl tyPROBLEM  d
-               -> SifExpr impl tySOLUTION d
-               -> SifExpr impl tyPATTERN  d
+               -> SifExpr tyPROBLEM  d impl
+               -> SifExpr tySOLUTION d impl
+               -> SifExpr tyPATTERN  d impl
 
 record SifBackend where
     constructor MkBackend
