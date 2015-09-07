@@ -61,78 +61,80 @@ mkDescPara (Just d) = para' (unlines [d,"\n"])
 -- ------------------------------------------------------- [ Convert Functions ]
 
 -- ---------------------------------------------------------------- [ Problems ]
-convertReq : REQUIREMENT impl -> List $ Edda STAR BLOCK
-convertReq r = [ subsection' Nothing
-                   (unwords [show (getRTy r), ":", getTitle r])
-               , mkDescPara (getDesc r)]
+convertReq : REQUIREMENT impl d -> List $ Edda STAR BLOCK
+convertReq r = with SifExpr
+    [ subsection' Nothing
+        (unwords [show (getRTy r), ":", getTitle r])
+    , mkDescPara (getDesc r)]
 
-convertProblem : PROBLEM impl -> List $ Edda STAR BLOCK
-convertProblem p = [ section' Nothing (unwords ["Problem:", getTitle p])
-                   , mkDescPara (getDesc p)
-                   , section' Nothing "Forces"]
-
-                   ++ convRS
+convertProblem : PROBLEM impl d -> List $ Edda STAR BLOCK
+convertProblem p = with SifExpr
+    [ section' Nothing (unwords ["Problem:", getTitle p])
+    , mkDescPara (getDesc p)
+    , section' Nothing "Forces"]
+    ++ convRS
   where
     convRS : List $ Edda STAR BLOCK
-    convRS = concatMap (convertReq) $ getReqs p
+    convRS = concatMap (convertReq) $ SifExpr.getReqs p
 
 -- ---------------------------------------------------------------- [ Solution ]
 
-convertAffect : AFFECT impl -> List $ Edda STAR BLOCK
+convertAffect : AFFECT impl d -> List $ Edda STAR BLOCK
 convertAffect a = [t,d]
   where
     t : Edda STAR BLOCK
     t = subsubsubsection' Nothing
-           (unwords [ "/", show (getCValue a), "/"
-                    , getTitle $ getReq a])
-    d : Edda STAR BLOCK
-    d = mkDescPara (getDesc a)
+           (unwords [ "/", show (SifExpr.getCValue a), "/"
+                    , SifExpr.getTitle $ SifExpr.getReq a])
 
-convertTrait : TRAIT impl -> List $ Edda STAR BLOCK
+    d : Edda STAR BLOCK
+    d = mkDescPara (SifExpr.getDesc a)
+
+convertTrait : TRAIT impl d -> List $ Edda STAR BLOCK
 convertTrait t = [tit,sVal,d] ++ as
   where
     tit : Edda STAR BLOCK
     tit = subsubsection' Nothing
-            (unwords [ "Trait", show (getTTy t), ":"
-                     , getTitle t])
+            (unwords [ "Trait", show (SifExpr.getTTy t), ":"
+                     , SifExpr.getTitle t])
 
     sVal : Edda STAR BLOCK
     sVal = DList STAR [MkPair (inline' "Evaluation Value")
-                              (inline' $ show (getSValue t))]
+                              (inline' $ show (SifExpr.getSValue t))]
 
     d : Edda STAR BLOCK
-    d = mkDescPara (getDesc t)
+    d = mkDescPara (SifExpr.getDesc t)
 
     as : List $ Edda STAR BLOCK
-    as = concatMap (convertAffect) $ getAffects t
+    as = concatMap (convertAffect) $ SifExpr.getAffects t
 
-convertProperty : PROPERTY impl -> List $ Edda STAR BLOCK
+convertProperty : PROPERTY impl d -> List $ Edda STAR BLOCK
 convertProperty p = [t,d] ++ ts
   where
     t : Edda STAR BLOCK
     t = subsection' Nothing
-          (unwords [ "Property:", getTitle p])
+          (unwords [ "Property:", SifExpr.getTitle p])
 
     d : Edda STAR BLOCK
-    d = mkDescPara (getDesc p)
+    d = mkDescPara (SifExpr.getDesc p)
 
     ts : List $ Edda STAR BLOCK
-    ts = concatMap (convertTrait) $ getTraits p
+    ts = concatMap (convertTrait) $ SifExpr.getTraits p
 
-convertSolution : SOLUTION impl -> List $ Edda STAR BLOCK
+convertSolution : SOLUTION impl d -> List $ Edda STAR BLOCK
 convertSolution s = [t,d] ++ ps
   where
     t : Edda STAR BLOCK
     t = section' Nothing
-            (unwords [ "Solution:", getTitle s])
+            (unwords [ "Solution:", SifExpr.getTitle s])
 
     d : Edda STAR BLOCK
-    d = mkDescPara (getDesc s)
+    d = mkDescPara (SifExpr.getDesc s)
 
     ps : List $ Edda STAR BLOCK
-    ps = concatMap (convertProperty) $ getProperties s
+    ps = concatMap (convertProperty) $ SifExpr.getProperties s
 
-convertDomain : DOMAIN impl -> List $ Edda STAR BLOCK
+convertDomain : SifDomain -> List $ Edda STAR BLOCK
 convertDomain c = [t,d]
   where
     t : Edda STAR BLOCK
@@ -141,27 +143,27 @@ convertDomain c = [t,d]
     d : Edda STAR BLOCK
     d = mkDescPara (getDesc c)
 
-convertPattern : PATTERN impl -> Edda STAR MODEL
+convertPattern : PATTERN impl d -> Edda STAR MODEL
 convertPattern p = EddaRaw as (intersperse (Empty STAR) body)
   where
     as : List (String, String)
-    as = [MkPair "TITLE" (getTitle p)]
+    as = [MkPair "TITLE" (SifExpr.getTitle p)]
 
     dom : List $ Edda STAR BLOCK
-    dom = convertDomain $ getDomainPattern p
+    dom = convertDomain $ SifExpr.getDomain p
 
     prob : List $ Edda STAR BLOCK
-    prob = convertProblem $ getProblem p
+    prob = convertProblem $ SifExpr.getProblem p
 
     sol : List $ Edda STAR BLOCK
-    sol = convertSolution $ getSolution p
+    sol = convertSolution $ SifExpr.getSolution p
 
     body : List $ Edda STAR BLOCK
-    body = [mkDescPara (getDesc p)] ++ dom ++ prob ++ sol
+    body = [mkDescPara (SifExpr.getDesc p)] ++ dom ++ prob ++ sol
 
 
 public
-toEdda : PATTERN impl -> Edda PRIME MODEL
+toEdda : PATTERN impl d -> Edda PRIME MODEL
 toEdda pdoc = refineEdda (convertPattern pdoc)
 
 -- --------------------------------------------------------------------- [ EOF ]

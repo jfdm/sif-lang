@@ -89,11 +89,11 @@ mkRels = addScore $ mkNode "relations"
 XEffs : List EFFECT
 XEffs = [STATE (Nat, Dict String Nat)]
 
-convertReq : REQUIREMENT impl c -> Eff (Document ELEMENT) XEffs
+convertReq : REQUIREMENT impl d -> Eff (Document ELEMENT) XEffs
 convertReq p = do
-       let ty = getRTy p
-       let t  = getTitle p
-       let d  = getDesc p
+       let ty = SifExpr.getRTy p
+       let t  = SifExpr.getTitle p
+       let d  = SifExpr.getDesc p
        let e  = addScore $ mkNDNode (cast ty) t d
        (idGen,_) <- get
        let idVal = cast {to=Int} (S idGen)
@@ -103,11 +103,11 @@ convertReq p = do
 
 convertProblem : PROBLEM impl d -> Eff (Document ELEMENT) XEffs
 convertProblem p = do
-       let t = getTitle p
-       let d = getDesc p
-       let rs = getReqs p
+       let t = SifExpr.getTitle p
+       let d = SifExpr.getDesc p
+       let rs = SifExpr.getReqs p
        let e = addScore $ mkNode "problem"
-       -- The following mess is because I could not get Effectful HOFs for DList to work.
+       -- The following mess is because I could not SifExpr.get Effectful HOFs for DList to work.
        -- <mess>
        rsC <- mapE (\r => convertReq r) rs
        let rNodes = foldl (\n,r => n <++> r) (mkSimpleElement "requirements") rsC
@@ -119,11 +119,11 @@ convertProblem p = do
 
 convertAffect : AFFECT impl d -> Eff (Document ELEMENT) XEffs
 convertAffect p = do
-       let d = getDesc p
-       let cval = Model.getCValue p
-       let r = getReq p
+       let d = SifExpr.getDesc p
+       let cval = Model.SifExpr.getCValue p
+       let r = SifExpr.getReq p
        (_,ids) <- get
-       let id = lookup (getTitle r) ids
+       let id = lookup (SifExpr.getTitle r) ids
        let e = case d of
            Nothing => mkNode "affect"
            Just d' => "affect" <+=> d'
@@ -133,11 +133,11 @@ convertAffect p = do
 
 convertTrait : TRAIT impl d -> Eff (Document ELEMENT) XEffs
 convertTrait p = do
-       let ty = getTTy p
-       let t = getTitle p
-       let d = getDesc p
-       let s = getSValue p
-       let as = getAffects p
+       let ty = SifExpr.getTTy p
+       let t = SifExpr.getTitle p
+       let d = SifExpr.getDesc p
+       let s = SifExpr.getSValue p
+       let as = SifExpr.getAffects p
        let e  = addScore $ mkNode (toLower $ show ty)
        let e' = setAttribute "svalue" (cast s) e
        -- <mess>
@@ -151,9 +151,9 @@ convertTrait p = do
 
 convertProperty : PROPERTY impl d -> Eff (Document ELEMENT) XEffs
 convertProperty p = do
-       let t = getTitle p
-       let d = getDesc p
-       let ts = getTraits p
+       let t = SifExpr.getTitle p
+       let d = SifExpr.getDesc p
+       let ts = SifExpr.getTraits p
        let e = addScore $ mkNode "property"
        -- <mess>
        tsC <- mapE (\t => convertTrait t) ts
@@ -167,9 +167,9 @@ convertProperty p = do
 
 convertSolution : SOLUTION impl d -> Eff (Document ELEMENT) XEffs
 convertSolution p = do
-       let t = getTitle p
-       let d = getDesc p
-       let ps = getProperties p
+       let t = SifExpr.getTitle p
+       let d = SifExpr.getDesc p
+       let ps = SifExpr.getProperties p
        let e = addScore $ mkNode "solution"
        -- <mess>
        psC <- mapE (\p => convertProperty p) ps
@@ -184,11 +184,11 @@ convertSolution p = do
 
 convertPattern : PATTERN impl d -> Eff (Document ELEMENT) XEffs
 convertPattern pat = do
-       let t = getTitle pat
-       let d = getDesc pat
-       let p = getProblem pat
-       let s = getSolution pat
-       let c = getDomain pat
+       let t = SifExpr.getTitle pat
+       let d = SifExpr.getDesc pat
+       let p = SifExpr.getProblem pat
+       let s = SifExpr.getSolution pat
+       let c = SifExpr.getDomain pat
 
        let e = mkNode "pattern"
        pNode <- convertProblem p
@@ -198,7 +198,7 @@ convertPattern pat = do
                 <++> (addScore $ mkEmptyNode "evidence")
                 <++> sNode
                 <++> pNode
-                <++> (addScore $ mkNDNode "context" (getTitle c) (getDesc c))
+                <++> (addScore $ mkNDNode "context" (SifDomain.getTitle c) (SifDomain.getDesc c))
                 <++> mkMdata
                 <++> (mkDescNode d)
                 <++> ("name" <+=> t)

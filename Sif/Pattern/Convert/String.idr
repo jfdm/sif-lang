@@ -17,26 +17,26 @@ import Sif.Pattern.API
 %default partial
 
 convertReq : REQUIREMENT impl d -> String
-convertReq r =
+convertReq r = with SifExpr
     unwords [ "   "
-             , show (Pattern.getRTy r)
+             , show (getRTy r)
              , ":"
-             , show (Pattern.getTitle r)]
+             , show (getTitle r)]
 
 convertProblem : PROBLEM impl d -> String
-convertProblem p =
+convertProblem p = with SifExpr
     unwords [ "  problem:", show (getTitle p), "\n"
             , unlines $ map (convertReq) (getReqs p)
             , "\n"]
 
 
 convertAffect : AFFECT impl d -> String
-convertAffect a =
+convertAffect a = with SifExpr
     unwords [ "       "
             , show (getCValue a), (getTitle $ getReq a), "\n"]
 
 convertTrait : TRAIT impl d -> String
-convertTrait t =
+convertTrait t = with SifExpr
     unwords [
         "     "
         , show (getTTy t), ":"
@@ -47,7 +47,7 @@ convertTrait t =
       , "\n"]
 
 convertProperty : PROPERTY impl d -> String
-convertProperty p =
+convertProperty p = with SifExpr
     unwords [
         "     property: " , (getTitle p) , "\n"
      , concatMap (convertTrait) (getTraits p)
@@ -55,7 +55,7 @@ convertProperty p =
 
 
 convertSolution : SOLUTION impl d -> String
-convertSolution s =
+convertSolution s = with SifExpr
     unwords [
          "  solution: " , (getTitle s) , "\n"
       , concatMap convertProperty (getProperties s)
@@ -72,10 +72,10 @@ convertContext d =
 convertPattern : PATTERN impl d -> String
 convertPattern p =
     unwords [
-         "Pattern:" , show (getTitle p) , "\n"
-      , convertContext  $ getDomain p
-      , convertProblem  $ getProblem p
-      , convertSolution $ getSolution p]
+         "Pattern:" , show (SifExpr.getTitle p) , "\n"
+      , convertContext  $ SifExpr.getDomain p
+      , convertProblem  $ SifExpr.getProblem p
+      , convertSolution $ SifExpr.getSolution p]
 
 public
 toString : PATTERN impl d -> String

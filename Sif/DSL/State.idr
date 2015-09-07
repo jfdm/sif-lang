@@ -20,15 +20,17 @@ import Sif.Pattern
 
 record BuildState where
   constructor MkSState
-  getProb   : Maybe String
-  getRQs    : List (String, SifAST tyREQ)
-  pattTitle : String
-  pattDesc  : Maybe String
-  getPFName : String
-  getSFName : String
+  getProb     : Maybe String
+  getRQs      : List (String, SifAST tyREQ)
+  pattTitle   : String
+  pattDesc    : Maybe String
+  getPFName   : String
+  getSFName   : String
+  getDomainID : Maybe String
+  getDomain   : SifDomain
 
 defBuildSt : String -> String -> BuildState
-defBuildSt p s = MkSState Nothing Nil "" Nothing p s
+defBuildSt p s = MkSState Nothing Nil "" Nothing p s Nothing defaultDomain
 
 instance Default BuildState where
   default = defBuildSt "" ""

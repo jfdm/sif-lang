@@ -1,6 +1,6 @@
 sif problem
 
-Problem "Information Secrecy" as infosec
+Problem "Information Secrecy" as infosec in normaal
 
 Description "Given two entities Alice and Bob, how can Bob send a message to Alice such that only the intended recipient, Alice, can be guaranteed to read the message."
 
@@ -42,3 +42,6 @@ secureImpl <- Reliability "Secure Implementation"
 """
 The implementation should be implemented securely.
 """
+
+where
+  normaal <- Context "Standard Setting"

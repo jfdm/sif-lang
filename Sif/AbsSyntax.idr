@@ -7,7 +7,7 @@ module Sif.AbsSyntax
 
 import GRL.Lang.GLang
 import Sif.Types
-
+import Sif.Pattern.Model
 namespace AST
 
   data SifAST : SifTy -> Type where
@@ -20,6 +20,7 @@ namespace AST
     Problem : (ident : String)
            -> (title : String)
            -> (desc  : Maybe String)
+           -> (context : Pair String SifDomain)
            -> List (SifAST tyREQ)
            -> SifAST tyPROBLEM
 
@@ -43,6 +44,7 @@ namespace AST
     Solution : (title : String)
             -> (probID : Pair String (Maybe String))
             -> (desc : Maybe String)
+            -> (ctxtID : String)
             -> (properties : List (SifAST tyPROPERTY))
             -> SifAST tySOLUTION
 

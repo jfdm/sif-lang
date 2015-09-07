@@ -112,8 +112,10 @@ solution = do
       keyword "solves"
       space
       pID <- ident
+      keyword "in"
+      cID <- ident
       (d,ps) <- braces $ body
-      pure $ AST.Solution t (pID,pd) d ps
+      pure $ AST.Solution t (pID,pd) d cID ps
     <?> "Solution"
   where
     body : Parser (Maybe String, List $ SifAST tyPROPERTY)

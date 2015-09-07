@@ -20,23 +20,23 @@ import public Data.AVL.Dict
 
 -- --------------------------------------------------------- [ Data Structures ]
 
-record LibEntry (impl : SifTy -> Type) where
+record LibEntry (impl : SifTy -> SifDomain -> Type) where
   constructor MkEntry
   idx   : Nat
-  entry : PATTERN impl
+  entry : PATTERN impl d
 
 record SifLib where
   constructor MkSLib
   counter : Nat
-  patts   : DList (SifTy -> Type) LibEntry is
+  patts   : DList (SifTy -> SifDomain -> Type) LibEntry is
 
 emptyLib : SifLib
 emptyLib = MkSLib Z Nil
 
-addToLibrary : PATTERN impl -> SifLib -> SifLib
+addToLibrary : PATTERN impl d -> SifLib -> SifLib
 addToLibrary p (MkSLib c ps) = MkSLib (S c) (MkEntry c p::ps)
 
-addToLibraryM : List (PATTERN impl) -> SifLib -> SifLib
+addToLibraryM : List (PATTERN impl d) -> SifLib -> SifLib
 addToLibraryM xs lib = foldl (flip $ addToLibrary) lib xs
 
 defaultLib : SifLib
@@ -49,16 +49,16 @@ getLibraryIndex : SifLib -> Dict Nat String
 getLibraryIndex lib = Dict.fromList idx
   where
     f : LibEntry impl -> (Nat, String)
-    f (MkEntry n p) = (n, unwords ["Pattern:", getTitle p])
+    f (MkEntry n p) = (n, unwords ["Pattern:", SifExpr.getTitle p])
 
     idx : List (Nat, String)
     idx = mapDList f (patts lib)
 
-getPatternByIndex : Nat -> SifLib -> Maybe (impl ** PATTERN impl)
+getPatternByIndex : Nat -> SifLib -> Maybe (d ** (impl ** PATTERN impl d))
 getPatternByIndex n lib =
   case index (length (patts lib) - (n + 1)) (patts lib) of
     Nothing       => Nothing
-    Just (_ ** p) => Just (_ ** entry p)
+    Just (_ ** p) => Just (_ ** (_ ** entry p))
 
 indexToString : Dict Nat String -> String
 indexToString idx = unlines res

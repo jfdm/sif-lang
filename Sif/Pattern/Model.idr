@@ -25,6 +25,12 @@ namespace Domain
     getTitle : String
     getDesc  : Maybe String
 
+  defaultDomain : SifDomain
+  defaultDomain = MkDomain "Default" (Just "Not Specified")
+
+  instance Eq SifDomain where
+    (==) (MkDomain x xd) (MkDomain y yd) = x == y && xd == yd
+
 data MetaModel : Type where
   MkModel : SifMetaModel a => a -> MetaModel
 
@@ -64,70 +70,133 @@ data SifExpr : SifTy
   where
     MkExpr : SifRepAPI impl => impl ty d -> SifExpr ty d impl
 
-instance SifRepAPI (\ty,d => SifExpr ty d impl) where
-  getTitle      (MkExpr x) = getTitle x
-  getDesc       (MkExpr x) = getDesc x
-  getTTy        (MkExpr x) = getTTy x
-  getRTy        (MkExpr x) = getRTy x
-  getSValue     (MkExpr x) = getSValue x
-  getCValue     (MkExpr x) = getCValue x
+namespace SifExpr
+  getTitle : SifExpr ty d impl -> {auto prf : HasMData ty} -> String
+  getTitle (MkExpr x) = Pattern.getTitle x
 
-  getProblem    (MkExpr x) = MkExpr $ getProblem x
-  getSolution   (MkExpr x) = MkExpr $ getSolution x
-  getReqs       (MkExpr x) = map MkExpr $ getReqs x
-  getProperties (MkExpr x) = map MkExpr $ getProperties x
-  getTraits     (MkExpr x) = map MkExpr $ getTraits x
-  getAffects    (MkExpr x) = map MkExpr $ getAffects x
-  getReq        (MkExpr x) = MkExpr $ getReq x
+  getDesc : SifExpr ty d impl -> Maybe String
+  getDesc (MkExpr x) = Pattern.getDesc x
 
-  evalPattern (MkExpr x)    = evalPattern x
-  fetchMetaModel (MkExpr x) = fetchMetaModel x
+  getRTy : SifExpr tyREQ d impl -> RTy
+  getRTy (MkExpr x) = Pattern.getRTy x
+
+  getTTy : SifExpr tyTRAIT d impl -> TTy
+  getTTy (MkExpr x) = Pattern.getTTy x
+
+  getSValue : SifExpr tyTRAIT d impl -> SValue
+  getSValue (MkExpr x) = Pattern.getSValue x
+
+  getCValue : SifExpr tyAFFECTS d impl -> CValue
+  getCValue (MkExpr x) = Pattern.getCValue x
+
+  getProblem : SifExpr tyPATTERN d impl -> SifExpr tyPROBLEM d impl
+  getProblem (MkExpr x) = MkExpr $ Pattern.getProblem x
+
+  getSolution : SifExpr tyPATTERN d impl -> SifExpr tySOLUTION d impl
+  getSolution (MkExpr x) = MkExpr $ Pattern.getSolution x
+
+  getReqs : SifExpr tyPROBLEM d impl -> List (SifExpr tyREQ d impl)
+  getReqs (MkExpr x) = map MkExpr $ Pattern.getReqs x
+
+  getProperties : SifExpr tySOLUTION d impl -> List (SifExpr tyPROPERTY d impl)
+  getProperties (MkExpr x) = map MkExpr $ Pattern.getProperties x
+
+  getTraits : SifExpr tyPROPERTY d impl -> List (SifExpr tyTRAIT d impl)
+  getTraits (MkExpr x) = map MkExpr $ Pattern.getTraits x
+
+  getAffects : SifExpr tyTRAIT d impl -> List (SifExpr tyAFFECTS d impl)
+  getAffects (MkExpr x) = map MkExpr $ Pattern.getAffects x
+
+  getReq : SifExpr tyAFFECTS d impl -> SifExpr tyREQ d impl
+  getReq (MkExpr x) = MkExpr $ Pattern.getReq x
+
+  getDomain : SifExpr ty d impl -> SifDomain
+  getDomain {d} _ = d
+
+  evalPattern : SifExpr tyPATTERN d impl -> Sif.EvalResult
+  evalPattern (MkExpr x)    = Pattern.evalPattern x
+
+  fetchMetaModel : SifExpr tyPATTERN d impl -> MetaModel
+  fetchMetaModel (MkExpr x) = Pattern.fetchMetaModel x
+
+-- Causing too mushc problems than it is worth...
+-- instance SifRepAPI (\ty,d => SifExpr ty d impl) where
+--   getTitle   x = SifExpr.getTitle x
+--   getDesc    x = SifExpr.getDesc x
+--   getTTy     x = SifExpr.getTTy x
+--   getRTy     x = SifExpr.getRTy x
+--   getSValue  x = SifExpr.getSValue x
+--   getCValue  x = SifExpr.getCValue x
+
+--   getProblem    x = SifExpr.getProblem x
+--   getSolution   x = SifExpr.getSolution x
+--   getReqs       x = SifExpr.getReqs x
+--   getProperties x = SifExpr.getProperties x
+--   getTraits     x = SifExpr.getTraits x
+--   getAffects    x = SifExpr.getAffects x
+--   getReq        x = SifExpr.getReq x
+
+--   evalPattern (MkExpr x)    = evalPattern x
+--   fetchMetaModel (MkExpr x) = fetchMetaModel x
+
+-- Better to parameterise SifBuilder by a SifDomain. the problem is
+-- not how to populate the value in the type---a update function that
+-- populates a record field and type value at the sametime. Rather the
+-- problem is how to have a clean api when defining instances of
+-- this data type in later code sans dependent pairs.
 
 ||| Factories for building concrete representations
-record SifBuilder (impl : SifTy -> SifDomain -> Type) (d : SifDomain) where
+|||
+record SifBuilder (impl : SifTy -> SifDomain -> Type) where
   constructor MkSifBuilder
-
-  buildReq : RTy
+  buildReq : (d : SifDomain)
+          -> RTy
           -> String
           -> Maybe String
           -> SifExpr tyREQ d impl
 
-  buildProblem : String
+  buildProblem : (d : SifDomain)
+              -> String
               -> Maybe String
               -> List (SifExpr tyREQ d impl)
               -> SifExpr tyPROBLEM d impl
 
-  buildAffect : CValue
+  buildAffect : (d : SifDomain)
+             -> CValue
              -> SifExpr tyREQ d impl
              -> Maybe String
              -> SifExpr tyAFFECTS d impl
 
-  buildTrait : TTy
+  buildTrait : (d : SifDomain)
+            -> TTy
             -> String
             -> Maybe String
             -> SValue
             -> List $ SifExpr tyAFFECTS d impl
             -> SifExpr tyTRAIT d impl
 
-  buildProperty : String
+  buildProperty : (d : SifDomain)
+               -> String
                -> Maybe String
                -> List $ SifExpr tyTRAIT d impl
                -> SifExpr tyPROPERTY d impl
 
-  buildSolution : String
+  buildSolution : (d : SifDomain)
+               -> String
                -> Maybe String
                -> List $ SifExpr tyPROPERTY d impl
                -> SifExpr tySOLUTION d impl
 
-  buildPattern  : String
-               -> Maybe String
-               -> SifExpr tyPROBLEM  d impl
-               -> SifExpr tySOLUTION d impl
-               -> SifExpr tyPATTERN  d impl
+  buildPattern : (d : SifDomain)
+              -> String
+              -> Maybe String
+              -> SifExpr tyPROBLEM  d impl
+              -> SifExpr tySOLUTION d impl
+              -> SifExpr tyPATTERN  d impl
 
 record SifBackend where
     constructor MkBackend
     name    : String
-    builder : (SifBuilder impl d)
+    builder : (SifBuilder impl)
 
 -- --------------------------------------------------------------------- [ EOF ]

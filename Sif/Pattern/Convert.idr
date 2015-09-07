@@ -31,7 +31,7 @@ convTy IDRIS   = String
 convTy STRING  = String
 
 covering
-convTo : (fmt : SifOutFormat) -> PATTERN impl -> Maybe (convTy fmt)
+convTo : (fmt : SifOutFormat) -> PATTERN impl d -> Maybe (convTy fmt)
 convTo XML     p = Just $ toXML p
 
 convTo EDDA    p = Just $ toEdda p
@@ -47,7 +47,7 @@ convTo STRING  p = Just $ String.toString p
 
 ||| o'rrible code
 covering
-showConvPattern : SifOutFormat -> PATTERN impl ->  Maybe String
+showConvPattern : SifOutFormat -> PATTERN impl d ->  Maybe String
 showConvPattern DOT p =
   case (the (Maybe (convTy DOT)) (convTo DOT p)) of
     Nothing => Nothing
@@ -94,3 +94,5 @@ showConvPattern STRING p =
     Just r  => Just r
 
 showConvPattern _ _ = Nothing
+
+-- --------------------------------------------------------------------- [ EOF ]

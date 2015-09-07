@@ -26,46 +26,46 @@ import Sif.Builder.Utils
 
 -- ----------------------------------------- [ Private Internal Data Structure ]
 
-data DirectRep : SifTy -> Type where
+data DirectRep : SifTy -> SifDomain -> Type where
   DirectMkReq : (ty   : RTy)
              -> (t    : String)
              -> (desc : Maybe String)
-             -> DirectRep tyREQ
+             -> DirectRep tyREQ d
 
   DirectMkProb : (title : String)
               -> (desc  : Maybe String)
-              -> List (DirectRep tyREQ)
-              -> DirectRep tyPROBLEM
+              -> List (DirectRep tyREQ d)
+              -> DirectRep tyPROBLEM d
 
   DirectMkAffect : (cval : CValue)
-               -> (req : DirectRep tyREQ)
+               -> (req : DirectRep tyREQ d)
                -> (desc : Maybe String)
-               -> DirectRep tyAFFECTS
+               -> DirectRep tyAFFECTS d
 
   DirectMkTrait : (ty : TTy)
                -> (title : String)
                -> (desc  : Maybe String)
                -> (sval  : SValue)
-               -> List (DirectRep tyAFFECTS)
-               -> DirectRep tyTRAIT
+               -> List (DirectRep tyAFFECTS d)
+               -> DirectRep tyTRAIT d
 
   DirectMkProp : (title : String)
               -> (desc : Maybe String)
-              -> List (DirectRep tyTRAIT)
-              -> DirectRep tyPROPERTY
+              -> List (DirectRep tyTRAIT d)
+              -> DirectRep tyPROPERTY d
 
   DirectMkSolt : (title : String)
               -> (desc : Maybe String)
-              -> List (DirectRep tyPROPERTY)
-              -> DirectRep tySOLUTION
+              -> List (DirectRep tyPROPERTY d)
+              -> DirectRep tySOLUTION d
 
   DirectMkPatt : (title : String)
               -> (desc : Maybe String)
-              -> DirectRep tyPROBLEM
-              -> DirectRep tySOLUTION
-              -> DirectRep tyPATTERN
+              -> DirectRep tyPROBLEM  d
+              -> DirectRep tySOLUTION d
+              -> DirectRep tyPATTERN  d
 
-getDirectTitle : DirectRep ty -> String
+getDirectTitle : DirectRep ty d -> String
 getDirectTitle (DirectMkReq _ t _)       = t
 getDirectTitle (DirectMkProb t _ _)      = t
 getDirectTitle (DirectMkTrait _ t _ _ _) = t
@@ -74,7 +74,7 @@ getDirectTitle (DirectMkSolt t _ _)      = t
 getDirectTitle (DirectMkPatt t _ _ _)    = t
 
 
-getDirectDesc : DirectRep ty -> Maybe String
+getDirectDesc : DirectRep ty d -> Maybe String
 getDirectDesc (DirectMkReq _ _ d)       = d
 getDirectDesc (DirectMkProb _ d rs)     = d
 getDirectDesc (DirectMkAffect _ _ d)    = d
@@ -83,43 +83,43 @@ getDirectDesc (DirectMkProp _ d _)      = d
 getDirectDesc (DirectMkSolt _ d _)      = d
 getDirectDesc (DirectMkPatt _ d _ _)    = d
 
-getDirectRTy : DirectRep tyREQ -> RTy
+getDirectRTy : DirectRep tyREQ d -> RTy
 getDirectRTy (DirectMkReq ty _ _) = ty
 
-getDirectTTy : DirectRep tyTRAIT -> TTy
+getDirectTTy : DirectRep tyTRAIT d -> TTy
 getDirectTTy (DirectMkTrait ty _ _ _ _) = ty
 
-getDirectSValue : DirectRep tyTRAIT -> SValue
+getDirectSValue : DirectRep tyTRAIT d -> SValue
 getDirectSValue (DirectMkTrait _ _ _ sval _) = sval
 
-getDirectCValue : DirectRep tyAFFECTS -> CValue
+getDirectCValue : DirectRep tyAFFECTS d -> CValue
 getDirectCValue (DirectMkAffect cval _ _) = cval
 
-getDirectProblem : DirectRep tyPATTERN -> (DirectRep tyPROBLEM)
+getDirectProblem : DirectRep tyPATTERN d -> (DirectRep tyPROBLEM d)
 getDirectProblem (DirectMkPatt _ _ p _) = p
 
-getDirectSolution : DirectRep tyPATTERN -> DirectRep tySOLUTION
+getDirectSolution : DirectRep tyPATTERN d -> DirectRep tySOLUTION d
 getDirectSolution (DirectMkPatt _ _ _ s) = s
 
-getDirectReqs : DirectRep tyPROBLEM -> List $ DirectRep tyREQ
+getDirectReqs : DirectRep tyPROBLEM d -> List $ DirectRep tyREQ d
 getDirectReqs (DirectMkProb _ _ rs) = rs
 
-getDirectProperties : DirectRep tySOLUTION -> List $ DirectRep tyPROPERTY
+getDirectProperties : DirectRep tySOLUTION d -> List $ DirectRep tyPROPERTY d
 getDirectProperties (DirectMkSolt _ _ ps) = ps
 
-getDirectTraits : DirectRep tyPROPERTY -> List $ DirectRep tyTRAIT
+getDirectTraits : DirectRep tyPROPERTY d -> List $ DirectRep tyTRAIT d
 getDirectTraits (DirectMkProp _ _ ts) = ts
 
-getDirectAffects : DirectRep tyTRAIT -> List $ DirectRep tyAFFECTS
+getDirectAffects : DirectRep tyTRAIT d -> List $ DirectRep tyAFFECTS d
 getDirectAffects (DirectMkTrait _ _ _ _ as) = as
 
-getDirectReq : DirectRep tyAFFECTS -> DirectRep tyREQ
+getDirectReq : DirectRep tyAFFECTS d -> DirectRep tyREQ d
 getDirectReq (DirectMkAffect _ r _) = r
 
 -- --------------------------------------------------------------------- [ GRL ]
 
 covering
-toGRL : DirectRep ty -> InterpRes ty
+toGRL : DirectRep ty d -> InterpRes ty
 toGRL (DirectMkReq ty t d)        = interpReq t
 toGRL (DirectMkProb t d rs)       = interpProb t (map toGRL rs)
 toGRL (DirectMkAffect cval r d)   = interpAffect cval (toGRL r)
@@ -128,9 +128,10 @@ toGRL (DirectMkProp t d ts)       = interpProp t (map toGRL ts)
 toGRL (DirectMkSolt t d ps)       = interpSolt t (map toGRL ps)
 toGRL (DirectMkPatt t d p s)      = interpPatt (toGRL p) (toGRL s)
 
+
 -- ----------------------------------------------------- [ Instances and Stuff ]
 
-getGModel : DirectRep tyPATTERN -> GModel
+getGModel : DirectRep tyPATTERN d -> GModel
 getGModel p = extract (toGRL p)
   where
     extract : InterpRes tyPATTERN -> GModel
@@ -164,58 +165,65 @@ instance SifRepAPI DirectRep where
 -- ------------------------------------------------------------- [ The Builder ]
 
 %inline
-conv : SifExpr DirectRep ty -> DirectRep ty
+conv : SifExpr ty d DirectRep -> DirectRep ty d
 conv (MkExpr x) = x
 
-buildReqDir : RTy
+buildReqDir : (d : SifDomain)
+           -> RTy
            -> String
            -> Maybe String
-           -> REQUIREMENT DirectRep
-buildReqDir ty s d = MkExpr $ DirectMkReq ty s d
+           -> REQUIREMENT DirectRep d
+buildReqDir _ ty s d = MkExpr $ DirectMkReq ty s d
 
-buildProblemDir : String
+buildProblemDir : (d : SifDomain)
+               -> String
                -> Maybe String
-               -> REQUIREMENTS DirectRep
-               -> PROBLEM DirectRep
-buildProblemDir t d rs =
+               -> REQUIREMENTS DirectRep d
+               -> PROBLEM DirectRep d
+buildProblemDir _ t d rs =
     MkExpr $ DirectMkProb t d (map conv rs)
 
-buildAffectDir : CValue
-              -> REQUIREMENT DirectRep
+buildAffectDir : (d : SifDomain)
+              -> CValue
+              -> REQUIREMENT DirectRep d
               -> Maybe String
-              -> AFFECT DirectRep
-buildAffectDir c r d = MkExpr $ DirectMkAffect c (conv r) d
+              -> AFFECT DirectRep d
+buildAffectDir _ c r d = MkExpr $ DirectMkAffect c (conv r) d
 
-buildTraitDir : TTy
+buildTraitDir : (d : SifDomain)
+             -> TTy
              -> String
              -> Maybe String
              -> SValue
-             -> AFFECTS DirectRep
-             -> TRAIT DirectRep
-buildTraitDir ty t d s rs =
+             -> AFFECTS DirectRep d
+             -> TRAIT DirectRep d
+buildTraitDir _ ty t d s rs =
     MkExpr $ DirectMkTrait ty t d s (map conv rs)
 
 
-buildPropertyDir : String
+buildPropertyDir : (d : SifDomain)
+                -> String
                 -> Maybe String
-                -> TRAITS DirectRep
-                -> PROPERTY DirectRep
-buildPropertyDir t d ts =
+                -> TRAITS DirectRep d
+                -> PROPERTY DirectRep d
+buildPropertyDir _ t d ts =
     MkExpr $ DirectMkProp t d (map conv ts)
 
-buildSolutionDir : String
+buildSolutionDir : (d : SifDomain)
+                -> String
                 -> Maybe String
-                -> PROPERTIES DirectRep
-                -> SOLUTION DirectRep
-buildSolutionDir s d ps =
+                -> PROPERTIES DirectRep d
+                -> SOLUTION DirectRep d
+buildSolutionDir _ s d ps =
     MkExpr $ DirectMkSolt s d (map conv ps)
 
-buildPatternDir  : String
-                -> Maybe String
-                -> PROBLEM DirectRep
-                -> SOLUTION DirectRep
-                -> PATTERN DirectRep
-buildPatternDir t d p s= MkExpr $ DirectMkPatt t d (conv p) (conv s)
+buildPatternDir : (d : SifDomain)
+               -> String
+               -> Maybe String
+               -> PROBLEM DirectRep d
+               -> SOLUTION DirectRep d
+               -> PATTERN DirectRep d
+buildPatternDir _ t d p s = MkExpr $ DirectMkPatt t d (conv p) (conv s)
 
 directBuilder : SifBuilder DirectRep
 directBuilder = MkSifBuilder

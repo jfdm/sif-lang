@@ -1,4 +1,0 @@
-%YAML 1.2
----
-{ counters: {  } , timers: { timer: { desc: prelude-loading , start: 0 , start: 0 , splits: {  } } } , timestamps: {  } }
-...

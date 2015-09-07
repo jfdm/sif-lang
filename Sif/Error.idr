@@ -19,12 +19,12 @@ data SifError : Type where
   FeatureNotImpl    : SifError
 
   CannotWriteFile : String -> SifError
-  NoSuchBackend  : String -> SifError
-  IDMissing      : String -> SifError
-  ProblemMissing : String -> SifError
-  DuplicateID    : String -> SifError
-  FileMissing    : String -> SifError
-  ParseError     : String -> String -> SifError
+  NoSuchBackend   : String -> SifError
+  IDMissing       : String -> SifError
+  DuplicateID     : String -> SifError
+  FileMissing     : String -> SifError
+  ParseError      : String -> String -> SifError
+  MismatchError   : String -> String -> SifError
 
 instance Show SifError where
   show IndexOutOfBounds = "Index Out of Bounds"
@@ -39,13 +39,17 @@ instance Show SifError where
   show FeatureNotImpl    = "Feature Not Implemented"
   show InternalErr       = "Internal Error"
 
-  show (CannotWriteFile f) = "Cannot write file, " ++ show f
-  show (IDMissing id)      = "Identifier Missing: " ++ show id
-  show (ProblemMissing id) = "Problem Doesn't Exist: " ++ show id
-  show (DuplicateID id)    = "Identifier already Exists: " ++ show id
-  show (FileMissing fname) = "File Missing " ++ fname
+  show (CannotWriteFile f)  = unwords ["Cannot write file:", show f]
+  show (NoSuchBackend b)    = unwords ["No Such Backend:", show b]
+  show (IDMissing id)       = unwords ["Identifier Missing:", show id]
+  show (DuplicateID id)     = unwords ["Identifier already Exists:", show id]
+  show (FileMissing fname)  = unwords ["File Missing", show fname]
+
   show (ParseError fn err) =
       unlines [ unwords ["Error Parsing file", show fn, "error was:"]
               , err]
-  show (NoSuchBackend b)    = unwords ["No Such Backend", show b]
+
+  show (MismatchError g e)  =
+      unwords ["Given ID:", show g, "but got", show e, "instead."]
+
 -- --------------------------------------------------------------------- [ EOF ]

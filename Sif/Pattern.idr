@@ -19,7 +19,7 @@ import public Sif.Pattern.Convert
 
 -- --------------------------------------------------- [ Public Data Structure ]
 
-instance Show (PATTERN impl) where
+instance Show (PATTERN impl d) where
   show x =
     case showConvPattern STRING x of
       Nothing => show $ InternalErr

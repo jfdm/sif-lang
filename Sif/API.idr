@@ -58,9 +58,9 @@ doSyntaxCheck (Nothing) (Just y) = do
 doSyntaxCheck (Nothing) (Nothing) = Sif.raise NoFileGiven
 
 
-evalAndPrintPattern : (PATTERN impl) -> Eff () SifEffs
+evalAndPrintPattern : (PATTERN impl d) -> Eff () SifEffs
 evalAndPrintPattern p = do
-  let tname = unwords ["Evaluating:", getTitle p]
+  let tname = unwords ["Evaluating:", SifExpr.getTitle p]
   trace tname
   mkTimer tname
   startTimer tname
@@ -71,7 +71,7 @@ evalAndPrintPattern p = do
 tryToBuildPatternE : SifBuilder impl
              -> Maybe String
              -> Maybe String
-             -> Eff (PATTERN impl) SifEffs
+             -> Eff (d ** PATTERN impl d) SifEffs
 tryToBuildPatternE bob Nothing Nothing   = Sif.raise NoFileGiven
 tryToBuildPatternE bob Nothing  _        = Sif.raise (FileMissing ("Solution File "))
 tryToBuildPatternE bob _        Nothing  = Sif.raise (FileMissing ("Problem File "))
@@ -87,14 +87,14 @@ tryToBuildPatternE bob (Just p) (Just s) = do
 evalPatternFromFile : Maybe String -> Maybe String -> Eff () SifEffs
 evalPatternFromFile p' s' = do
   bob <- getSifBackend
-  p <- tryToBuildPatternE (builder bob) p' s'
-  putStrLn $ unwords ["loaded", getTitle p]
+  (_ ** p) <- tryToBuildPatternE (builder bob) p' s'
+  putStrLn $ unwords ["loaded", SifExpr.getTitle p]
   evalAndPrintPattern p
 
-printPattern : PATTERN impl -> Maybe SifOutFormat -> Eff () SifEffs
+printPattern : PATTERN impl d -> Maybe SifOutFormat -> Eff () SifEffs
 printPattern _ Nothing    = printLn NoFormatSpecified
 printPattern p (Just fmt) = do
-    let tname = unwords ["Converting", show $ getTitle p, "to", show fmt]
+    let tname = unwords ["Converting", show $ SifExpr.getTitle p, "to", show fmt]
     mkTimer tname
     startTimer tname
     let res = showConvPattern fmt p
@@ -110,7 +110,7 @@ convPatternFromFile : Maybe String
                    -> Eff () SifEffs
 convPatternFromFile p s fname fmt = do
     bob <- getSifBackend
-    p <- tryToBuildPatternE (builder bob) p s
+    (_ ** p) <- tryToBuildPatternE (builder bob) p s
     case fname of
       Nothing => printPattern p fmt
       Just _  => printLn FeatureNotImpl
@@ -124,7 +124,7 @@ importPreludeIDX nspace ((p,s)::ps) = do
                     , "\tProblem File: "  ++ show (pDir p)
                     , "\tSolution File: " ++ show (pDir s)]
     bob <- getSifBackend
-    patt <- tryToBuildPatternE (builder bob) (pDir p) (pDir s)
+    (_ ** patt) <- tryToBuildPatternE (builder bob) (pDir p) (pDir s)
     updateLibrary (\idx => addToLibrary patt idx)
     importPreludeIDX nspace ps
   where
@@ -158,7 +158,7 @@ listLibrary = do
     putStrLn (indexToString idx)
 
 
-getPatternByIndexEff : Nat -> Eff (impl ** PATTERN impl) SifEffs
+getPatternByIndexEff : Nat -> Eff (d ** (impl ** PATTERN impl d)) SifEffs
 getPatternByIndexEff n =
   case getPatternByIndex n !getLibrary of
     Nothing => Sif.raise NoSuchPattern
@@ -166,12 +166,12 @@ getPatternByIndexEff n =
 
 getAndEvalPattern : Nat -> Eff () SifEffs
 getAndEvalPattern n = do
-  (_ ** p) <- getPatternByIndexEff n
+  (_ ** (_ ** p)) <- getPatternByIndexEff n
   evalAndPrintPattern p
 
 getAndPrintPattern : Nat -> Maybe SifOutFormat -> Eff () SifEffs
 getAndPrintPattern n fmt = do
-  (_ ** p) <- getPatternByIndexEff n
+  (_ ** (_ ** p)) <- getPatternByIndexEff n
   printPattern p fmt
 
 -- --------------------------------------------------------------------- [ EOF ]

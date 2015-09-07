@@ -12,6 +12,7 @@ import Lightyear.Strings
 
 import Sif.Types
 import Sif.AbsSyntax
+import Sif.Pattern.Model
 
 import Sif.DSL.Parser.Utils
 import Sif.DSL.Parser.Common
@@ -42,6 +43,16 @@ requirement = do
     pure $ AST.Req i ty t d
   <?> "Requirement"
 
+context : String -> Parser $ Pair String SifDomain
+context id = do
+  keyword "where"
+  keyword id
+  keyword "<-"
+  keyword "Context"
+  t <- title
+  desc <- opt descString
+  pure $ MkPair id (MkDomain t desc)
+
 
 public
 problem : Parser $ SifAST tyPROBLEM
@@ -55,10 +66,14 @@ problem = do
     keyword "as"
     i <- ident
     space
+    keyword "in"
+    cID <- ident
+    space
     d <- opt desc
     rs <- many requirement
     space
-    pure $ (AST.Problem i t d rs)
+    c <- context cID
+    pure $ (AST.Problem i t d c rs)
   <?> "Problem Specification"
 
 -- --------------------------------------------------------------------- [ EOF ]
