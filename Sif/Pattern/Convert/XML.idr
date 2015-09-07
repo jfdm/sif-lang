@@ -198,10 +198,14 @@ convertPattern pat = do
                 <++> (addScore $ mkEmptyNode "evidence")
                 <++> sNode
                 <++> pNode
-                <++> (addScore $ mkNDNode "context" (SifDomain.getTitle c) (SifDomain.getDesc c))
+                <++> convertDomain c
                 <++> mkMdata
                 <++> (mkDescNode d)
                 <++> ("name" <+=> t)
+
+  where
+    convertDomain : SifDomain -> Document ELEMENT
+    convertDomain (MkDomain t d) = (addScore $ mkNDNode "context" t d)
 
 public
 toXML : PATTERN impl d -> Document DOCUMENT

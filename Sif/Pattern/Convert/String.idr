@@ -63,9 +63,9 @@ convertSolution s = with SifExpr
 
 
 convertContext : SifDomain -> String
-convertContext d =
+convertContext (MkDomain t d) =
     unwords [ "  context:"
-            , show (getTitle d)
+            , show t
             , "\n"]
 
 

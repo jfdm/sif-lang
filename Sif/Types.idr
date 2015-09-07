@@ -91,4 +91,14 @@ readOutFMT s =
     "edda"     => Nothing -- TODO Just EDDA
     otherwise  => Nothing
 
+
+data SifDomain = MkDomain String (Maybe String)
+
+defaultDomain : SifDomain
+defaultDomain = MkDomain "Default" (Just "Not Specified")
+
+instance Eq SifDomain where
+  (==) (MkDomain x xd) (MkDomain y yd) = x == y && xd == yd
+
+
 -- --------------------------------------------------------------------- [ EOF ]

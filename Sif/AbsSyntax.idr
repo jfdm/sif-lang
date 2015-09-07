@@ -8,6 +8,7 @@ module Sif.AbsSyntax
 import GRL.Lang.GLang
 import Sif.Types
 import Sif.Pattern.Model
+
 namespace AST
 
   data SifAST : SifTy -> Type where

@@ -135,13 +135,13 @@ convertSolution s = [t,d] ++ ps
     ps = concatMap (convertProperty) $ SifExpr.getProperties s
 
 convertDomain : SifDomain -> List $ Edda STAR BLOCK
-convertDomain c = [t,d]
+convertDomain (MkDomain t d) = [tblock, dblock]
   where
-    t : Edda STAR BLOCK
-    t = section' Nothing
-          (unwords ["Context:", getTitle c])
-    d : Edda STAR BLOCK
-    d = mkDescPara (getDesc c)
+    tblock : Edda STAR BLOCK
+    tblock = section' Nothing (unwords ["Context:", t])
+
+    dblock : Edda STAR BLOCK
+    dblock = mkDescPara d
 
 convertPattern : PATTERN impl d -> Edda STAR MODEL
 convertPattern p = EddaRaw as (intersperse (Empty STAR) body)

@@ -19,18 +19,6 @@ namespace Sif
 class SifMetaModel a where
   toString : a -> String
 
-namespace Domain
-  record SifDomain where
-    constructor MkDomain
-    getTitle : String
-    getDesc  : Maybe String
-
-  defaultDomain : SifDomain
-  defaultDomain = MkDomain "Default" (Just "Not Specified")
-
-  instance Eq SifDomain where
-    (==) (MkDomain x xd) (MkDomain y yd) = x == y && xd == yd
-
 data MetaModel : Type where
   MkModel : SifMetaModel a => a -> MetaModel
 

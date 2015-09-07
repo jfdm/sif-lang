@@ -40,6 +40,7 @@ modules = Effect.Logging.Level
 
         , Sif.DSL.Parser.Utils
         , Sif.DSL.Parser.Common
+        , Sif.DSL.Parser.Context
         , Sif.DSL.Parser.Problem
         , Sif.DSL.Parser.Solution
         , Sif.DSL.Parser
