@@ -43,13 +43,12 @@ requirement = do
     pure $ AST.Req i ty t d
   <?> "Requirement"
 
-context : String -> Parser $ Pair String SifDomain
+context : Parser $ Pair String SifDomain
 context id = do
-  keyword "where"
-  keyword id
-  keyword "<-"
   keyword "Context"
   t <- title
+  keyword "as"
+  i <- ident
   desc <- opt descString
   pure $ MkPair id (MkDomain t desc)
 
@@ -66,13 +65,11 @@ problem = do
     keyword "as"
     i <- ident
     space
-    keyword "in"
-    cID <- ident
+    c <- context
     space
     d <- opt desc
     rs <- many requirement
     space
-    c <- context cID
     pure $ (AST.Problem i t d c rs)
   <?> "Problem Specification"
 
