@@ -44,13 +44,13 @@ requirement = do
   <?> "Requirement"
 
 context : Parser $ Pair String SifDomain
-context id = do
+context = do
   keyword "Context"
   t <- title
   keyword "as"
   i <- ident
   desc <- opt descString
-  pure $ MkPair id (MkDomain t desc)
+  pure $ MkPair i (MkDomain t desc)
 
 
 public
