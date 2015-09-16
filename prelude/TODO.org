@@ -1,0 +1,73 @@
+#+TITLE: Patterns to Model
+
+* TODO In Depth Patterns [0/2]
+** TODO Information Secrecy [0/4]
+*** TODO Asymmetric Crypto
+*** TODO Symmetric Crypto
+*** TODO Public Key Crypto
+*** TODO Hybrid Crypto
+** TODO Data Polymorphism [0/3]
+*** TODO Simple Factory
+*** TODO Factory Method
+*** TODO Abstract Factories
+** TODO Data Modification Detection
+*** TODO Cryptographic Hash Functions
+#+BEGIN_EXAMPLE
+    Pre-image resistance
+
+        Given a hash value h it should be difficult to find any message m such that h = hash(m). This concept is related to that of one-way function. Functions that lack this property are vulnerable to preimage attacks.
+
+    Second pre-image resistance
+
+        Given an input m1 it should be difficult to find different input m2 such that hash(m1) = hash(m2). Functions that lack this property are vulnerable to second-preimage attacks.
+
+    Collision resistance
+        It should be difficult to find two different messages m1 and m2 such that hash(m1) = hash(m2). Such a pair is called a cryptographic hash collision. This property is sometimes referred to as strong collision resistance. It requires a hash value at least twice as long as that required for preimage-resistance; otherwise collisions may be found by a birthday attack.
+
+
+#+END_EXAMPLE
+*** TODO Checksums
+* TODO Chain of Problem/Solution Pairings
+** Hash Functions
+#+BEGIN_EXAMPLE
+Problem of Data Modification Detection is solved by
+    Cryptographic Hash Functions
+    CheckSums
+    Hash Functions
+
+Problem of Password Authentication is solved by:
+  Textual Passwords
+  Graphical Passwords
+    Shapes
+    Pictures
+  Pincodes
+#+END_EXAMPLE
+** Asymmetric Encryption
+* TODO Light Pattern Modelling [0/3]
+** TODO Patterns Different Contexts
++ Problem :: Authentication
++ Contexts ::
+  + Remote Authentication
+  + Local Authentication
+  + Offline Authentication
+*** TODO Solutions [0/2]
+**** TODO Remote Authentication
+***** TODO Passwordless Authentication
+***** TODO Password Authentication
+***** TODO Challenge Response Mechanisms
+***** TODO 2FA
+**** TODO Local Authentication
+***** TODO 2FA
+***** TODO Physical Token-Based Authentication
+***** TODO Password Authentication
+**** TODO Offline Authentication
+***** TODO Physical Token-Based Authentication
+***** TODO Password Authentication
+** TODO Pattern General [0/7]
+*** TODO Message Authentication
+*** TODO Sender Authentication
+*** TODO Secrecy with Authentication
+*** TODO Secrecy with Signature
+*** TODO Secrecy with Integrity
+*** TODO Signature with Appendix
+*** TODO Secrecy with Signature with Appendix
