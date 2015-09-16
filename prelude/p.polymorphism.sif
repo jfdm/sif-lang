@@ -1,38 +1,37 @@
 sif problem
 
-Problem "Polymorphic Data Usage" as polymorph
-
-Description """
+polymorph <- Problem "Polymorphic Data Usage" where
+"""
 Given an abstract description of an data structure together with several concrete implementations of these data structure.
 The problem is how to present, create, serve, and work with data using an abstract representation without exposing their concrete implementation.
 """
 
-separateObjects <- Functional "Separate Data Structures"
+separateObjects <- Functional "Separate Data Structures" where
 """
 The solution must provide separate representation and implementation data structures.
 """
 
-agnosticObjectGeneration <- Functional "Agnostic Generation of Objects"
+agnosticObjectGeneration <- Functional "Agnostic Generation of Objects" where
 """
 The solution must allow for the generation of data structure instances without knowledge of the underlying implementation.
 """
 
-closedForModification <- Functional "Closed for Modification"
+closedForModification <- Functional "Closed for Modification" where
 """
 The creation and use of data instances should be closed for modification.
 """
 
-flexibleReplacement <- Functional "Flexible Replacement"
+flexibleReplacement <- Functional "Flexible Replacement" where
 """
 There should be an ability to replace the method of creation easily.
 """
 
-minimalDependancies <- Supportability "Minimal Dependencies"
+minimalDependancies <- Supportability "Minimal Dependencies" where
 """
 The resulting code should have minimal dependencies.
 """
 
-languageAgnostic <- Functional "Language Agnostic"
+languageAgnostic <- Functional "Language Agnostic" where
 """
 The solution should limit the use of language specific features.
 """

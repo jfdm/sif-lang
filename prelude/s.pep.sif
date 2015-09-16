@@ -1,6 +1,6 @@
 sif solution
 
-Solution "Policy Enforcement Points" solves policyenforce {
+Solution "Policy Enforcement Points" solves policyenforce in std {
 
   Property "Abstract Definition" {
     Advantage "Agnostic" is Satisfied {

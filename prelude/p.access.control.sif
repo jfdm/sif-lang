@@ -1,6 +1,6 @@
 sif problem
 
-Problem "Access Control" as accesscontrol
+accesscontrol <- Problem "Access Control"
 
 control     <- Functional "Access Restriction"
 indy        <- Functional "Application Independence"

@@ -1,8 +1,6 @@
 sif solution
 
-
-
-Solution "Symmetric Cryptography" solves infosec {
+Solution "Symmetric Cryptography" solves infosec in std {
 
   Property "Public Key Pairs" {
     Advantage "Same Keys" is Satisfied {

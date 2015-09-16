@@ -1,6 +1,6 @@
 #+TITLE: Patterns to Model
 
-* TODO In Depth Patterns [0/2]
+* TODO In Depth Patterns [0/3]
 ** TODO Information Secrecy [0/4]
 *** TODO Asymmetric Crypto
 *** TODO Symmetric Crypto
@@ -10,23 +10,7 @@
 *** TODO Simple Factory
 *** TODO Factory Method
 *** TODO Abstract Factories
-** TODO Data Modification Detection
-*** TODO Cryptographic Hash Functions
-#+BEGIN_EXAMPLE
-    Pre-image resistance
 
-        Given a hash value h it should be difficult to find any message m such that h = hash(m). This concept is related to that of one-way function. Functions that lack this property are vulnerable to preimage attacks.
-
-    Second pre-image resistance
-
-        Given an input m1 it should be difficult to find different input m2 such that hash(m1) = hash(m2). Functions that lack this property are vulnerable to second-preimage attacks.
-
-    Collision resistance
-        It should be difficult to find two different messages m1 and m2 such that hash(m1) = hash(m2). Such a pair is called a cryptographic hash collision. This property is sometimes referred to as strong collision resistance. It requires a hash value at least twice as long as that required for preimage-resistance; otherwise collisions may be found by a birthday attack.
-
-
-#+END_EXAMPLE
-*** TODO Checksums
 * TODO Chain of Problem/Solution Pairings
 ** Hash Functions
 #+BEGIN_EXAMPLE
@@ -44,6 +28,23 @@ Problem of Password Authentication is solved by:
 #+END_EXAMPLE
 ** Asymmetric Encryption
 * TODO Light Pattern Modelling [0/3]
+** TODO Data Modification Detection [0/2]
+*** TODO Cryptographic Hash Functions
+#+BEGIN_EXAMPLE
+    Pre-image resistance
+
+        Given a hash value h it should be difficult to find any message m such that h = hash(m). This concept is related to that of one-way function. Functions that lack this property are vulnerable to preimage attacks.
+
+    Second pre-image resistance
+
+        Given an input m1 it should be difficult to find different input m2 such that hash(m1) = hash(m2). Functions that lack this property are vulnerable to second-preimage attacks.
+
+    Collision resistance
+        It should be difficult to find two different messages m1 and m2 such that hash(m1) = hash(m2). Such a pair is called a cryptographic hash collision. This property is sometimes referred to as strong collision resistance. It requires a hash value at least twice as long as that required for preimage-resistance; otherwise collisions may be found by a birthday attack.
+
+
+#+END_EXAMPLE
+*** TODO Checksums
 ** TODO Patterns Different Contexts
 + Problem :: Authentication
 + Contexts ::

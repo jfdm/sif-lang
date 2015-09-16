@@ -2,7 +2,7 @@ sif solution
 
 Description "Provides an interface for creating families of related or dependent data structures without specifying their concrete implementations."
 
-Solution "Abstract Factories" solves polymorph {
+Solution "Abstract Factories" solves polymorph in std {
     Property "Creators with Interfaces" {
     Description """
 Utilisation of a generic construction mechanism that contains the implementation/manipulate details common for all products, aside from the actual construction mechanism.

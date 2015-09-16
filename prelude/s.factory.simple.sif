@@ -1,6 +1,6 @@
 sif solution
 
-Solution "Simple Factory" solves polymorph {
+Solution "Simple Factory" solves polymorph in std {
 
   Property "Factory" {
     Description """A mechanism to generate concrete classes based upon a predetermined decision procedure."""

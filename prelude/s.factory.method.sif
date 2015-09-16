@@ -4,7 +4,7 @@ Description """
 Defines an interface for creating data but lets the subclasses decide which class to instantiate. Factory method lets a class defer instantiation to subclasses.
 """
 
-Solution "Factory Methods" solves polymorph {
+Solution "Factory Methods" solves polymorph in std {
   Property "Creators with Interfaces" {
     Description """
 Utilisation of a generic construction mechanism that contains the implementation/manipulate details common for all products, aside from the actual construction mechanism.

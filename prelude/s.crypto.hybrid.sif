@@ -3,7 +3,7 @@ sif solution
 Description """Provides information security through the provision on
  an efficient public-key crypto-scheme."""
 
-Solution "Hybrid Cryptography" solves infosec {
+Solution "Hybrid Cryptography" solves infosec in std {
 
   Description """Asymmetric Schemes allow for cryptographic keys to be made separate for encryption and decryption, but have an operational complexity that increases with the size of the data to be encrypted. Symmetric schemes have low operational complexity, but require the use of a shared key. These schemes can be combined to provide an efficient solution using asymmetric cryptography to information security."""
 

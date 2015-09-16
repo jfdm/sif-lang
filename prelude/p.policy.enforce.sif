@@ -1,6 +1,6 @@
 sif problem
 
-Problem "Policy Enforcement" as policyenforce
+policyenforce <- Problem "Policy Enforcement"
 
 enforcement    <- Functional "Policy Enforcement"
 timely         <- Functional "Timely Enforcement"

@@ -24,6 +24,10 @@ import Sif.DSL.Parser.Common
 
 -- ----------------------------------------------------------------- [ Parsers ]
 
+
+data VariableDecl : Type where
+  MkVar : String -> String -> (Maybe String) -> VariableDecl
+
 furpsTy : Parser RTy
 furpsTy = (keyword "Functional"     *> return FUNC)
       <|> (keyword "Usability"      *> return USAB)
@@ -32,26 +36,43 @@ furpsTy = (keyword "Functional"     *> return FUNC)
       <|> (keyword "Supportability" *> return SUPP)
       <?> "Requirement Type"
 
-requirement : Parser $ SifAST tyREQ
-requirement = do
+
+docString : Parser String
+docString = do
+    keyword "where"
+    s <- descString
+    pure s
+
+variable : Parser a -> Parser $ Pair a VariableDecl
+variable getTy = do
     i <- ident
     token "<-"
-    ty <- furpsTy
+    ty <- getTy
     t <- title
-    d <- opt descString
+    space
+    d <- opt docString
+    pure $ MkPair ty (MkVar i t d)
+  <?> "Variable"
+
+requirement : Parser $ SifAST tyREQ
+requirement = do
+    (ty, MkVar i t d) <- variable furpsTy
     space
     pure $ AST.Req i ty t d
   <?> "Requirement"
 
+
 context : Parser $ Pair String SifDomain
 context = do
-  keyword "Context"
-  t <- title
-  keyword "as"
-  i <- ident
-  desc <- opt descString
-  pure $ MkPair i (MkDomain t desc)
+    (_, MkVar i t d) <- variable (keyword "Context")
+    pure $ MkPair i $ MkDomain t d
+  <?> "Context"
 
+problemDef : Parser $ VariableDecl
+problemDef = do
+    (_, var) <- variable (keyword "Problem")
+    pure var
+  <?> "Problem"
 
 public
 problem : Parser $ SifAST tyPROBLEM
@@ -60,17 +81,14 @@ problem = do
     string "problem"
     eol
     space
-    keyword "Problem"
-    t <- title
-    keyword "as"
-    i <- ident
+    (MkVar i t d) <- problemDef
+    c <- opt context
     space
-    c <- context
-    space
-    d <- opt desc
     rs <- many requirement
     space
-    pure $ (AST.Problem i t d c rs)
+    case c of
+      Nothing => pure $ (AST.Problem i t d ("std", defaultDomain) rs)
+      Just c' => pure $ (AST.Problem i t d c' rs)
   <?> "Problem Specification"
 
 -- --------------------------------------------------------------------- [ EOF ]
