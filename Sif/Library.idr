@@ -56,7 +56,7 @@ getLibraryIndex lib = Dict.fromList idx
 
 getPatternByIndex : Nat -> SifLib -> Maybe (d ** (impl ** PATTERN impl d))
 getPatternByIndex n lib =
-  case index (length (patts lib) - (n + 1)) (patts lib) of
+  case index (minus (length (patts lib)) (n + 1)) (patts lib) of
     Nothing       => Nothing
     Just (_ ** p) => Just (_ ** (_ ** entry p))
 
