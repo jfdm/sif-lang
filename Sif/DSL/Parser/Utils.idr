@@ -63,14 +63,19 @@ comment l b e = (line l)
           pure ()
         <?> "Block Comment"
 
-doc : String -> Parser $ List String
-doc m = some (docString m) <?> "Documentation"
+doc : String -> Parser String
+doc m = do
+      ds <- some $ docString m
+      space
+      pure $ concat ds
+    <?> "Documentation"
   where
       docString : String -> Parser String
       docString m = do
-        token m
-        d <- manyTill anyChar eol
-        pure d
-     <?> "Doc String"
+          token m
+          d <- manyTill anyChar eol
+          space
+          pure $ pack d
+        <?> "Doc String"
 
 -- --------------------------------------------------------------------- [ EOF ]

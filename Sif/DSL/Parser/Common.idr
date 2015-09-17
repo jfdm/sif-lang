@@ -16,6 +16,7 @@ sifComment = comment "--" "{-" "-}" <?> "Sif Comment"
 
 sifDoc : Parser String
 sifDoc = doc ">"
+    <?> "Sif Doc String"
 
 descString : Parser String
 descString = literal
@@ -25,17 +26,17 @@ descString = literal
 
 keyword : String -> Parser ()
 keyword s = do
-  string s
-  space
-  pure ()
+     string s
+     sifComment
+     pure ()
 
 desc : Parser $ String
 desc = do
-   lexeme $ string "Description"
-   s <- descString
-   space
-   pure s
-  <?> "Description"
+     token "Description"
+     s <- descString
+     space
+     pure s
+    <?> "Description"
 
 ident : Parser String
 ident = lexeme (map pack $ some (satisfy isAlphaNum) ) <?> "Identity"

@@ -37,20 +37,14 @@ furpsTy = (keyword "Functional"     *> return FUNC)
       <?> "Requirement Type"
 
 
-docString : Parser String
-docString = do
-    keyword "where"
-    s <- descString
-    pure s
-
 variable : Parser a -> Parser $ Pair a VariableDecl
 variable getTy = do
+    d <- opt sifDoc
     i <- ident
     token "<-"
     ty <- getTy
     t <- title
-    space
-    d <- opt docString
+    sifComment
     pure $ MkPair ty (MkVar i t d)
   <?> "Variable"
 
@@ -77,15 +71,16 @@ problemDef = do
 public
 problem : Parser $ SifAST tyPROBLEM
 problem = do
+    sifComment
     keyword "sif"
     string "problem"
     eol
-    space
+    sifComment
     (MkVar i t d) <- problemDef
     c <- opt context
-    space
+    sifComment
     rs <- many requirement
-    space
+    sifComment
     case c of
       Nothing => pure $ (AST.Problem i t d ("std", defaultDomain) rs)
       Just c' => pure $ (AST.Problem i t d c' rs)

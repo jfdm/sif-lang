@@ -60,53 +60,46 @@ affect = do
     pure $ AST.Affect c i d
   <?> "Affects"
 
+affects : Parser $ List $ SifAST tyAFFECTS
+affects = do
+    keyword "Affects"
+    as <- braces $ commaSep1 affect
+    sifComment
+    pure as
+
 trait : Parser $ SifAST tyTRAIT
 trait = do
+      d <- opt sifDoc
       ty <- traitTy
       t <- title
       keyword "is"
       s <- sValue
-      (d,as) <- braces body
-      space
+      as <- braces affects
+      sifComment
       pure $ AST.Trait ty t s d as
     <?> "Trait"
-  where
-    body : Parser (Maybe String, List $ SifAST tyAFFECTS)
-    body = do
-        d <- opt desc
-        keyword "Affects"
-        as <- braces $ commaSep1 affect
-        space
-        pure $ (d,as)
-      <?> "Affects"
-
 
 property : Parser $ SifAST tyPROPERTY
 property = do
+      d <- opt sifDoc
       keyword "Property"
       t <- title
-      (d,ts) <- braces body
-      space
+      ts <- braces $ some trait
+      sifComment
       pure $ AST.Property t d ts
     <?> "Property"
-  where
-    body : Parser (Maybe String, List $ SifAST tyTRAIT)
-    body = do
-        d <- opt desc
-        ts <- some trait
-        space
-        pure (d, ts)
-      <?> "Property Body"
 
 public
 solution : Parser $ (SifAST tySOLUTION)
 solution = do
+      sifComment
       keyword "sif"
       space
       string "solution"
       eol
-      space
+      sifComment
       pd <- opt desc
+      d <- opt sifDoc
       keyword "Solution"
       t <- title
       keyword "solves"
@@ -114,17 +107,9 @@ solution = do
       pID <- ident
       keyword "in"
       cID <- ident
-      (d,ps) <- braces $ body
+      ps <- braces $ some property
       pure $ AST.Solution t (pID,pd) d cID ps
     <?> "Solution"
-  where
-    body : Parser (Maybe String, List $ SifAST tyPROPERTY)
-    body = do
-        d <- opt desc
-        ps <- some property
-        space
-        pure (d, ps)
-      <?> "Solution Body"
 
 
 
