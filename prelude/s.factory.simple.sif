@@ -2,7 +2,8 @@ sif solution
 
 Solution "Simple Factory" solves polymorph in std {
 
-  > A mechanism to generate concrete classes based upon a predetermined decision procedure.
+  > A mechanism to generate concrete classes based upon a predetermined
+  > decision procedure.
   Property "Factory" {
 
     Advantage "Separation" is Satisfied {
