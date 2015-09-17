@@ -1,9 +1,82 @@
 sif solution
 
-Solution "Simple Factory" solves polymorph in std {
+Description """Factory methods, programming against interfaces, and concrete implementations allow for a loose coupling of data representations against their representations."""
 
-  > A mechanism to generate concrete classes based upon a predetermined
-  > decision procedure.
+> Interfaces are constructs that describe the permited operations that
+> a data structure should have. Instances provide implementations that
+> adhere to these interfaces for particular data structure
+> representations. When combined with Factory methods, that construct
+> concrete instances, devlopers can build data structures that work
+> against these interfaces and use factory methods to swap out
+> implementations.
+
+Solution "Simple Factory" solves adt in std {
+
+  > Abstract Product Interfaces describes the operations that are
+  > common to all products. This is a centralised definition that
+  > programmers can develop against.
+  >
+  > This interface is a contract through which access to the data will
+  > be controlled. Through provision of this interface access to the
+  > data has been restricted to allowed oeprations only.  This has
+  > advantages that the resulting code used to interact with data is
+  > the same regardless of implementation. However, there is a down
+  > side that not all programming languages support the ability to
+  > programme against an interface.
+
+  Property "Abstract Product Interface" {
+
+    > Interface programming ensures that the representation and usage
+    > for a data structure is kept separate, and helps provide a means
+    > through which the creation of objects can be assured.
+
+	Advantage "Is Abstract" is Satisfied {
+	    Affects {
+  	      Makes separateObjects,
+		  Helps agnosticObjectGeneration
+		}
+    }
+
+	> Provision of an interface provides a central definition that is
+	> used to program against and ensures that the resulting code is
+	> closed for modification.
+    Advantage "Central Definition" is Satisfied {
+        Affects { Helps closedForModification }
+	}
+
+    > Not all programming languages facilitates programming against interfaces.
+	Disadvantage "Interface Programming" is WeakDen  {
+        Affects { SomeNeg languageAgnostic }
+	}
+  }
+
+  > Concrete implementations are data implementations that must adhere to the
+  > abstract product interface.
+  >
+  >
+  > While descriptions detail what a data structure can do, concrete
+  > implementations provide the means how.
+
+  Property "Concrete Products" {
+
+    > This is the how through which operations are performed.
+    Advantage "Is Real" is Satisfied {
+	  Affects {
+	      Makes separateObjects,
+		  Helps agnosticObjectGeneration
+		}
+    }
+  }
+
+  > A mechanism to generate concrete classes through provision of factory
+  > methods rather than constructors
+  >
+  > Product interfaces detail the 'what', while concrete products
+  > detail the 'how'.  The 'Factory' methods provide the link between
+  > constructing concrete representations of the data structures and
+  > passing the 'real' implementation to the code that interacts with
+  > the representation using the abstract product interface.
+
   Property "Factory" {
 
     Advantage "Separation" is Satisfied {
@@ -32,32 +105,4 @@ Solution "Simple Factory" solves polymorph in std {
     }
   }
 
-  > This represents the abstract representation of the data structure
-  > to be created. It is with this representation that developers will
-  > interact with the product.
-
-  Property "Abstract Product Interface" {
-
-
-	Advantage "Is Abstract" is Satisfied {
-	    Affects {
-  	      Makes separateObjects,
-		  Helps agnosticObjectGeneration
-		}
-    }
-  }
-
-  > This provides concrete representations of the data structure to be
-  > created.  This will be used to implement the abstract data
-  > structure.
-
-  Property "Concrete Products" {
-
-    Advantage "Is Real" is Satisfied {
-	  Affects {
-	      Makes separateObjects,
-		  Helps agnosticObjectGeneration
-		}
-    }
-  }
 }

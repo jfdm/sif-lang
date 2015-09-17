@@ -1,0 +1,64 @@
+sif problem
+
+> How to work with data structures without knowledge of their concrete
+> representation.
+>
+> When working with data structures, how can one present, create,
+> serve, and work with data without exposing the data structure's
+> concrete implementation. This development technique allows for a
+> loose coupling  to be made between data representation and use.
+
+adt <- Problem "Abstract Data Types"
+
+> The solution must provide a means to separate representation and
+> implementation of data structures.
+>
+> This is a core requirement of the problem. This separation between
+> representation and implementation, allows for different
+> implementations to be presented to developers.
+
+separateObjects <- Functional "Separate Data Structures"
+
+> The solution must allow for the generation of data structure
+> instances without knowledge of the underlying implementation.
+>
+> Obsfucation of concrete object generation facilitates greater
+> Implementation code, and hides away implementation
+> specific constructs from developers.
+
+agnosticObjectGeneration <- Functional "Agnostic Generation of Objects"
+
+> The creation and use of data instances should be closed for modification.
+
+> A change of data structure representation should not require code
+> that utilises the data structure to be changed. Operations common to
+> all concrete representations should be the only API that the
+> programmer uses.
+
+closedForModification <- Functional "Closed for Modification"
+
+> There should be an ability to replace the method of creation easily.
+>
+> How each concrete data instance is created by different
+> representations should be kept the same. Use of different methods
+> for each different representation increases the effort required in
+> swapping out conrete implementations.
+
+flexibleReplacement <- Functional "Flexible Replacement"
+
+> The resulting code should have minimal dependencies.
+>
+> The technical debt in using this solution should not be high.
+
+minimalDependancies <- Supportability "Minimal Dependencies"
+
+> The solution should limit the use of language specific features.
+>
+> The technical constructs used to achieve separation should not be
+> bespoke to the language. Use of bespoke constructs limits the
+> applicability of the solution to programming environments that share
+> the same language constructs.
+
+languageAgnostic <- Functional "Language Agnostic"
+
+--  -------------------------------------------------------------------- [ EOF ]
