@@ -2,8 +2,8 @@ sif solution
 
 Solution "Simple Factory" solves polymorph in std {
 
+  > A mechanism to generate concrete classes based upon a predetermined decision procedure.
   Property "Factory" {
-    Description """A mechanism to generate concrete classes based upon a predetermined decision procedure."""
 
     Advantage "Separation" is Satisfied {
        Affects {
@@ -20,8 +20,8 @@ Solution "Simple Factory" solves polymorph in std {
     }
   }
 
+  > The function in the code base that utilises the factory to create objects.
   Property "Factory Client" {
-    Description """The function in the code base that utilises the factory to create objects."""
 
     Advantage "Kept the Same" is Satisfied {
       Affects {
@@ -31,8 +31,12 @@ Solution "Simple Factory" solves polymorph in std {
     }
   }
 
+  > This represents the abstract representation of the data structure
+  > to be created. It is with this representation that developers will
+  > interact with the product.
+
   Property "Abstract Product Interface" {
-    Description """This represents the abstract representation of the data structure to be created. It is with this representation that developers will interact with the product."""
+
 
 	Advantage "Is Abstract" is Satisfied {
 	    Affects {
@@ -42,10 +46,11 @@ Solution "Simple Factory" solves polymorph in std {
     }
   }
 
+  > This provides concrete representations of the data structure to be
+  > created.  This will be used to implement the abstract data
+  > structure.
+
   Property "Concrete Products" {
-    Description """
-This provides concrete representations of the data structure to be created.
-This will be used to implement the abstract data structure."""
 
     Advantage "Is Real" is Satisfied {
 	  Affects {

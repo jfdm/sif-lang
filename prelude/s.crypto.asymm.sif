@@ -2,13 +2,17 @@ sif solution
 
 Description """Information Secrecy is about keeping data confidential. Public key encryption provides a mathematically guaranteed mechanism that allows data to be obfuscated such that only the recipient can reconstitute the messages original meaning."""
 
-Solution "Asymmetric Cryptography" solves infosec in std {
-  Description """Public key crypto schemes are an application of asymmetric cryptography in which the public/private key pair is used for encryption/decryption respectively. Asymmetric crypto schemes consist of three algorithms.
 
-+ keygen :: Given a security parameter generates a public private key pair.
-+ encrypt :: Given a public key and a message, encrypts the message under the given public key.
-+ decrypt :: Given a private key and a ciphertext, =decrypt= returns a readable plaintext if the private key was paired with the ciphertexts encryption key.
-"""
+> Public key crypto schemes are an application of asymmetric
+> cryptography in which the public/private key pair is used for
+> encryption/decryption respectively. Asymmetric crypto schemes
+> consist of three algorithms.
+>
+> + keygen :: Given a security parameter generates a public private key pair.
+> + encrypt :: Given a public key and a message, encrypts the message under the given public key.
+> + decrypt :: Given a private key and a ciphertext, =decrypt= returns a readable plaintext if the private key was paired with the ciphertexts encryption key.
+
+Solution "Asymmetric Cryptography" solves infosec in std {
 
   Property "Public Key Pairs" {
     Advantage "Different Keys" is Satisfied {

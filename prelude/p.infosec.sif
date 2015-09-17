@@ -1,43 +1,51 @@
 sif problem
 
-infosec <- Problem "Information Secrecy" where
-"Given two entities Alice and Bob, how can Bob send a message to Alice such that only the intended recipient, Alice, can be guaranteed to read the message."
+> Given two entities Alice and Bob, how can Bob send a message to
+> Alice such that only the intended recipient, Alice, can be guaranteed
+> to read the message.
 
-dataConf <- Functional "Data Confidentiality" where
-"""
-This functional requirement represents the core principle behind data confidentiality, the data should be kept confidential.
-The attacker may obtain knowledge about the sender/recipient, means and times of transport but the information contained inside should not be accessible.
-"""
+infosec <- Problem "Information Secrecy"
 
-recipConf <- Functional "Recipient Confidentiality" where
-"""
-A related functional requirement is that the recipient of the message should be the only entity capable of accessing the data contained within the message.
-"""
+> This functional requirement represents the core principle behind
+> data confidentiality, the data should be kept confidential. The
+> attacker may obtain knowledge about the sender/recipient, means and
+> times of transport but the information contained inside should not be
+> accessible.
 
-multiSecLevels <- Performance "Suitable Security Level" where
-"""
-This performance requirement represents the notion that not all data needs equivalent levels of protection.
-Data only needs to be protected for the lifetime that the confidentiality needs to be guaranteed.
-"""
+dataConf <- Functional "Data Confidentiality"
 
-mechPerf <- Performance "Suitable performance" where
-"""
-This usability requirement represents the idea that the actual act of securing data should not hinder upon the usage of any proposed mechanism.
-A user of the solution must not be inconvenienced by its use.
-"""
+> A related functional requirement is that the recipient of the
+> message should be the only entity capable of accessing the data
+> contained within the message.
 
-understandable <- Usability "Comprehensible by Non-Experts" where
-"""
-A secondary usability requirement targets the level of knowledge that an end-user of the solution must possess to use the solution.
-The user should need minimal knowledge of the underlying system.
-"""
+recipConf <- Functional "Recipient Confidentiality"
 
-minDisrupt <- Usability "Minimal Workflow Disruption" where
-"""
-The resulting solution should have minimal impact on the workflow of the user.
-"""
+> This performance requirement represents the notion that not all data
+> needs equivalent levels of protection.  Data only needs to be
+> protected for the lifetime that the confidentiality needs to be
+> guaranteed.
 
-secureImpl <- Reliability "Secure Implementation" where
-"""
-The implementation should be implemented securely.
-"""
+multiSecLevels <- Performance "Suitable Security Level"
+
+> This usability requirement represents the idea that the actual act
+> of securing data should not hinder upon the usage of any proposed
+> mechanism. A user of the solution must not be inconvenienced by its
+> use.
+
+mechPerf <- Performance "Suitable performance"
+
+> A secondary usability requirement targets the level of knowledge
+> that an end-user of the solution must possess to use the solution.
+> The user should need minimal knowledge of the underlying system.
+
+understandable <- Usability "Comprehensible by Non-Experts"
+
+
+> The resulting solution should have minimal impact on the workflow of
+> the user.
+
+minDisrupt <- Usability "Minimal Workflow Disruption"
+
+> The implementation should be implemented securely.
+
+secureImpl <- Reliability "Secure Implementation"

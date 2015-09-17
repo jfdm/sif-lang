@@ -1,37 +1,37 @@
 sif problem
 
-polymorph <- Problem "Polymorphic Data Usage" where
-"""
-Given an abstract description of an data structure together with several concrete implementations of these data structure.
-The problem is how to present, create, serve, and work with data using an abstract representation without exposing their concrete implementation.
-"""
+> Given an abstract description of an data structure together with
+> several concrete implementations of these data structure.  The problem
+> is how to present, create, serve, and work with data using an abstract
+> representation without exposing their concrete implementation.
 
-separateObjects <- Functional "Separate Data Structures" where
-"""
-The solution must provide separate representation and implementation data structures.
-"""
+polymorph <- Problem "Polymorphic Data Usage"
 
-agnosticObjectGeneration <- Functional "Agnostic Generation of Objects" where
-"""
-The solution must allow for the generation of data structure instances without knowledge of the underlying implementation.
-"""
+> The solution must provide separate representation and implementation
+> data structures.
 
-closedForModification <- Functional "Closed for Modification" where
-"""
-The creation and use of data instances should be closed for modification.
-"""
+separateObjects <- Functional "Separate Data Structures"
 
-flexibleReplacement <- Functional "Flexible Replacement" where
-"""
-There should be an ability to replace the method of creation easily.
-"""
+> The solution must allow for the generation of data structure
+> instances without knowledge of the underlying implementation.
 
-minimalDependancies <- Supportability "Minimal Dependencies" where
-"""
-The resulting code should have minimal dependencies.
-"""
+agnosticObjectGeneration <- Functional "Agnostic Generation of Objects"
 
-languageAgnostic <- Functional "Language Agnostic" where
-"""
-The solution should limit the use of language specific features.
-"""
+
+> The creation and use of data instances should be closed for modification.
+
+closedForModification <- Functional "Closed for Modification"
+
+
+> There should be an ability to replace the method of creation easily.
+
+flexibleReplacement <- Functional "Flexible Replacement"
+
+
+> The resulting code should have minimal dependencies.
+
+minimalDependancies <- Supportability "Minimal Dependencies"
+
+> The solution should limit the use of language specific features.
+
+languageAgnostic <- Functional "Language Agnostic"

@@ -3,28 +3,36 @@ sif solution
 Description "Provides an interface for creating families of related or dependent data structures without specifying their concrete implementations."
 
 Solution "Abstract Factories" solves polymorph in std {
-    Property "Creators with Interfaces" {
-    Description """
-Utilisation of a generic construction mechanism that contains the implementation/manipulate details common for all products, aside from the actual construction mechanism.
 
-Concrete mechanisms will extend the generic mechanism to perform construction of the products. It is these concrete mechanisms that are responsible for creating one or more concrete products, and is the only mechanism with knowledge of this creation.
-"""
-	Advantage "Generic Creators" is Satisfied {
+   > Utilisation of a generic construction mechanism that contains
+   > the implementation/manipulate details common for all products,
+   > aside from the actual construction mechanism.  Concrete
+   > mechanisms will extend the generic mechanism to perform
+   > construction of the products. It is these concrete mechanisms
+   > that are responsible for creating one or more concrete products,
+   > and is the only mechanism with knowledge of this creation.
+
+   Property "Creators with Interfaces" {
+
+    Advantage "Generic Creators" is Satisfied {
       Affects {
-	    Helps agnosticObjectGeneration,
-		Helps separateObjects,
-		Helps closedForModification,
-		Helps flexibleReplacement
-      }
+  	    Helps agnosticObjectGeneration,
+  		Helps separateObjects,
+  		Helps closedForModification,
+  		Helps flexibleReplacement
+     }
 	}
   }
+
+  > Provision of a generic interface which all product implementations
+  > must satisfy.  This allows for products to be used agnostic to their
+  > implementation.
+
   Property "Product with an Interface" {
-    Description """
-Provision of a generic interface which all product implementations must satisfy.
-This allows for products to be used agnostic to their implementation.
-"""
+
+    > Facilitates the actual separation of product implementation and creation
     Advantage "Using Products Interfaces" is Satisfied {
-	  Description "Facilitates the actual separation of product implementation and creation"
+
 	  Affects {
 	    Helps separateObjects,
 		Helps closedForModification,
@@ -34,8 +42,14 @@ This allows for products to be used agnostic to their implementation.
       }
     }
   }
+
+  > The techniques used for decoupling product descriptions and
+  > implementations are not bespoke to a single language. This
+  > decoupling can be achieved using inheritance, interfaces,
+  > typeclasses, traits.
+
   Property "Possibly Language Agnostic" {
-    Description """The techniques used for decoupling product descriptions and implementations are not bespoke to a single language. This decoupling can be achieved using inheritance, interfaces, typeclasses, traits."""
+
 	Advantage "Lang Agnostic Techniques" is WeakSatis {
 	  Affects {
 	    Helps languageAgnostic
