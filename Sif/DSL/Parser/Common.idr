@@ -11,6 +11,12 @@ import Lightyear.Strings
 
 import Sif.DSL.Parser.Utils
 
+sifComment : Parser ()
+sifComment = comment "--" "{-" "-}" <?> "Sif Comment"
+
+sifDoc : Parser String
+sifDoc = doc ">"
+
 descString : Parser String
 descString = literal
          <|> (literallyBetween '\"')

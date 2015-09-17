@@ -40,4 +40,37 @@ literal = do
     ss <- manyTill anyChar (token "\"\"\"")
     pure (pack ss)
 
+
+comment : String -> String -> String -> Parser ()
+comment l b e = (line l)
+            <|> (block b e)
+            <|> space
+            <?> "Comment"
+    where
+      line : String -> Parser ()
+      line l = do
+          token l
+          manyTill anyChar eol
+          space
+          pure ()
+        <?> "Line comment"
+
+      block : String -> String -> Parser ()
+      block b e = do
+          token b
+          manyTill anyChar (token e)
+          space
+          pure ()
+        <?> "Block Comment"
+
+doc : String -> Parser $ List String
+doc m = some (docString m) <?> "Documentation"
+  where
+      docString : String -> Parser String
+      docString m = do
+        token m
+        d <- manyTill anyChar eol
+        pure d
+     <?> "Doc String"
+
 -- --------------------------------------------------------------------- [ EOF ]
