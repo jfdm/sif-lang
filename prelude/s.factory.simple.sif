@@ -53,13 +53,12 @@ Solution "Simple Factory" solves adt in std {
   > Concrete implementations are data implementations that must adhere to the
   > abstract product interface.
   >
-  >
   > While descriptions detail what a data structure can do, concrete
   > implementations provide the means how.
 
   Property "Concrete Products" {
 
-    > This is the how through which operations are performed.
+    > This is the 'how' through which operations are performed.
     Advantage "Is Real" is Satisfied {
 	  Affects {
 	      Makes separateObjects,
@@ -79,6 +78,10 @@ Solution "Simple Factory" solves adt in std {
 
   Property "Factory" {
 
+    > Factories provide the functionality through which concrete
+    > instances are created and inserted into the code that relies
+    > upon the abstract interfaces.
+
     Advantage "Separation" is Satisfied {
        Affects {
           Makes separateObjects,
@@ -86,6 +89,10 @@ Solution "Simple Factory" solves adt in std {
 		  Makes closedForModification
        }
     }
+
+    > Factories offer a choke point and each data structure requires
+	> a distinct factory.
+
 	Disadvantage "Choke Point" is WeakDen {
        Affects {
          Hurts minimalDependancies,
@@ -94,7 +101,9 @@ Solution "Simple Factory" solves adt in std {
     }
   }
 
-  > The function in the code base that utilises the factory to create objects.
+  > The function in the code base that utilises the factory to create
+  > objects.
+
   Property "Factory Client" {
 
     Advantage "Kept the Same" is Satisfied {
@@ -104,5 +113,4 @@ Solution "Simple Factory" solves adt in std {
       }
     }
   }
-
 }

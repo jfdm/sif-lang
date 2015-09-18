@@ -1,0 +1,12 @@
+sif problem
+
+authentication <- Problem "Authentication"
+
+enrolment    <- Functional "Enrollment"
+authStep     <- Functional "Authentication Mechanism"
+changable    <- Functional "Changable"
+
+consistent   <- Reliability "Authentication happens"
+timely       <- Performance "Timely Authentication"
+
+lockout      <- Functional "Able to set limited access attempts"

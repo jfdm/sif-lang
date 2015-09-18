@@ -8,8 +8,8 @@
 *** TODO Hybrid Crypto
 ** STARTED Generic Data Representation [0/2]
 *** STARTED Problem
-*** TODO Solution
-**** TODO Simple Factory
+*** STARTED Solution
+**** STARTED Simple Factory
 **** TODO Factory Method
 **** TODO Abstract Factories
 * TODO Chain of Problem/Solution Pairings
