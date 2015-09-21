@@ -1,8 +1,10 @@
 sif solution
 
-Description "Provides an interface for creating families of related or dependent data structures without specifying their concrete implementations."
+Description """
+Provides an interface for creating families of related or dependent data structures without specifying their concrete implementations."""
 
-Solution "Abstract Factories" solves polymorph in std {
+>
+Solution "Abstract OO Factories" solves adt in std {
 
    > Utilisation of a generic construction mechanism that contains
    > the implementation/manipulate details common for all products,
@@ -28,10 +30,10 @@ Solution "Abstract Factories" solves polymorph in std {
   > must satisfy.  This allows for products to be used agnostic to their
   > implementation.
 
-  Property "Product with an Interface" {
+  Property "Products with an Interface" {
 
     > Facilitates the actual separation of product implementation and creation
-    Advantage "Using Products Interfaces" is Satisfied {
+    Advantage "Using Product Interfaces" is Satisfied {
 
 	  Affects {
 	    Helps separateObjects,
@@ -41,21 +43,50 @@ Solution "Abstract Factories" solves polymorph in std {
 		Helps minimalDependancies
       }
     }
+	Advantage "Product Families" is Satisfied {
+	  Affects {
+	    Helps separateObjects,
+		Helps closedForModification,
+		Helps flexibleReplacement,
+		Helps separateObjects,
+		Helps minimalDependancies
+      }
+	}
   }
 
-  > The techniques used for decoupling product descriptions and
-  > implementations are not bespoke to a single language. This
-  > decoupling can be achieved using inheritance, interfaces,
-  > typeclasses, traits.
+  > Single API presented to developers.
+  >
+  > Code that works with the product family will use the same code
+  > regardless of which family is being interacted with.
+  > The chock point
 
-  Property "Possibly Language Agnostic" {
+  Property "Multiple Factory Clients" {
 
-	Advantage "Lang Agnostic Techniques" is WeakSatis {
-	  Affects {
-	    Helps languageAgnostic
-	  }
+    > The same API is presented for all product families.
+    Advantage "Familiarity" is Satisfied {
+      Affects {
+        Makes closedForModification,
+		SomePos minimalDependancies
+      }
+    }
+
+	> There is a choke point in product family creation that allows
+    >  for a switch between different product families.
+	Advantage "Known Choke Point" is Satisfied {
+	  Affects {Helps flexibleReplacement}
     }
   }
 
+  > The techniques used for decoupling product descriptions and
+  > implementations require OO-specific functionality. The decoupling
+  > is achieved using inheritance, abstract implementations, and
+  > interfaces.
+  Property "Not Language Agnostic" {
 
+	Disadvantage "OO Specific Technologies" is WeakSatis {
+	  Affects {
+	    SomeNeg languageAgnostic
+	  }
+    }
+  }
 }

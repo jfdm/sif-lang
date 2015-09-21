@@ -24,7 +24,7 @@ Solution "Simple Factory" solves adt in std {
   > side that not all programming languages support the ability to
   > programme against an interface.
 
-  Property "Abstract Product Interface" {
+  Property "Product Interface" {
 
     > Interface programming ensures that the representation and usage
     > for a data structure is kept separate, and helps provide a means
@@ -113,4 +113,19 @@ Solution "Simple Factory" solves adt in std {
       }
     }
   }
+
+  > The techniques used for decoupling product descriptions and
+  > implementations are not bespoke to a single language. This
+  > decoupling can be achieved using inheritance, interfaces,
+  > typeclasses, traits.
+
+  Property "Possibly Language Agnostic" {
+
+	Advantage "Lang Agnostic Techniques" is WeakSatis {
+	  Affects {
+	    SomePos languageAgnostic
+	  }
+    }
+  }
+
 }

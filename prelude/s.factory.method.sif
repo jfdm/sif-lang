@@ -4,65 +4,149 @@ Description """
 Defines an interface for creating data but lets the subclasses decide which class to instantiate. Factory method lets a class defer instantiation to subclasses.
 """
 
-Solution "Factory Methods" solves polymorph in std {
+> Extension of the Simple Factory Solution using OO Concepts to defer instantiation
+> to the subclass.
+>
+> The Simple Factory solution detailed how a combination of Interface
+> Programming, abstract representation, and constructors is used to
+> address the problem of abstract data types.  The OO Factory solution
+> extends the simple factory solution using OO concepts.  Object
+> Inheritance and Abstract Classes allow for partial implementation of
+> the constructs common to all concrete constructors, and that these
+> constructs are extended to provide representation specific
+> constructs.
+
+Solution "OO Factories" solves adt in std {
+
+  > Product Interfaces describes the operations that are
+  > common to all products. This is a centralised definition that
+  > programmers can develop against.
+  >
+  > This interface is a contract through which access to the data will
+  > be controlled. Through provision of this interface access to the
+  > data has been restricted to allowed oeprations only.  This has
+  > advantages that the resulting code used to interact with data is
+  > the same regardless of implementation. However, there is a down
+  > side that not all programming languages support the ability to
+  > programme against an interface.
+
+  Property "Product Interface" {
+
+    > Interface programming ensures that the representation and usage
+    > for a data structure is kept separate, and helps provide a means
+    > through which the creation of objects can be assured.
+
+	Advantage "Is Abstract" is Satisfied {
+	    Affects {
+  	      Makes separateObjects,
+		  Helps agnosticObjectGeneration
+		}
+    }
+
+	> Provision of an interface provides a central definition that is
+	> used to program against and ensures that the resulting code is
+	> closed for modification.
+    Advantage "Central Definition" is Satisfied {
+        Affects { Helps closedForModification }
+	}
+
+    > Not all programming languages facilitates programming against interfaces.
+	Disadvantage "Interface Programming" is WeakSatis {
+        Affects { SomeNeg languageAgnostic }
+	}
+  }
+
+  > Concrete implementations are data implementations that must adhere to the
+  > abstract product interface.
+  >
+  > While descriptions detail what a data structure can do, concrete
+  > implementations provide the means how.
+
+  Property "Concrete Products" {
+
+    > This is the 'how' through which operations are performed.
+    Advantage "Is Real" is Satisfied {
+	  Affects {
+	      Makes separateObjects,
+		  Helps agnosticObjectGeneration
+		}
+    }
+  }
+
 
   > Utilisation of a generic construction mechanism that contains the
-  > implementation/manipulate details common for all products, aside
-  > from the actual construction mechanism. Concrete mechanisms will
-  > extend the generic mechanism to perform construction of the
-  > products. It is these concrete mechanisms that are responsible for
-  > creating one or more concrete products, and is the only mechanism
-  > with knowledge of this creation.
+  > implementation/manipulate details common for all products.
+  >
+  > Product interfaces detail the 'what', while concrete products
+  > detail the 'how'.  The 'Abstract Factory' object provides the link
+  > between constructing concrete representations of the data
+  > structures and passing the 'real' implementation to the code
+  > through provision of a common interace.
 
-  Property "Creators with Interfaces" {
+  Property "Abstract Factories" {
 
 	Advantage "Generic Creators" is Satisfied {
       Affects {
 	    Helps agnosticObjectGeneration,
 		Helps separateObjects,
 		Helps closedForModification,
-		Helps flexibleReplacement
+		Helps flexibleReplacement,
+		SomeNeg languageAgnostic
+      }
+	}
+	Advantage "Product Families" is Satisfied {
+      Affects {
+	    Helps agnosticObjectGeneration,
+		Helps separateObjects,
+		Helps closedForModification,
+		Helps flexibleReplacement,
+		SomeNeg languageAgnostic
       }
 	}
   }
 
-  > Provision of a generic interface which all product implementations
-  > must satisfy.  This allows for products to be used agnostic to
-  > their implementation.
+  > Implementation specific constructors that extend the abstract
+  > factories with implemention specific functionality.
+  >
+  > Concrete Factories detail how concrete products are to be
+  > implemented. Extension of the abstract factory allows concrete
+  > factories to be built in accordance with the abstract factory
+  > interface.
 
-  Property "Product with an Interface" {
-
-    > Facilitates the actual separation of product implementation and creation
-    Advantage "Using Products Interfaces" is Satisfied {
-
+  Property "Concrete Factories" {
+    Advantage "Concrete Creators" is Satisfied {
 	  Affects {
-	    Helps separateObjects,
-		Helps closedForModification,
-		Helps flexibleReplacement
-      }
-    }
-
-	> Only a single product is created.
-
-	Disadvantage "Single Product" is WeakSatis {
-
-	  Affects {
-		  SomeNeg separateObjects by "restricting the factory to a single product."
-		, SomeNeg minimalDependancies by "Multiple products will require multiple creators"
+	    Helps agnosticObjectGeneration,
+		Helps separateObjects,
+		Helps flexibleReplacement,
+		SomeNeg languageAgnostic
       }
     }
   }
 
+  > The function in the code base that utilises the concrete factory
+  > to create objects.
+
+  Property "Factory Clients" {
+
+    Advantage "Kept the Same" is Satisfied {
+      Affects {
+        Makes closedForModification,
+		Makes minimalDependancies
+      }
+    }
+  }
+
+
   > The techniques used for decoupling product descriptions and
-  > implementations are not bespoke to a single language. This
-  > decoupling can be achieved using inheritance, interfaces,
-  > typeclasses, traits.
+  > implementations require OO-specific functionality. The decoupling
+  > is achieved using inheritance, abstract implementations, and
+  > interfaces.
+  Property "Not Language Agnostic" {
 
-  Property "Possibly Language Agnostic" {
-
-	Advantage "Lang Agnostic Techniques" is WeakSatis {
+	Disadvantage "OO Specific Technologies" is WeakSatis {
 	  Affects {
-	    Helps languageAgnostic
+	    SomeNeg languageAgnostic
 	  }
     }
   }
