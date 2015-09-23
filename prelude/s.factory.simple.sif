@@ -101,7 +101,9 @@ Solution "Simple Factory" solves adt in std {
     }
   }
 
-  > The function in the code base that utilises the factory to create
+  > A point in the code base from which the concrete representation is
+  > generated and used through the abstract product interface. The
+  > function in the code base that utilises the factory to create
   > objects.
 
   Property "Factory Client" {

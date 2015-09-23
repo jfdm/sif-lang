@@ -1,9 +1,19 @@
 sif solution
 
-Description """
-Provides an interface for creating families of related or dependent data structures without specifying their concrete implementations."""
+Description """ Provides an interface for creating families of related
+or dependent data structures without specifying their concrete
+implementations."""
 
+> Extension of the OO Factory Solution to provide for product families
+> to be constructed.
 >
+>
+> OO Factories detail how a single product is created, and how OO
+> paradigms provide for a generic construction mechanism to be
+> provided for products. 'Abstract OO Factories' extends the OO
+> Factories solution by facilitating the create of product families,
+> multiple products from the same abstraction point.
+
 Solution "Abstract OO Factories" solves adt in std {
 
    > Utilisation of a generic construction mechanism that contains
@@ -40,16 +50,18 @@ Solution "Abstract OO Factories" solves adt in std {
 		Helps closedForModification,
 		Helps flexibleReplacement,
 		Helps separateObjects,
-		Helps minimalDependancies
+		Hurts minimalDependancies
       }
     }
+
+	> Multiple product families is great but this increases the code dependencies.
 	Advantage "Product Families" is Satisfied {
 	  Affects {
 	    Helps separateObjects,
 		Helps closedForModification,
 		Helps flexibleReplacement,
 		Helps separateObjects,
-		Helps minimalDependancies
+		Hurts minimalDependancies
       }
 	}
   }
@@ -58,7 +70,7 @@ Solution "Abstract OO Factories" solves adt in std {
   >
   > Code that works with the product family will use the same code
   > regardless of which family is being interacted with.
-  > The chock point
+  > The chock point.
 
   Property "Multiple Factory Clients" {
 

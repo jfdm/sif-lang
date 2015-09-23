@@ -124,10 +124,11 @@ Solution "OO Factories" solves adt in std {
     }
   }
 
-  > The function in the code base that utilises the concrete factory
-  > to create objects.
-
-  Property "Factory Clients" {
+  > A point in the code base from which the concrete representation is
+  > generated and used through the abstract product interface.  The
+  > function in the code base that utilises the concrete factory to
+  > create objects.
+  Property "Factory Client" {
 
     Advantage "Kept the Same" is Satisfied {
       Affects {
@@ -137,7 +138,8 @@ Solution "OO Factories" solves adt in std {
     }
   }
 
-
+  > Use of OO techniques.
+  >
   > The techniques used for decoupling product descriptions and
   > implementations require OO-specific functionality. The decoupling
   > is achieved using inheritance, abstract implementations, and
