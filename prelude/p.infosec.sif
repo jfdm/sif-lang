@@ -1,11 +1,13 @@
 sif problem
 
-> Given two entities Alice and Bob, how can Bob send a message to
+> Given two entities Alice and Bob, how can Bob give a message to
 > Alice such that only the intended recipient, Alice, can be guaranteed
-> to read the message.
+> to access the message.
 
 infosec <- Problem "Information Secrecy"
 
+> Core principle that ensures that the data is kept confidential.
+>
 > This functional requirement represents the core principle behind
 > data confidentiality, the data should be kept confidential. The
 > attacker may obtain knowledge about the sender/recipient, means and
@@ -14,6 +16,8 @@ infosec <- Problem "Information Secrecy"
 
 dataConf <- Functional "Data Confidentiality"
 
+> The data should be viewable only by the intended recipient.
+>
 > A related functional requirement is that the recipient of the
 > message should be the only entity capable of accessing the data
 > contained within the message.
@@ -39,7 +43,6 @@ mechPerf <- Performance "Suitable performance"
 > The user should need minimal knowledge of the underlying system.
 
 understandable <- Usability "Comprehensible by Non-Experts"
-
 
 > The resulting solution should have minimal impact on the workflow of
 > the user.
