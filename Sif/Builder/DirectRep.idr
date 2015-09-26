@@ -30,40 +30,40 @@ data DirectRep : SifTy -> SifDomain -> Type where
   DirectMkReq : (ty   : RTy)
              -> (t    : String)
              -> (desc : Maybe String)
-             -> DirectRep tyREQ d
+             -> DirectRep TyREQ d
 
   DirectMkProb : (title : String)
               -> (desc  : Maybe String)
-              -> List (DirectRep tyREQ d)
-              -> DirectRep tyPROBLEM d
+              -> List (DirectRep TyREQ d)
+              -> DirectRep TyPROBLEM d
 
   DirectMkAffect : (cval : CValue)
-               -> (req : DirectRep tyREQ d)
+               -> (req : DirectRep TyREQ d)
                -> (desc : Maybe String)
-               -> DirectRep tyAFFECTS d
+               -> DirectRep TyAFFECTS d
 
   DirectMkTrait : (ty : TTy)
                -> (title : String)
                -> (desc  : Maybe String)
                -> (sval  : SValue)
-               -> List (DirectRep tyAFFECTS d)
-               -> DirectRep tyTRAIT d
+               -> List (DirectRep TyAFFECTS d)
+               -> DirectRep TyTRAIT d
 
   DirectMkProp : (title : String)
               -> (desc : Maybe String)
-              -> List (DirectRep tyTRAIT d)
-              -> DirectRep tyPROPERTY d
+              -> List (DirectRep TyTRAIT d)
+              -> DirectRep TyPROPERTY d
 
   DirectMkSolt : (title : String)
               -> (desc : Maybe String)
-              -> List (DirectRep tyPROPERTY d)
-              -> DirectRep tySOLUTION d
+              -> List (DirectRep TyPROPERTY d)
+              -> DirectRep TySOLUTION d
 
   DirectMkPatt : (title : String)
               -> (desc : Maybe String)
-              -> DirectRep tyPROBLEM  d
-              -> DirectRep tySOLUTION d
-              -> DirectRep tyPATTERN  d
+              -> DirectRep TyPROBLEM  d
+              -> DirectRep TySOLUTION d
+              -> DirectRep TyPATTERN  d
 
 getDirectTitle : DirectRep ty d -> String
 getDirectTitle (DirectMkReq _ t _)       = t
@@ -83,37 +83,37 @@ getDirectDesc (DirectMkProp _ d _)      = d
 getDirectDesc (DirectMkSolt _ d _)      = d
 getDirectDesc (DirectMkPatt _ d _ _)    = d
 
-getDirectRTy : DirectRep tyREQ d -> RTy
+getDirectRTy : DirectRep TyREQ d -> RTy
 getDirectRTy (DirectMkReq ty _ _) = ty
 
-getDirectTTy : DirectRep tyTRAIT d -> TTy
+getDirectTTy : DirectRep TyTRAIT d -> TTy
 getDirectTTy (DirectMkTrait ty _ _ _ _) = ty
 
-getDirectSValue : DirectRep tyTRAIT d -> SValue
+getDirectSValue : DirectRep TyTRAIT d -> SValue
 getDirectSValue (DirectMkTrait _ _ _ sval _) = sval
 
-getDirectCValue : DirectRep tyAFFECTS d -> CValue
+getDirectCValue : DirectRep TyAFFECTS d -> CValue
 getDirectCValue (DirectMkAffect cval _ _) = cval
 
-getDirectProblem : DirectRep tyPATTERN d -> (DirectRep tyPROBLEM d)
+getDirectProblem : DirectRep TyPATTERN d -> (DirectRep TyPROBLEM d)
 getDirectProblem (DirectMkPatt _ _ p _) = p
 
-getDirectSolution : DirectRep tyPATTERN d -> DirectRep tySOLUTION d
+getDirectSolution : DirectRep TyPATTERN d -> DirectRep TySOLUTION d
 getDirectSolution (DirectMkPatt _ _ _ s) = s
 
-getDirectReqs : DirectRep tyPROBLEM d -> List $ DirectRep tyREQ d
+getDirectReqs : DirectRep TyPROBLEM d -> List $ DirectRep TyREQ d
 getDirectReqs (DirectMkProb _ _ rs) = rs
 
-getDirectProperties : DirectRep tySOLUTION d -> List $ DirectRep tyPROPERTY d
+getDirectProperties : DirectRep TySOLUTION d -> List $ DirectRep TyPROPERTY d
 getDirectProperties (DirectMkSolt _ _ ps) = ps
 
-getDirectTraits : DirectRep tyPROPERTY d -> List $ DirectRep tyTRAIT d
+getDirectTraits : DirectRep TyPROPERTY d -> List $ DirectRep TyTRAIT d
 getDirectTraits (DirectMkProp _ _ ts) = ts
 
-getDirectAffects : DirectRep tyTRAIT d -> List $ DirectRep tyAFFECTS d
+getDirectAffects : DirectRep TyTRAIT d -> List $ DirectRep TyAFFECTS d
 getDirectAffects (DirectMkTrait _ _ _ _ as) = as
 
-getDirectReq : DirectRep tyAFFECTS d -> DirectRep tyREQ d
+getDirectReq : DirectRep TyAFFECTS d -> DirectRep TyREQ d
 getDirectReq (DirectMkAffect _ r _) = r
 
 -- --------------------------------------------------------------------- [ GRL ]
@@ -131,10 +131,10 @@ toGRL (DirectMkPatt t d p s)      = interpPatt (toGRL p) (toGRL s)
 
 -- ----------------------------------------------------- [ Instances and Stuff ]
 
-getGModel : DirectRep tyPATTERN d -> GModel
+getGModel : DirectRep TyPATTERN d -> GModel
 getGModel p = extract (toGRL p)
   where
-    extract : InterpRes tyPATTERN -> GModel
+    extract : InterpRes TyPATTERN -> GModel
     extract (IPatt m) = m
 
 -- ------------------------------------------------------ [ Builder Definition ]

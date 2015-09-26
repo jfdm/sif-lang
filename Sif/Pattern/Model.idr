@@ -28,22 +28,22 @@ namespace Pattern
   class SifRepAPI (impl : SifTy -> SifDomain -> Type) where
       getTitle  : impl ty d -> {auto prf : HasMData ty} -> String
       getDesc   : impl ty d -> Maybe String
-      getRTy    : impl tyREQ     d -> RTy
-      getTTy    : impl tyTRAIT   d -> TTy
-      getSValue : impl tyTRAIT   d -> SValue
-      getCValue : impl tyAFFECTS d -> CValue
+      getRTy    : impl TyREQ     d -> RTy
+      getTTy    : impl TyTRAIT   d -> TTy
+      getSValue : impl TyTRAIT   d -> SValue
+      getCValue : impl TyAFFECTS d -> CValue
 
-      getProblem  : impl tyPATTERN d -> impl tyPROBLEM  d
-      getSolution : impl tyPATTERN d -> impl tySOLUTION d
+      getProblem  : impl TyPATTERN d -> impl TyPROBLEM  d
+      getSolution : impl TyPATTERN d -> impl TySOLUTION d
 
-      getReqs       : impl tyPROBLEM  d -> List (impl tyREQ      d)
-      getProperties : impl tySOLUTION d -> List (impl tyPROPERTY d)
-      getTraits     : impl tyPROPERTY d -> List (impl tyTRAIT    d)
-      getAffects    : impl tyTRAIT    d -> List (impl tyAFFECTS  d)
-      getReq        : impl tyAFFECTS  d -> impl tyREQ d
+      getReqs       : impl TyPROBLEM  d -> List (impl TyREQ      d)
+      getProperties : impl TySOLUTION d -> List (impl TyPROPERTY d)
+      getTraits     : impl TyPROPERTY d -> List (impl TyTRAIT    d)
+      getAffects    : impl TyTRAIT    d -> List (impl TyAFFECTS  d)
+      getReq        : impl TyAFFECTS  d -> impl TyREQ d
 
-      evalPattern    : impl tyPATTERN d -> Sif.EvalResult
-      fetchMetaModel : impl tyPATTERN d -> MetaModel
+      evalPattern    : impl TyPATTERN d -> Sif.EvalResult
+      fetchMetaModel : impl TyPATTERN d -> MetaModel
 
       getDomain : impl ty d -> SifDomain
       getDomain {d} _ = d
@@ -65,67 +65,47 @@ namespace SifExpr
   getDesc : SifExpr ty d impl -> Maybe String
   getDesc (MkExpr x) = Pattern.getDesc x
 
-  getRTy : SifExpr tyREQ d impl -> RTy
+  getRTy : SifExpr TyREQ d impl -> RTy
   getRTy (MkExpr x) = Pattern.getRTy x
 
-  getTTy : SifExpr tyTRAIT d impl -> TTy
+  getTTy : SifExpr TyTRAIT d impl -> TTy
   getTTy (MkExpr x) = Pattern.getTTy x
 
-  getSValue : SifExpr tyTRAIT d impl -> SValue
+  getSValue : SifExpr TyTRAIT d impl -> SValue
   getSValue (MkExpr x) = Pattern.getSValue x
 
-  getCValue : SifExpr tyAFFECTS d impl -> CValue
+  getCValue : SifExpr TyAFFECTS d impl -> CValue
   getCValue (MkExpr x) = Pattern.getCValue x
 
-  getProblem : SifExpr tyPATTERN d impl -> SifExpr tyPROBLEM d impl
+  getProblem : SifExpr TyPATTERN d impl -> SifExpr TyPROBLEM d impl
   getProblem (MkExpr x) = MkExpr $ Pattern.getProblem x
 
-  getSolution : SifExpr tyPATTERN d impl -> SifExpr tySOLUTION d impl
+  getSolution : SifExpr TyPATTERN d impl -> SifExpr TySOLUTION d impl
   getSolution (MkExpr x) = MkExpr $ Pattern.getSolution x
 
-  getReqs : SifExpr tyPROBLEM d impl -> List (SifExpr tyREQ d impl)
+  getReqs : SifExpr TyPROBLEM d impl -> List (SifExpr TyREQ d impl)
   getReqs (MkExpr x) = map MkExpr $ Pattern.getReqs x
 
-  getProperties : SifExpr tySOLUTION d impl -> List (SifExpr tyPROPERTY d impl)
+  getProperties : SifExpr TySOLUTION d impl -> List (SifExpr TyPROPERTY d impl)
   getProperties (MkExpr x) = map MkExpr $ Pattern.getProperties x
 
-  getTraits : SifExpr tyPROPERTY d impl -> List (SifExpr tyTRAIT d impl)
+  getTraits : SifExpr TyPROPERTY d impl -> List (SifExpr TyTRAIT d impl)
   getTraits (MkExpr x) = map MkExpr $ Pattern.getTraits x
 
-  getAffects : SifExpr tyTRAIT d impl -> List (SifExpr tyAFFECTS d impl)
+  getAffects : SifExpr TyTRAIT d impl -> List (SifExpr TyAFFECTS d impl)
   getAffects (MkExpr x) = map MkExpr $ Pattern.getAffects x
 
-  getReq : SifExpr tyAFFECTS d impl -> SifExpr tyREQ d impl
+  getReq : SifExpr TyAFFECTS d impl -> SifExpr TyREQ d impl
   getReq (MkExpr x) = MkExpr $ Pattern.getReq x
 
   getDomain : SifExpr ty d impl -> SifDomain
   getDomain {d} _ = d
 
-  evalPattern : SifExpr tyPATTERN d impl -> Sif.EvalResult
+  evalPattern : SifExpr TyPATTERN d impl -> Sif.EvalResult
   evalPattern (MkExpr x)    = Pattern.evalPattern x
 
-  fetchMetaModel : SifExpr tyPATTERN d impl -> MetaModel
+  fetchMetaModel : SifExpr TyPATTERN d impl -> MetaModel
   fetchMetaModel (MkExpr x) = Pattern.fetchMetaModel x
-
--- Causing too mushc problems than it is worth...
--- instance SifRepAPI (\ty,d => SifExpr ty d impl) where
---   getTitle   x = SifExpr.getTitle x
---   getDesc    x = SifExpr.getDesc x
---   getTTy     x = SifExpr.getTTy x
---   getRTy     x = SifExpr.getRTy x
---   getSValue  x = SifExpr.getSValue x
---   getCValue  x = SifExpr.getCValue x
-
---   getProblem    x = SifExpr.getProblem x
---   getSolution   x = SifExpr.getSolution x
---   getReqs       x = SifExpr.getReqs x
---   getProperties x = SifExpr.getProperties x
---   getTraits     x = SifExpr.getTraits x
---   getAffects    x = SifExpr.getAffects x
---   getReq        x = SifExpr.getReq x
-
---   evalPattern (MkExpr x)    = evalPattern x
---   fetchMetaModel (MkExpr x) = fetchMetaModel x
 
 -- Better to parameterise SifBuilder by a SifDomain. the problem is
 -- not how to populate the value in the type---a update function that
@@ -141,46 +121,46 @@ record SifBuilder (impl : SifTy -> SifDomain -> Type) where
           -> RTy
           -> String
           -> Maybe String
-          -> SifExpr tyREQ d impl
+          -> SifExpr TyREQ d impl
 
   buildProblem : (d : SifDomain)
               -> String
               -> Maybe String
-              -> List (SifExpr tyREQ d impl)
-              -> SifExpr tyPROBLEM d impl
+              -> List (SifExpr TyREQ d impl)
+              -> SifExpr TyPROBLEM d impl
 
   buildAffect : (d : SifDomain)
              -> CValue
-             -> SifExpr tyREQ d impl
+             -> SifExpr TyREQ d impl
              -> Maybe String
-             -> SifExpr tyAFFECTS d impl
+             -> SifExpr TyAFFECTS d impl
 
   buildTrait : (d : SifDomain)
             -> TTy
             -> String
             -> Maybe String
             -> SValue
-            -> List $ SifExpr tyAFFECTS d impl
-            -> SifExpr tyTRAIT d impl
+            -> List $ SifExpr TyAFFECTS d impl
+            -> SifExpr TyTRAIT d impl
 
   buildProperty : (d : SifDomain)
                -> String
                -> Maybe String
-               -> List $ SifExpr tyTRAIT d impl
-               -> SifExpr tyPROPERTY d impl
+               -> List $ SifExpr TyTRAIT d impl
+               -> SifExpr TyPROPERTY d impl
 
   buildSolution : (d : SifDomain)
                -> String
                -> Maybe String
-               -> List $ SifExpr tyPROPERTY d impl
-               -> SifExpr tySOLUTION d impl
+               -> List $ SifExpr TyPROPERTY d impl
+               -> SifExpr TySOLUTION d impl
 
   buildPattern : (d : SifDomain)
               -> String
               -> Maybe String
-              -> SifExpr tyPROBLEM  d impl
-              -> SifExpr tySOLUTION d impl
-              -> SifExpr tyPATTERN  d impl
+              -> SifExpr TyPROBLEM  d impl
+              -> SifExpr TySOLUTION d impl
+              -> SifExpr TyPATTERN  d impl
 
 record SifBackend where
     constructor MkBackend

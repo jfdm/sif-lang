@@ -48,7 +48,7 @@ variable getTy = do
     pure $ MkPair ty (MkVar i t d)
   <?> "Variable"
 
-requirement : Parser $ SifAST tyREQ
+requirement : Parser $ SifAST TyREQ
 requirement = do
     (ty, MkVar i t d) <- variable furpsTy
     space
@@ -69,7 +69,7 @@ problemDef = do
   <?> "Problem"
 
 public
-problem : Parser $ SifAST tyPROBLEM
+problem : Parser $ SifAST TyPROBLEM
 problem = do
     sifComment
     keyword "sif"

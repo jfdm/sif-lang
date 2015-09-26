@@ -50,7 +50,7 @@ sValue = (keyword "Denied"    *> return DENIED)
      <|> (keyword "None"      *> return NONE)
      <?> "Trait Type"
 
-affect : Parser $ SifAST tyAFFECTS
+affect : Parser $ SifAST TyAFFECTS
 affect = do
     c <- cValue
     space
@@ -60,14 +60,14 @@ affect = do
     pure $ AST.Affect c i d
   <?> "Affects"
 
-affects : Parser $ List $ SifAST tyAFFECTS
+affects : Parser $ List $ SifAST TyAFFECTS
 affects = do
     keyword "Affects"
     as <- braces $ commaSep1 affect
     sifComment
     pure as
 
-trait : Parser $ SifAST tyTRAIT
+trait : Parser $ SifAST TyTRAIT
 trait = do
       d <- opt sifDoc
       ty <- traitTy
@@ -79,7 +79,7 @@ trait = do
       pure $ AST.Trait ty t s d as
     <?> "Trait"
 
-property : Parser $ SifAST tyPROPERTY
+property : Parser $ SifAST TyPROPERTY
 property = do
       d <- opt sifDoc
       keyword "Property"
@@ -90,7 +90,7 @@ property = do
     <?> "Property"
 
 public
-solution : Parser $ (SifAST tySOLUTION)
+solution : Parser $ (SifAST TySOLUTION)
 solution = do
       sifComment
       keyword "sif"

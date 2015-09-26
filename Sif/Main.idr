@@ -50,7 +50,6 @@ runMode (Just Conv) = do
     putStrLn "Converting Pattern"
     convPatternFromFile (pSpec os) (sSpec os) (out os) (to os)
 
-covering
 sifMain : Eff () SifEffs
 sifMain = do
     opts <- parseOptions

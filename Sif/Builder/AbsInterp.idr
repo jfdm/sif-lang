@@ -32,52 +32,52 @@ data AbsInterpPriv : InterpRes ty -> SifTy -> Type where
 
   priv__mkProb : (title : String)
               -> (desc  : Maybe String)
-              -> DList (InterpRes tyREQ) (\x => AbsInterpPriv x tyREQ) xs
-              -> AbsInterpPriv (interpProb title xs) tyPROBLEM
+              -> DList (InterpRes TyREQ) (\x => AbsInterpPriv x TyREQ) xs
+              -> AbsInterpPriv (interpProb title xs) TyPROBLEM
 
   priv__mkTLink : (cval : CValue)
-               -> (req : AbsInterpPriv r tyREQ)
+               -> (req : AbsInterpPriv r TyREQ)
                -> (desc : Maybe String)
-               -> AbsInterpPriv (interpAffect cval r) tyAFFECTS
+               -> AbsInterpPriv (interpAffect cval r) TyAFFECTS
 
   priv__mkTrait : (ty : TTy)
                -> (title : String)
                -> (desc  : Maybe String)
                -> (sval  : SValue)
-               -> DList (InterpRes tyAFFECTS) (\x => AbsInterpPriv x tyAFFECTS) rs
-               -> AbsInterpPriv (interpTrait title sval rs ty) tyTRAIT
+               -> DList (InterpRes TyAFFECTS) (\x => AbsInterpPriv x TyAFFECTS) rs
+               -> AbsInterpPriv (interpTrait title sval rs ty) TyTRAIT
 
   priv__mkProp : (title : String)
               -> (desc : Maybe String)
-              -> DList (InterpRes tyTRAIT) (\x => AbsInterpPriv x tyTRAIT) ts
-              -> AbsInterpPriv (interpProp title ts) tyPROPERTY
+              -> DList (InterpRes TyTRAIT) (\x => AbsInterpPriv x TyTRAIT) ts
+              -> AbsInterpPriv (interpProp title ts) TyPROPERTY
 
   priv__mkSolt : (title : String)
               -> (desc : Maybe String)
-              -> DList (InterpRes tyPROPERTY) (\x => AbsInterpPriv x tyPROPERTY) ps
-              -> AbsInterpPriv (interpSolt title ps) tySOLUTION
+              -> DList (InterpRes TyPROPERTY) (\x => AbsInterpPriv x TyPROPERTY) ps
+              -> AbsInterpPriv (interpSolt title ps) TySOLUTION
 
   priv__mkPatt : (title : String)
               -> (desc : Maybe String)
-              -> AbsInterpPriv p tyPROBLEM
-              -> AbsInterpPriv s tySOLUTION
-              -> AbsInterpPriv (interpPatt p s) tyPATTERN
+              -> AbsInterpPriv p TyPROBLEM
+              -> AbsInterpPriv s TySOLUTION
+              -> AbsInterpPriv (interpPatt p s) TyPATTERN
 
 -- ----------------------------------------------------- [ Instances and Stuff ]
 
 
-getModel : {x : InterpRes tyPATTERN} -> AbsInterpPriv x tyPATTERN -> GModel
+getModel : {x : InterpRes TyPATTERN} -> AbsInterpPriv x TyPATTERN -> GModel
 getModel {x} _ = extract x
   where
-    extract : InterpRes tyPATTERN -> GModel
+    extract : InterpRes TyPATTERN -> GModel
     extract (IPatt m) = m
     extract _         = emptyModel
 
 -- ------------------------------------------------------ [ Builder Definition ]
 
 covering
-evalPatternAbs : {i : InterpRes tyPATTERN}
-              -> AbsInterpPriv i tyPATTERN
+evalPatternAbs : {i : InterpRes TyPATTERN}
+              -> AbsInterpPriv i TyPATTERN
               -> Sif.EvalResult
 evalPatternAbs p =
     case evalModel (getModel p) Nothing of
@@ -113,44 +113,59 @@ getPrivDesc (priv__mkSolt _ d _)      = d
 getPrivDesc (priv__mkPatt _ d _ _)    = d
 getPrivDesc _ = Nothing
 
-
-getPrivRTy : AbsInterpPriv i tyREQ -> RTy
+getPrivRTy : {i : InterpRes TyREQ}
+          -> AbsInterpPriv i TyREQ
+          -> RTy
 getPrivRTy (priv__mkReq ty _ _) = ty
 
-getPrivTTy    : AbsInterpPriv i tyTRAIT -> TTy
+getPrivTTy : {i : InterpRes TyTRAIT}
+          -> AbsInterpPriv i TyTRAIT
+          -> TTy
 getPrivTTy (priv__mkTrait ty _ _ _ _) = ty
 
-getPrivSValue : AbsInterpPriv i tyTRAIT -> SValue
+getPrivSValue : {i : InterpRes TyTRAIT}
+              -> AbsInterpPriv i TyTRAIT
+              -> SValue
 getPrivSValue (priv__mkTrait _ _ _ sval as) = sval
 
-getPrivCValue : AbsInterpPriv i tyAFFECTS -> CValue
+getPrivCValue : {i : InterpRes TyAFFECTS}
+             -> AbsInterpPriv i TyAFFECTS
+             -> CValue
 getPrivCValue (priv__mkTLink cval _ _) = cval
 
-getPrivProblem : AbsInterpPriv i tyPATTERN
-    -> (x : InterpRes tyPROBLEM ** AbsInterpPriv x tyPROBLEM)
+getPrivProblem : {i : InterpRes TyPATTERN}
+              -> AbsInterpPriv i TyPATTERN
+              -> (x : InterpRes TyPROBLEM ** AbsInterpPriv x TyPROBLEM)
 getPrivProblem (priv__mkPatt _ _ p _) = (_ ** p)
 
-getPrivSolution   : AbsInterpPriv i tyPATTERN
-    -> (s : InterpRes tySOLUTION ** AbsInterpPriv s tySOLUTION)
+getPrivSolution : {i : InterpRes TyPATTERN}
+               -> AbsInterpPriv i TyPATTERN
+               -> (s : InterpRes TySOLUTION ** AbsInterpPriv s TySOLUTION)
 getPrivSolution (priv__mkPatt _ _ _ s) = (_ ** s)
 
-getPrivReqs : AbsInterpPriv i tyPROBLEM
-  -> (xs ** DList (InterpRes tyREQ) (\x => AbsInterpPriv x tyREQ) xs)
+getPrivReqs : {i : InterpRes TyPROBLEM}
+            -> AbsInterpPriv i TyPROBLEM
+            -> (xs ** DList (InterpRes TyREQ) (\x => AbsInterpPriv x TyREQ) xs)
 getPrivReqs (priv__mkProb _ _ rs) = (_ ** rs)
 
-getPrivProperties : AbsInterpPriv i tySOLUTION
-  -> (xs ** DList (InterpRes tyPROPERTY) (\x => AbsInterpPriv x tyPROPERTY) xs)
+getPrivProperties : {i : InterpRes TySOLUTION}
+                  -> AbsInterpPriv i TySOLUTION
+                  -> (xs ** DList (InterpRes TyPROPERTY) (\x => AbsInterpPriv x TyPROPERTY) xs)
 getPrivProperties (priv__mkSolt _ _ ps) = (_ ** ps)
 
-getPrivTraits : AbsInterpPriv i tyPROPERTY
-  -> (xs ** DList (InterpRes tyTRAIT) (\x => AbsInterpPriv x tyTRAIT) xs)
+getPrivTraits : {i : InterpRes TyPROPERTY}
+             -> AbsInterpPriv i TyPROPERTY
+             -> (xs ** DList (InterpRes TyTRAIT) (\x => AbsInterpPriv x TyTRAIT) xs)
 getPrivTraits (priv__mkProp _ _ ts) = (_ ** ts)
 
-getPrivAffects : AbsInterpPriv i tyTRAIT
-  -> (xs ** DList (InterpRes tyAFFECTS) (\x => AbsInterpPriv x tyAFFECTS) xs)
+getPrivAffects : {i : InterpRes TyTRAIT}
+               -> AbsInterpPriv i TyTRAIT
+               -> (xs ** DList (InterpRes TyAFFECTS) (\x => AbsInterpPriv x TyAFFECTS) xs)
 getPrivAffects (priv__mkTrait _ _ _ _ as) = (_ ** as)
 
-getPrivReq : AbsInterpPriv i tyAFFECTS -> (s : InterpRes tyREQ ** AbsInterpPriv s tyREQ)
+getPrivReq : {i : InterpRes TyAFFECTS}
+          -> AbsInterpPriv i TyAFFECTS
+          -> (s : InterpRes TyREQ ** AbsInterpPriv s TyREQ)
 getPrivReq (priv__mkTLink _ r _) = (_ ** r)
 
 instance SifRepAPI AbsInterpRep where

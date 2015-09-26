@@ -16,44 +16,44 @@ namespace AST
        -> (ty    : RTy)
        -> (title : String)
        -> (desc  : Maybe String)
-       -> SifAST tyREQ
+       -> SifAST TyREQ
 
     Problem : (ident : String)
            -> (title : String)
            -> (desc  : Maybe String)
            -> (context : Pair String SifDomain)
-           -> List (SifAST tyREQ)
-           -> SifAST tyPROBLEM
+           -> List (SifAST TyREQ)
+           -> SifAST TyPROBLEM
 
     Affect : (value : CValue)
           -> (id : String)
           -> (desc : Maybe String)
-          -> SifAST tyAFFECTS
+          -> SifAST TyAFFECTS
 
     Trait : (ty : TTy)
          -> (title : String)
          -> (value : SValue)
          -> (desc  : Maybe String)
-         -> (affects : List (SifAST tyAFFECTS))
+         -> (affects : List (SifAST TyAFFECTS))
          -> SifAST tyTRAIT
 
     Property : (title : String)
             -> (desc : Maybe String)
-            -> (traits : List (SifAST tyTRAIT))
+            -> (traits : List (SifAST TyTRAIT))
             -> SifAST tyPROPERTY
 
     Solution : (title : String)
             -> (probID : Pair String (Maybe String))
             -> (desc : Maybe String)
             -> (ctxtID : String)
-            -> (properties : List (SifAST tyPROPERTY))
-            -> SifAST tySOLUTION
+            -> (properties : List (SifAST TyPROPERTY))
+            -> SifAST TySOLUTION
 
     Pattern : (title : String)
            -> (desc : Maybe String)
-           -> (problem : SifAST tyPROBLEM)
-           -> (solution : SifAST tySOLUTION)
-           -> SifAST tyPATTERN
+           -> (problem : SifAST TyPROBLEM)
+           -> (solution : SifAST TySOLUTION)
+           -> SifAST TyPATTERN
 
 
 -- --------------------------------------------------------------------- [ EOF ]

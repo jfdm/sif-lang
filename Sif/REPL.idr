@@ -62,7 +62,6 @@ fetchCMD = do
                printLn IndexOutOfBounds
                fetchCMD
 
-covering
 doCommand : SifCMD -> Eff () SifEffs
 doCommand Quit = pure ()
 doCommand Help = putStrLn showHelp
@@ -94,6 +93,7 @@ doCommand (EvalPattern n) = do
 doCommand (CheckExtPattern p s) = do
   putStrLn "Importing..."
   evalPatternFromFile (Just p) (Just s)
+
 doCommand _ = printLn NoSuchCommand
 
 

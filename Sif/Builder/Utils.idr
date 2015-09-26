@@ -21,21 +21,21 @@ instance SifMetaModel GModel where
   toString x = GLang.toString x
 
 data InterpRes : SifTy -> Type where
-  IReq    : GLang ELEM -> InterpRes tyREQ
-  IProb   : GLang ELEM -> GModel               -> InterpRes tyPROBLEM
-  IAffect : GLang ELEM -> CValue               -> InterpRes tyAFFECTS
-  ITrait  : GLang ELEM -> List (GLang INTENT)  -> InterpRes tyTRAIT
-  IProp   : GLang ELEM -> DList GTy GLang es   -> InterpRes tyPROPERTY
-  ISolt   : GLang ELEM -> DList GTy GLang ss   -> InterpRes tySOLUTION
-  IPatt   : GModel                             -> InterpRes tyPATTERN
+  IReq    : GLang ELEM -> InterpRes TyREQ
+  IProb   : GLang ELEM -> GModel               -> InterpRes TyPROBLEM
+  IAffect : GLang ELEM -> CValue               -> InterpRes TyAFFECTS
+  ITrait  : GLang ELEM -> List (GLang INTENT)  -> InterpRes TyTRAIT
+  IProp   : GLang ELEM -> DList GTy GLang es   -> InterpRes TyPROPERTY
+  ISolt   : GLang ELEM -> DList GTy GLang ss   -> InterpRes TySOLUTION
+  IPatt   : GModel                             -> InterpRes TyPATTERN
 
-interpReq : String -> InterpRes tyREQ
+interpReq : String -> InterpRes TyREQ
 interpReq s = IReq root
   where
     root : GLang ELEM
     root = mkGoal ("Requirement: " ++ s)
 
-interpProb : String -> List (InterpRes tyREQ) -> InterpRes tyPROBLEM
+interpProb : String -> List (InterpRes TyREQ) -> InterpRes TyPROBLEM
 interpProb s ps = IProb root (model' \= (root &= cs))
   where
     root : GLang ELEM
@@ -50,14 +50,14 @@ interpProb s ps = IProb root (model' \= (root &= cs))
     model' : GModel
     model' = insertMany cs model
 
-interpAffect : CValue -> InterpRes tyREQ -> InterpRes tyAFFECTS
+interpAffect : CValue -> InterpRes TyREQ -> InterpRes TyAFFECTS
 interpAffect c (IReq r) = IAffect r c
 
 interpTrait : String
            -> SValue
-           -> List (InterpRes tyAFFECTS)
+           -> List (InterpRes TyAFFECTS)
            -> TTy
-           -> InterpRes tyTRAIT
+           -> InterpRes TyTRAIT
 interpTrait s m es ty = ITrait node cs
   where
     sVal : SValue -> SValue
@@ -79,8 +79,8 @@ interpTrait s m es ty = ITrait node cs
     cs = map (\(IAffect r c) => node ==> r | c) es
 
 interpProp : String
-          -> List (InterpRes tyTRAIT)
-          -> InterpRes tyPROPERTY
+          -> List (InterpRes TyTRAIT)
+          -> InterpRes TyPROPERTY
 interpProp s ts = IProp pelem (Sigma.getProof elems)
   where
     pelem : GLang ELEM
@@ -105,8 +105,8 @@ interpProp s ts = IProp pelem (Sigma.getProof elems)
                 ++ [newCS])
 
 interpSolt : String
-          -> List (InterpRes tyPROPERTY)
-          -> InterpRes tySOLUTION
+          -> List (InterpRes TyPROPERTY)
+          -> InterpRes TySOLUTION
 interpSolt s ps = ISolt root (Sigma.getProof elems)
   where
     root : GLang ELEM
@@ -115,7 +115,7 @@ interpSolt s ps = ISolt root (Sigma.getProof elems)
     cs : GLang STRUCT
     cs = (root &= map (\(IProp x ys) => x) ps)
 
-    doGet : InterpRes tyPROPERTY
+    doGet : InterpRes TyPROPERTY
          -> (is ** DList GTy GLang is)
          -> (xs ** DList GTy GLang xs)
     doGet (IProp x ys) (is ** res) = (_ ** ys ++ res)
@@ -126,9 +126,9 @@ interpSolt s ps = ISolt root (Sigma.getProof elems)
     elems : (es ** DList GTy GLang es)
     elems = (_ ** [root, cs] ++ (Sigma.getProof getDecls))
 
-interpPatt : InterpRes tyPROBLEM
-          -> InterpRes tySOLUTION
-          -> InterpRes tyPATTERN
+interpPatt : InterpRes TyPROBLEM
+          -> InterpRes TySOLUTION
+          -> InterpRes TyPATTERN
 interpPatt (IProb rP m) (ISolt rS is) = IPatt (insertDecls is m)
 
 

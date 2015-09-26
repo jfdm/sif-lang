@@ -37,19 +37,17 @@ instance Show TTy where
 
 data STy = ABSTRACT | CONCRETE
 
-data SifTy = tyREQ     | tyTRAIT   | tyPROPERTY | tySOLUTION
-           | tyPROBLEM | tyPATTERN | tyAFFECTS
+data SifTy = TyREQ     | TyTRAIT   | TyPROPERTY | TySOLUTION
+           | TyPROBLEM | TyPATTERN | TyAFFECTS
 
 
 data HasMData : SifTy -> Type where
-  HMA : HasMData tyREQ
-  HMB : HasMData tyPROPERTY
-  HMC : HasMData tySOLUTION
-  HMD : HasMData tyPROBLEM
-  HME : HasMData tyPATTERN
-  HMF : HasMData tyTRAIT
-  HMG : HasMData tyDOMAIN
-
+  HMA : HasMData TyREQ
+  HMB : HasMData TyPROPERTY
+  HMC : HasMData TySOLUTION
+  HMD : HasMData TyPROBLEM
+  HME : HasMData TyPATTERN
+  HMF : HasMData TyTRAIT
 
 data SifOutFormat = ORG  | LATEX   | CMARK | XML    | DOT
                   | EDDA | COMPACT | IDRIS | STRING

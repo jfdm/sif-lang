@@ -21,7 +21,7 @@ import Sif.Pattern
 record BuildState where
   constructor MkSState
   getProb     : Maybe String
-  getRQs      : List (String, SifAST tyREQ)
+  getRQs      : List (String, SifAST TyREQ)
   pattTitle   : String
   pattDesc    : Maybe String
   getPFName   : String

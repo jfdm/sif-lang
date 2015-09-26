@@ -12,58 +12,58 @@ import Sif.Pattern.Model
 -- ----------------------------------------------------------- [ Type Synonyms ]
 
 FUNCTIONAL : (impl : SifTy -> SifDomain -> Type) -> SifDomain -> Type
-FUNCTIONAL impl d = SifExpr tyREQ d impl
+FUNCTIONAL impl d = SifExpr TyREQ d impl
 
 USABILITY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-USABILITY impl d = SifExpr tyREQ d impl
+USABILITY impl d = SifExpr TyREQ d impl
 
 RELIABILITY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-RELIABILITY impl d = SifExpr tyREQ d impl
+RELIABILITY impl d = SifExpr TyREQ d impl
 
 PERFORMANCE : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-PERFORMANCE impl d = SifExpr tyREQ d impl
+PERFORMANCE impl d = SifExpr TyREQ d impl
 
 SUPPORTABILITY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-SUPPORTABILITY impl d = SifExpr tyREQ d impl
+SUPPORTABILITY impl d = SifExpr TyREQ d impl
 
 REQUIREMENT : (impl : SifTy -> SifDomain -> Type) -> SifDomain -> Type
-REQUIREMENT impl d = SifExpr tyREQ d impl
+REQUIREMENT impl d = SifExpr TyREQ d impl
 
 REQUIREMENTS : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 REQUIREMENTS impl d = List (REQUIREMENT impl d)
 
 PROBLEM : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-PROBLEM impl d = SifExpr tyPROBLEM d impl
+PROBLEM impl d = SifExpr TyPROBLEM d impl
 
 ADVANTAGE : (impl : SifTy -> SifDomain -> Type) -> SifDomain -> Type
-ADVANTAGE impl d = SifExpr tyTRAIT d impl
+ADVANTAGE impl d = SifExpr TyTRAIT d impl
 
 DISADVANTAGE : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-DISADVANTAGE impl d = SifExpr tyTRAIT d impl
+DISADVANTAGE impl d = SifExpr TyTRAIT d impl
 
 TRAIT : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-TRAIT impl d = SifExpr tyTRAIT d impl
+TRAIT impl d = SifExpr TyTRAIT d impl
 
 TRAITS : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 TRAITS impl d = List (TRAIT impl d)
 
 AFFECT : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-AFFECT impl d = SifExpr tyAFFECTS d impl
+AFFECT impl d = SifExpr TyAFFECTS d impl
 
 AFFECTS : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 AFFECTS impl d = List (AFFECT impl d)
 
 PROPERTY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-PROPERTY impl d = SifExpr tyPROPERTY d impl
+PROPERTY impl d = SifExpr TyPROPERTY d impl
 
 PROPERTIES : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 PROPERTIES impl d = List (PROPERTY impl d)
 
 SOLUTION : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-SOLUTION impl d = SifExpr tySOLUTION d impl
+SOLUTION impl d = SifExpr TySOLUTION d impl
 
 PATTERN : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
-PATTERN impl d = SifExpr tyPATTERN d impl
+PATTERN impl d = SifExpr TyPATTERN d impl
 
 -- ------------------------------------------------------------- [ Problem API ]
 

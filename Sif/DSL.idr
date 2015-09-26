@@ -29,7 +29,7 @@ import Sif.DSL.Parser
 
 buildReqE : SifBuilder impl
          -> (d : SifDomain)
-         -> SifAST tyREQ
+         -> SifAST TyREQ
          -> Eff (REQUIREMENT impl d) SifEffs
 buildReqE bob c q@(Req i ty t d) = do
   st <- getBuildState
@@ -41,7 +41,7 @@ buildReqE bob c q@(Req i ty t d) = do
       pure r
 
 buildProblemE : SifBuilder impl
-             -> SifAST tyPROBLEM
+             -> SifAST TyPROBLEM
              -> Eff (d ** PROBLEM impl d) SifEffs
 buildProblemE bob (Problem i t d (cID,c) rs) = do
     trace "Building problem specification"
@@ -71,7 +71,7 @@ problemFromFile bob f = do
 
 buildAffectE : SifBuilder impl
             -> (d : SifDomain)
-            -> SifAST tyAFFECTS
+            -> SifAST TyAFFECTS
             -> Eff (AFFECT impl d) SifEffs
 buildAffectE bob ctxt (Affect c i d) = do
   debug $ unwords ["Building Affect for", show i]
@@ -84,7 +84,7 @@ buildAffectE bob ctxt (Affect c i d) = do
 
 buildTraitE : SifBuilder impl
            -> (d : SifDomain)
-           -> SifAST tyTRAIT
+           -> SifAST TyTRAIT
            -> Eff (TRAIT impl d) SifEffs
 buildTraitE bob c (Trait ty t v d as) = do
   debug $ unwords ["Building Trait", show t]
@@ -94,7 +94,7 @@ buildTraitE bob c (Trait ty t v d as) = do
 
 buildPropertyE : SifBuilder impl
               -> (d : SifDomain)
-              -> SifAST tyPROPERTY
+              -> SifAST TyPROPERTY
               -> Eff (PROPERTY impl d) SifEffs
 buildPropertyE bob c (Property t d ts) = do
   debug $ unwords ["Building Property", show t]
@@ -104,9 +104,9 @@ buildPropertyE bob c (Property t d ts) = do
 
 buildSolutionE : SifBuilder impl
               -> (d : SifDomain)
-              -> SifAST tySOLUTION
+              -> SifAST TySOLUTION
               -> Eff (SOLUTION impl d) SifEffs
-buildSolutionE bob c (Solution t (pID,pDesc) d cID ps) = do
+buildSolutionE bob c (Solution t (pID, pDesc) d cID ps) = do
   trace "Building solution specification"
   st <- getBuildState
 
