@@ -43,8 +43,8 @@ mkDescNode (Just d) = "description" <+=> d
 
 mkNDNode : String -> String -> Maybe String -> Document ELEMENT
 mkNDNode n t d = (addScore $ mkNode n)
-            <++> (addScore $ mkDescNode d)
-            <++> (addScore $ "name" <+=> t)
+            <++> (mkDescNode d)
+            <++> ("name" <+=> t)
 
 mkMdata : Document ELEMENT
 mkMdata = mkNode "metadata"
@@ -70,7 +70,7 @@ mkModel = setAttribute
 
 mkStructure : Document ELEMENT
 mkStructure = addScore $ mkNode "structure"
-    <++> (addScore $ mkDescNode Nothing)
+    <++> (mkDescNode Nothing)
     <++> mkModel
 
 mkDynamics : Document ELEMENT
