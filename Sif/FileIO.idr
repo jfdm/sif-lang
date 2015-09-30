@@ -20,19 +20,5 @@ writeFile fname content = do
         trace $ unwords ["Finished writing file,", show fname]
       False => Sif.raise (CannotWriteFile fname)
 
-readFile : String -> Eff String SifEffs
-readFile fname = do
-    trace $ unwords ["Reading file:", show fname]
-    case !(open fname Read) of
-      True => do
-        src <- readAcc ""
-        close
-        pure src
-      False => Sif.raise (FileMissing fname)
-  where
-    readAcc : String -> Eff String [FILE_IO (OpenFile Read)]
-    readAcc acc = if (not !(eof))
-                     then readAcc (acc ++ !(readLine))
-                     else pure acc
 
 -- --------------------------------------------------------------------- [ EOF ]

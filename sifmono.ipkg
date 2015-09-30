@@ -11,13 +11,13 @@ pkgs = effects
      , argparse
      , freyja
 
+--opts = "--log 1"
+
 main = Sif.Main
 executable = sifc
 
 
-modules = Effect.Logging.Level
-        , Effect.Logging.Default
-        , Effect.Perf
+modules = Effect.Perf
 
         , Sif.Types
         , Sif.AbsSyntax

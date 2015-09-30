@@ -14,7 +14,7 @@ import public Effect.StdIO
 import public Effect.Logging.Default
 import public Effect.Perf
 
-import public ArgParse
+import ArgParse
 
 import Sif.Types
 import Sif.DSL.State
@@ -34,7 +34,6 @@ record SifState where
   constructor MkSifState
   opts    : SifOpts
   lib     : SifLib
-  benv    : BuildState
   bends   : List SifBackend
   builder : SifBackend
 
@@ -42,7 +41,6 @@ instance Default SifState where
   default = MkSifState
       defOpts
       defaultLib
-      (defBuildSt "" "")
       [backendAbsInterp,backendDirectRep]
       backendAbsInterp
 
@@ -53,22 +51,14 @@ SifEffs = [ FILE_IO ()
           , SYSTEM
           , STDIO
           , LOG
-          , PERF -- Not unifiable
+          , PERF
           , 'sif      ::: EXCEPTION SifError
-          , 'argparse ::: EXCEPTION ArgParseError
+          , 'bstate   ::: STATE BuildState
           , 'sstate   ::: STATE SifState
           ]
 
--- -------------------------------------------------------- [ Helper Functions ]
-
-namespace Sif
-  raise : SifError -> Eff b ['sif ::: EXCEPTION SifError]
-  raise err = 'sif :- Exception.raise err
-
-
-fromJustEff : Maybe a -> Eff a ['sif ::: EXCEPTION SifError]
-fromJustEff (Just x) = pure x
-fromJustEff Nothing = Sif.raise InternalErr
+Sif : Type -> Type
+Sif rTy = Eff rTy SifEffs
 
 -- ----------------------------------------------------------------- [ Options ]
 
@@ -115,19 +105,12 @@ setSifBackend (Just n) = do
 addSifBackend : SifBackend -> Eff () ['sstate ::: STATE SifState]
 addSifBackend b = 'sstate :- update (\st => record {bends = (b::bends st)} st)
 
--- ----------------------------------------------------------- [ Build Helpers ]
-
-getBuildState : Eff BuildState ['sstate ::: STATE SifState]
-getBuildState = pure $ benv !('sstate :- get)
-
-putBuildState : BuildState -> Eff () ['sstate ::: STATE SifState]
-putBuildState l = 'sstate :- update (\st => record {benv  = l} st)
-
-updateBuildState : (BuildState -> BuildState) -> Eff () ['sstate ::: STATE SifState]
-updateBuildState f = 'sstate :- update (\st => record {benv = f (benv st)} st)
-
 -- ----------------------------------------------------------------- [ Options ]
-parseOptions : Eff SifOpts SifEffs
-parseOptions = parseArgs defOpts convOpts !getArgs
+
+parseOptions : Sif SifOpts
+parseOptions =
+    case parseArgs defOpts convOpts !getArgs of
+      Left err => Sif.raise $ GeneralError (show err)
+      Right o  => pure o
 
 -- --------------------------------------------------------------------- [ EOF ]

@@ -7,13 +7,21 @@
 module Sif.DSL
 
 -- ----------------------------------------------------------------- [ Imports ]
+import Effects
+import Effect.State
+import Effect.Default
+import Effect.Perf
+import Effect.File
+import Effect.Exception
+import Effect.Logging.Default
+
 import Lightyear
 import Lightyear.Strings
 
 import Sif.Types
 import Sif.AbsSyntax
 import Sif.Error
-import Sif.Effs
+
 import Sif.Pattern
 
 import Sif.DSL.State
@@ -25,12 +33,36 @@ import Sif.DSL.Parser
 %access private
 %default partial
 
+-- @TODO de exception this...
+
+BuildEffs : List EFFECT
+BuildEffs = [ FILE_IO ()
+            , LOG
+            , PERF
+            , 'sif    ::: EXCEPTION SifError
+            , 'bstate ::: STATE BuildState
+            ]
+
+-- ----------------------------------------------------------- [ Build Helpers ]
+
+getBuildState : Eff BuildState ['bstate ::: STATE BuildState]
+getBuildState = pure $ !('bstate :- get)
+
+putBuildState : BuildState -> Eff () ['bstate ::: STATE BuildState]
+putBuildState st = 'bstate :- put st
+
+updateBuildState : (BuildState -> BuildState) -> Eff () ['bstate ::: STATE BuildState]
+updateBuildState f = 'bstate :- update (\st => f st)
+
+DSLBuilder : Type -> Type
+DSLBuilder rTy = Eff rTy BuildEffs
+
 -- ----------------------------------------------------------- [ Build Problem ]
 
 buildReqE : SifBuilder impl
          -> (d : SifDomain)
          -> SifAST TyREQ
-         -> Eff (REQUIREMENT impl d) SifEffs
+         -> DSLBuilder $ REQUIREMENT impl d
 buildReqE bob c q@(Req i ty t d) = do
   st <- getBuildState
   case lookup i (getRQs st) of
@@ -42,7 +74,7 @@ buildReqE bob c q@(Req i ty t d) = do
 
 buildProblemE : SifBuilder impl
              -> SifAST TyPROBLEM
-             -> Eff (d ** PROBLEM impl d) SifEffs
+             -> DSLBuilder (d ** PROBLEM impl d)
 buildProblemE bob (Problem i t d (cID,c) rs) = do
     trace "Building problem specification"
     rs' <- mapE (\r => buildReqE bob c r) rs
@@ -56,12 +88,12 @@ buildProblemE bob (Problem i t d (cID,c) rs) = do
 
 problemFromFile : SifBuilder impl
                -> String
-               -> Eff (d ** PROBLEM impl d) SifEffs
+               -> DSLBuilder (d ** PROBLEM impl d)
 problemFromFile bob f = do
     trace "Fetching problem specification"
     mkTimer f
     startTimer f
-    past <- readSifFile problem f
+    (Right past) <- readSifFile problem f | Left err => Sif.raise err
     splitTimerMsg f "Finished Parsing now building"
     rval <- buildProblemE bob past
     stopTimer f
@@ -72,7 +104,7 @@ problemFromFile bob f = do
 buildAffectE : SifBuilder impl
             -> (d : SifDomain)
             -> SifAST TyAFFECTS
-            -> Eff (AFFECT impl d) SifEffs
+            -> DSLBuilder (AFFECT impl d)
 buildAffectE bob ctxt (Affect c i d) = do
   debug $ unwords ["Building Affect for", show i]
   st <- getBuildState
@@ -85,7 +117,7 @@ buildAffectE bob ctxt (Affect c i d) = do
 buildTraitE : SifBuilder impl
            -> (d : SifDomain)
            -> SifAST TyTRAIT
-           -> Eff (TRAIT impl d) SifEffs
+           -> DSLBuilder (TRAIT impl d)
 buildTraitE bob c (Trait ty t v d as) = do
   debug $ unwords ["Building Trait", show t]
   as' <- mapE (\x => buildAffectE bob c x) as
@@ -95,7 +127,7 @@ buildTraitE bob c (Trait ty t v d as) = do
 buildPropertyE : SifBuilder impl
               -> (d : SifDomain)
               -> SifAST TyPROPERTY
-              -> Eff (PROPERTY impl d) SifEffs
+              -> DSLBuilder (PROPERTY impl d)
 buildPropertyE bob c (Property t d ts) = do
   debug $ unwords ["Building Property", show t]
   ts' <- mapE (\x => buildTraitE bob c x) ts
@@ -105,7 +137,7 @@ buildPropertyE bob c (Property t d ts) = do
 buildSolutionE : SifBuilder impl
               -> (d : SifDomain)
               -> SifAST TySOLUTION
-              -> Eff (SOLUTION impl d) SifEffs
+              -> DSLBuilder (SOLUTION impl d)
 buildSolutionE bob c (Solution t (pID, pDesc) d cID ps) = do
   trace "Building solution specification"
   st <- getBuildState
@@ -132,12 +164,12 @@ buildSolutionE bob c (Solution t (pID, pDesc) d cID ps) = do
 solutionFromFile : SifBuilder impl
                 -> (d : SifDomain)
                 -> String
-                -> Eff (SOLUTION impl d) SifEffs
+                -> DSLBuilder (SOLUTION impl d)
 solutionFromFile bob c f = do
     trace "Fetching Solution Specification"
     mkTimer f
     startTimer f
-    sast <- readSifFile solution f
+    (Right sast) <- readSifFile solution f | Left err => Sif.raise err
     splitTimerMsg f "Finished Parsing now building"
     sval <- buildSolutionE bob c sast
     stopTimer f
@@ -149,7 +181,7 @@ buildPatternE : SifBuilder impl
              -> (d : SifDomain)
              -> PROBLEM impl d
              -> SOLUTION impl d
-             -> Eff (PATTERN impl d) SifEffs
+             -> DSLBuilder (PATTERN impl d)
 buildPatternE bob c p s = do
     st <- getBuildState
     trace $ unwords ["Building Pattern", show $ pattTitle st]
@@ -164,7 +196,7 @@ public
 patternFromFile : SifBuilder impl
                -> String
                -> String
-               -> Eff (d ** PATTERN impl d) SifEffs
+               -> DSLBuilder (d ** PATTERN impl d)
 patternFromFile bob p s = do
   putBuildState (defBuildSt p s)
   (c ** p') <- problemFromFile bob p

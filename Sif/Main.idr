@@ -15,6 +15,7 @@ import Sif.Builder.DirectRep
 import Sif.Effs
 import Sif.Error
 import Sif.Library
+import Sif.DSL.State
 import Sif.DSL.Parser.Problem
 import Sif.DSL.Parser.Solution
 import Sif.DSL.Parser
@@ -26,7 +27,7 @@ import Sif.Perf
 
 %default partial
 
-runMode : Maybe SifMode -> Eff () SifEffs
+runMode : Maybe SifMode -> Sif ()
 runMode Nothing     = putStrLn helpStr
 runMode (Just VERS) = printLn FeatureNotImpl
 runMode (Just HELP) = putStrLn helpStr
@@ -50,7 +51,7 @@ runMode (Just Conv) = do
     putStrLn "Converting Pattern"
     convPatternFromFile (pSpec os) (sSpec os) (out os) (to os)
 
-sifMain : Eff () SifEffs
+sifMain : Sif ()
 sifMain = do
     opts <- parseOptions
     putOptions opts

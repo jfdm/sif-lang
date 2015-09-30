@@ -1,0 +1,31 @@
+package sifcore
+
+pkgs = effects
+     , containers
+     , test
+     , grl
+     , edda
+     , graphviz
+     , xml
+     , freyja
+
+
+modules = Sif.Types
+        , Sif.AbsSyntax
+
+        , Sif.Pattern.Model
+        , Sif.Pattern.API
+        , Sif.Pattern.Convert.XML
+        , Sif.Pattern.Convert.Edda
+        , Sif.Pattern.Convert.String
+        , Sif.Pattern.Convert.Freyja
+
+        , Sif.Pattern.Convert
+        , Sif.Pattern
+
+        , Sif.Builder.Utils
+        , Sif.Builder.AbsInterp
+        , Sif.Builder.DirectRep
+        -- , Sif.PModel
+
+        , Sif.Library

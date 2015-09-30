@@ -1,8 +1,32 @@
 package sifexe
 
-opts = "-p effects -p containers -p grl -p lightyear -p config -p edda -p graphviz -p xml -p argparse -p sif -p sifprelude -p sifio"
+pkgs = effects
+     , containers
+     , test
+     , grl
+     , edda
+     , freyja
+     , graphviz
+     , xml
+     , lightyear
+     , argparse
+     , config
+     , sifcore
+     , siflang
 
-modules = Sif.Main
+modules = Sif.Effs
+
+        , Sif.FileIO
+        , Sif.Perf
+
+        , Sif.Options
+        , Sif.Prelude
+        , Sif.API
+        , Sif.Commands
+        , Sif.REPL
+        , Sif.Main
+
+
 
 main = Sif.Main
 

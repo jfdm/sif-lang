@@ -4,13 +4,15 @@
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
 ||| State for Building Patterns from the AST.
-module Sif.DSL.State
+module Sif.DSL.Effs
 
+import Effects
 import Effect.Default
 
 import Sif.Types
 import Sif.AbsSyntax
 import Sif.Pattern
+import Sif.Error
 
 -- -------------------------------------------------------------- [ Directives ]
 %access public

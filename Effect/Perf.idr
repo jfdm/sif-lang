@@ -109,7 +109,7 @@ perfLog res msg =
 -- ------------------------------------------------------- [ Effect Definition ]
 
 data Perf : Effect where
-  GetMetrics     : sig Perf (PMetrics) (PMetrics)
+  GetMetrics  : sig Perf (PMetrics) (PMetrics)
   TurnOn      : Bool -> sig Perf () (PMetrics) (PMetrics)
   MkCounter   : String -> sig Perf () (PMetrics) (PMetrics)
   IncCounter  : String -> sig Perf () (PMetrics) (PMetrics)

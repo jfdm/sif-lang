@@ -1,0 +1,27 @@
+package siflang
+
+pkgs = effects
+     , containers
+     , test
+     , grl
+     , edda
+     , freyja
+     , graphviz
+     , xml
+     , lightyear
+     , argparse
+     , config
+     , sifcore
+
+modules = Effect.Perf
+
+        , Sif.Error
+
+        , Sif.DSL.State
+        , Sif.DSL.Parser.Utils
+        , Sif.DSL.Parser.Common
+        , Sif.DSL.Parser.Context
+        , Sif.DSL.Parser.Problem
+        , Sif.DSL.Parser.Solution
+        , Sif.DSL.Parser
+        , Sif.DSL

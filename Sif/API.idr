@@ -5,6 +5,16 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Sif.API
 
+import Effects
+import Effect.System
+import Effect.Default
+import Effect.State
+import Effect.Exception
+import Effect.File
+import Effect.StdIO
+import Effect.Logging.Default
+import Effect.Perf
+
 import Config.Error
 import Config.YAML
 
@@ -14,13 +24,16 @@ import XML.DOM
 import Sif.Types
 import Sif.AbsSyntax
 import Sif.Pattern
-import Sif.Effs
-import Sif.Error
-import Sif.Library
+import Sif.DSL.State
 import Sif.DSL.Parser.Problem
 import Sif.DSL.Parser.Solution
 import Sif.DSL.Parser
 import Sif.DSL
+
+import Sif.Effs
+import Sif.Error
+import Sif.Library
+
 import Sif.Options
 import Sif.Prelude
 
@@ -29,7 +42,7 @@ import Sif.Prelude
 
 
 ||| Print results of evaluation
-printResults : EvalResult -> Eff () SifEffs
+printResults : EvalResult -> Sif ()
 printResults Bad        = Sif.raise ResultInvalid
 printResults (Good is)  = do
     let is' = map (\(t,s) => unwords [showSValue s,"\t==>\t", t]) is
@@ -40,7 +53,7 @@ printResults (Good is)  = do
     showSValue (Just x) = show x
 
 ||| Syntax check a Problem or a solution pairing.
-doSyntaxCheck : Maybe String -> Maybe String -> Eff () SifEffs
+doSyntaxCheck : Maybe String -> Maybe String -> Sif ()
 
 doSyntaxCheck (Just x) (Just y) = do
     readSifFile problem x
@@ -58,7 +71,7 @@ doSyntaxCheck (Nothing) (Just y) = do
 doSyntaxCheck (Nothing) (Nothing) = Sif.raise NoFileGiven
 
 
-evalAndPrintPattern : (PATTERN impl d) -> Eff () SifEffs
+evalAndPrintPattern : (PATTERN impl d) -> Sif ()
 evalAndPrintPattern p = do
   let tname = unwords ["Evaluating:", SifExpr.getTitle p]
   trace tname
@@ -71,7 +84,7 @@ evalAndPrintPattern p = do
 tryToBuildPatternE : SifBuilder impl
              -> Maybe String
              -> Maybe String
-             -> Eff (d ** PATTERN impl d) SifEffs
+             -> Sif (d ** PATTERN impl d)
 tryToBuildPatternE bob Nothing Nothing   = Sif.raise NoFileGiven
 tryToBuildPatternE bob Nothing  _        = Sif.raise (FileMissing ("Solution File "))
 tryToBuildPatternE bob _        Nothing  = Sif.raise (FileMissing ("Problem File "))
@@ -81,17 +94,17 @@ tryToBuildPatternE bob (Just p) (Just s) = do
   startTimer tname
   patt <- patternFromFile bob p s
   stopTimer tname
-  pure $ patt
+  pure patt
 
 
-evalPatternFromFile : Maybe String -> Maybe String -> Eff () SifEffs
+evalPatternFromFile : Maybe String -> Maybe String -> Sif ()
 evalPatternFromFile p' s' = do
   bob <- getSifBackend
   (_ ** p) <- tryToBuildPatternE (builder bob) p' s'
   putStrLn $ unwords ["loaded", SifExpr.getTitle p]
   evalAndPrintPattern p
 
-printPattern : PATTERN impl d -> Maybe SifOutFormat -> Eff () SifEffs
+printPattern : PATTERN impl d -> Maybe SifOutFormat -> Sif ()
 printPattern _ Nothing    = printLn NoFormatSpecified
 printPattern p (Just fmt) = do
     let tname = unwords ["Converting", show $ SifExpr.getTitle p, "to", show fmt]
@@ -107,7 +120,7 @@ convPatternFromFile : Maybe String
                    -> Maybe String
                    -> Maybe String
                    -> Maybe SifOutFormat
-                   -> Eff () SifEffs
+                   -> Sif ()
 convPatternFromFile p s fname fmt = do
     bob <- getSifBackend
     (_ ** p) <- tryToBuildPatternE (builder bob) p s
@@ -117,7 +130,7 @@ convPatternFromFile p s fname fmt = do
 
 -- ------------------------------------------------------- [ Library Functions ]
 
-importPreludeIDX : String -> List (String, String) -> Eff () SifEffs
+importPreludeIDX : String -> List (String, String) -> Sif ()
 importPreludeIDX _      Nil         = pure ()
 importPreludeIDX nspace ((p,s)::ps) = do
     trace $ unlines [ "Trying to build:"
@@ -131,7 +144,7 @@ importPreludeIDX nspace ((p,s)::ps) = do
     pDir : String -> Maybe String
     pDir f = Just $ with List concat [nspace,"/",f]
 
-loadPrelude : Eff () SifEffs
+loadPrelude : Sif ()
 loadPrelude = do
     mkTimer "prelude-loading"
     putLibrary emptyLib
@@ -150,7 +163,7 @@ loadPrelude = do
                   importPreludeIDX pdir ps
                   stopTimer "prelude-loading"
 
-listLibrary : Eff () SifEffs
+listLibrary : Sif ()
 listLibrary = do
     l <- getLibrary
     let idx = (getLibraryIndex l)
@@ -158,18 +171,20 @@ listLibrary = do
     putStrLn (indexToString idx)
 
 
-getPatternByIndexEff : Nat -> Eff (d ** (impl ** PATTERN impl d)) SifEffs
+getPatternByIndexEff : Nat -> Sif (d ** (impl ** PATTERN impl d))
 getPatternByIndexEff n =
   case getPatternByIndex n !getLibrary of
     Nothing => Sif.raise NoSuchPattern
     Just p' => pure p'
 
-getAndEvalPattern : Nat -> Eff () SifEffs
+getAndEvalPattern : Nat -> Sif ()
 getAndEvalPattern n = do
   (_ ** (_ ** p)) <- getPatternByIndexEff n
   evalAndPrintPattern p
 
-getAndPrintPattern : Nat -> Maybe SifOutFormat -> Eff () SifEffs
+getAndPrintPattern : Nat
+                  -> Maybe SifOutFormat
+                  -> Sif ()
 getAndPrintPattern n fmt = do
   (_ ** (_ ** p)) <- getPatternByIndexEff n
   printPattern p fmt

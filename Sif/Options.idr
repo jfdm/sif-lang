@@ -5,6 +5,8 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Sif.Options
 
+import Effect.Default
+
 import ArgParse
 
 import Sif.Types
