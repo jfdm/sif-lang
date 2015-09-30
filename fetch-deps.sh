@@ -36,10 +36,15 @@ cd argparse/
 make install
 cd ../
 
-
 echo "Fetching grl       "
 git clone git@github.com:jfdm/idris-grl.git grl
 cd grl/
+make install
+cd ../
+
+echo "Fetching xml       "
+git clone git@github.com:jfdm/idris-xml.git xml
+cd xml/
 make install
 cd ../
 
@@ -49,9 +54,9 @@ cd edda/
 make install
 cd ../
 
-echo "Fetching xml       "
-git clone git@github.com:jfdm/idris-xml.git xml
-cd xml/
+echo "Fetching freyja"
+git clone git@github.com:jfdm/freyja-schema.git freyja
+cd freyja/
 make install
 cd ../
 

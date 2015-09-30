@@ -30,6 +30,8 @@ modules = Effect.Perf
         , Sif.Pattern.Convert.Freyja
 
         , Sif.Pattern.Convert
+        , Sif.Pattern.Recover
+
         , Sif.Pattern
 
         , Sif.Builder.Utils

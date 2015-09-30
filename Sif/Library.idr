@@ -7,7 +7,6 @@
 module Sif.Library
 
 import Effect.Default
-import Config.YAML
 
 import Sif.Types
 import Sif.Pattern

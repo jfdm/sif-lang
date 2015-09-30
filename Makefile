@@ -5,8 +5,8 @@
 # ---------------------------------------------------------------------- [ EOH ]
 
 IDRIS   := idris
-LANGLIB := sif
-IOLIB   := sifio
+LANGLIB := sifcore
+IOLIB   := siflang
 EXE     := sifexe
 MONO    := sifmono
 

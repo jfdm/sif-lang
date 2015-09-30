@@ -2,6 +2,7 @@ package sifcore
 
 pkgs = effects
      , containers
+     , lightyear
      , test
      , grl
      , edda
@@ -21,6 +22,7 @@ modules = Sif.Types
         , Sif.Pattern.Convert.Freyja
 
         , Sif.Pattern.Convert
+        , Sif.Pattern.Recover
         , Sif.Pattern
 
         , Sif.Builder.Utils
