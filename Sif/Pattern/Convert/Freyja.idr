@@ -1,3 +1,8 @@
+-- -------------------------------------------------------------- [ Freyja.idr ]
+-- Module    : Freyja.idr
+-- Copyright : (c) Jan de Muijnck-Hughes
+-- License   : see LICENSE
+-- --------------------------------------------------------------------- [ EOH ]
 module Sif.Pattern.Convert.Freyja
 
 import Data.AVL.Dict
