@@ -25,9 +25,6 @@ import Sif.Pattern.API
 
 -- ------------------------------------------------------------------- [ Utils ]
 
-mkNode : String -> Document ELEMENT
-mkNode = mkSimpleElement
-
 mkPCNode : String -> String -> Document ELEMENT
 mkPCNode p c = mkNode p <++> (c <+=> "TO BE DETERMIND")
 
@@ -209,7 +206,7 @@ convertPattern pat = do
 
 public
 toXML : PATTERN impl d -> Document DOCUMENT
-toXML p = setRoot root $ mkDocument (mkQName "pattern") Nothing
+toXML p = mkDocument root
   where
     partial
     root : Document ELEMENT

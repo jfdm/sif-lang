@@ -9,12 +9,16 @@ import Edda.Writer.CommonMark
 
 import XML.DOM
 
+import Freyja
+import Freyja.Convert.XML
+
 import Sif.Types
 import Sif.Pattern.Model
 import Sif.Pattern.API
-import Sif.Pattern.Convert.XML
+--import Sif.Pattern.Convert.XML
 import Sif.Pattern.Convert.Edda
 import Sif.Pattern.Convert.String
+import Sif.Pattern.Convert.Freyja
 
 %default partial
 
@@ -29,20 +33,24 @@ convTy EDDA    = Edda PRIME MODEL
 convTy COMPACT = String
 convTy IDRIS   = String
 convTy STRING  = String
+convTy FREYJA  = PatternDoc
 
 covering
 convTo : (fmt : SifOutFormat) -> PATTERN impl d -> Maybe (convTy fmt)
-convTo XML     p = Just $ toXML p
+convTo FREYJA  p = Just $ toFreyja p
+convTo XML     p = Just $ toXML (toFreyja p)
 
 convTo EDDA    p = Just $ toEdda p
 convTo ORG     p = Just $ org $ toEdda p
 convTo LATEX   p = Just $ latex $ toEdda p
 convTo CMARK   p = Just $ markdown $ toEdda p
 
-convTo DOT     p = Nothing -- Just $ toDot p
 convTo COMPACT p = Just $ String.toString p
-convTo IDRIS   p = Nothing
 convTo STRING  p = Just $ String.toString p
+
+convTo DOT     p = Nothing -- Just $ toDot p
+
+convTo IDRIS   p = Nothing
 
 
 ||| o'rrible code
@@ -72,16 +80,6 @@ showConvPattern LATEX p =
   case (the (Maybe (convTy LATEX)) (convTo LATEX p)) of
     Nothing => Nothing
     Just r  => Just r
-
-showConvPattern IDRIS p =
-  case (the (Maybe (convTy IDRIS)) (convTo IDRIS p)) of
-    Nothing => Nothing
-    Just r  => Just (show r)
-
-showConvPattern EDDA p =
-  case (the (Maybe (convTy EDDA)) (convTo EDDA p)) of
-    Nothing => Nothing
-    Just r  => Nothing -- TODO Just (show r)
 
 showConvPattern COMPACT p =
   case (the (Maybe (convTy COMPACT)) (convTo COMPACT p)) of

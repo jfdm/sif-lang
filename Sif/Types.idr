@@ -5,35 +5,12 @@
 -- --------------------------------------------------------------------- [ EOH ]
 module Sif.Types
 
+import public Freyja.Common
 -- ----------------------------------------------- [ Problems and Requirements ]
 
 -- Encoding of CONTROL | CODE | ACTION ??
 -- Encoding of Categories => Security, Access Control, HCI...
 
--- These internal types are not used. How to use them?
-
-data RTy = FUNC | USAB | RELI | PERF | SUPP
-
-instance Cast RTy String where
-  cast FUNC = "functional"
-  cast USAB = "usability"
-  cast RELI = "reliability"
-  cast PERF = "performance"
-  cast SUPP = "supportability"
-
-instance Show RTy where
-  show FUNC = "Functional"
-  show USAB = "Usability"
-  show RELI = "Reliability"
-  show PERF = "Performance"
-  show SUPP = "Supportability"
-
-data TTy = ADV  | DIS | GEN
-
-instance Show TTy where
-  show ADV = "Advantage"
-  show DIS = "Disadvantage"
-  show GEN = "Trait"
 
 data STy = ABSTRACT | CONCRETE
 
@@ -50,7 +27,7 @@ data HasMData : SifTy -> Type where
   HMF : HasMData TyTRAIT
 
 data SifOutFormat = ORG  | LATEX   | CMARK | XML    | DOT
-                  | EDDA | COMPACT | IDRIS | STRING
+                  | EDDA | COMPACT | IDRIS | STRING | FREYJA
 
 instance Eq SifOutFormat where
   (==) LATEX   LATEX   = True
@@ -62,6 +39,7 @@ instance Eq SifOutFormat where
   (==) COMPACT COMPACT = True
   (==) IDRIS   IDRIS   = True
   (==) STRING  STRING  = True
+  (==) FREYJA  FREYJA  = True
   (==) _       _       = False
 
 instance Show SifOutFormat where
@@ -74,6 +52,7 @@ instance Show SifOutFormat where
   show COMPACT = "Compact"
   show IDRIS   = "Idris"
   show STRING  = "String"
+  show FREYJA  = "Freyja"
 
 readOutFMT : String -> Maybe SifOutFormat
 readOutFMT s =
@@ -86,7 +65,8 @@ readOutFMT s =
     "compact"  => Just COMPACT
     "string"   => Just STRING
     "idris"    => Nothing -- TODO Just IDRIS
-    "edda"     => Nothing -- TODO Just EDDA
+    "freyja"   => Nothing -- internal
+    "edda"     => Nothing -- internal
     otherwise  => Nothing
 
 

@@ -1,6 +1,15 @@
 package sifmono
 
-opts = "-p effects -p containers -p grl -p lightyear -p config -p edda -p graphviz -p xml -p argparse"
+pkgs = effects
+     , containers
+     , grl
+     , lightyear
+     , config
+     , edda
+     , graphviz
+     , xml
+     , argparse
+     , freyja
 
 main = Sif.Main
 executable = sifc
@@ -18,6 +27,7 @@ modules = Effect.Logging.Level
         , Sif.Pattern.Convert.XML
         , Sif.Pattern.Convert.Edda
         , Sif.Pattern.Convert.String
+        , Sif.Pattern.Convert.Freyja
 
         , Sif.Pattern.Convert
         , Sif.Pattern
