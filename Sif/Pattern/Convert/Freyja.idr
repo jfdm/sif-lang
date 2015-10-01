@@ -172,6 +172,8 @@ convertPattern p = MkPDoc n d md c p' s e ss Nil
     ss : List Study
     ss = [MkStudy (inlines "To be determined") e e]
 
-public
-toFreyja : PATTERN impl d -> PatternDoc
-toFreyja p = convertPattern p
+namespace Sif
+  public
+  toFreyja : PATTERN impl d -> PatternDoc
+  toFreyja p = convertPattern p
+-- --------------------------------------------------------------------- [ EOF ]

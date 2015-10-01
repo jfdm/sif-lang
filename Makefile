@@ -10,20 +10,20 @@ IOLIB   := siflang
 EXE     := sifexe
 MONO    := sifmono
 
-.PHONY: doc clobber check clean io lang linecount testLang testIO tests all monolithic perfbuild
+.PHONY: doc clobber check clean core dsl exe linecount all monolithic perfbuild
 
-lang:
+core:
 	${IDRIS} --build ${LANGLIB}.ipkg
 	${IDRIS} --install ${LANGLIB}.ipkg
 
-io:
+dsl:
 	${IDRIS} --build ${IOLIB}.ipkg
 	${IDRIS} --install ${IOLIB}.ipkg
 
 exe:
 	${IDRIS} --build ${EXE}.ipkg
 
-all: lang prelude io exe
+all: core dsl exe
 
 monolithic:
 	${IDRIS} --build ${MONO}.ipkg
@@ -54,16 +54,6 @@ doc:
 	${IDRIS} --mkdoc ${LANGLIB}.ipkg
 	${IDRIS} --mkdoc ${IOLIB}.ipkg
 	${IDRIS} --mkdoc ${EXE}.ipkg
-
-# testLang: lang
-
-# ${IDRIS} --testpkg ${LANGLIB}.ipkg
-
-testIO: lang
-	${IDRIS} --testpkg ${IOLIB}.ipkg
-
-tests: testIO
-
 
 linecount:
 	find . -name "*.idr" | grep -v Lib |xargs wc -l -

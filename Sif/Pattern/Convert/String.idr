@@ -77,8 +77,9 @@ convertPattern p =
       , convertProblem  $ SifExpr.getProblem p
       , convertSolution $ SifExpr.getSolution p]
 
-public
-toString : PATTERN impl d -> String
-toString p = convertPattern p
+namespace Sif
+  public
+  toString : PATTERN impl d -> String
+  toString p = convertPattern p
 
 -- --------------------------------------------------------------------- [ EOF ]

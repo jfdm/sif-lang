@@ -15,7 +15,7 @@ import Freyja.Convert.XML
 import Sif.Types
 import Sif.Pattern.Model
 import Sif.Pattern.API
---import Sif.Pattern.Convert.XML
+import Sif.Pattern.Convert.XML
 import Sif.Pattern.Convert.Edda
 import Sif.Pattern.Convert.String
 import Sif.Pattern.Convert.Freyja
@@ -24,29 +24,29 @@ import Sif.Pattern.Convert.Freyja
 
 covering
 convTy : SifOutFormat -> Type
-convTy LATEX   = String -- This should be a data structure...
-convTy CMARK   = String -- This should be a data structure...
-convTy ORG     = String -- This should be a data structure...
-convTy XML     = Document DOCUMENT
+convTy LATEX   = String
+convTy CMARK   = String
+convTy ORG     = String
+convTy XML     = XMLDoc
 convTy DOT     = SimpleDot GRAPH
-convTy EDDA    = Edda PRIME MODEL
+convTy EDDA    = EddaDoc
 convTy COMPACT = String
 convTy IDRIS   = String
 convTy STRING  = String
-convTy FREYJA  = PatternDoc
+convTy FREYJA  = XMLDoc
 
 covering
 convTo : (fmt : SifOutFormat) -> PATTERN impl d -> Maybe (convTy fmt)
-convTo FREYJA  p = Just $ toFreyja p
-convTo XML     p = Just $ toXML (toFreyja p)
+convTo FREYJA  p = Just $ Freyja.toXML (toFreyja p)
 
+convTo XML     p = Just $ toXML p
 convTo EDDA    p = Just $ toEdda p
 convTo ORG     p = Just $ org $ toEdda p
 convTo LATEX   p = Just $ latex $ toEdda p
 convTo CMARK   p = Just $ markdown $ toEdda p
 
-convTo COMPACT p = Just $ String.toString p
-convTo STRING  p = Just $ String.toString p
+convTo COMPACT p = Just $ Sif.toString p
+convTo STRING  p = Just $ Sif.toString p
 
 convTo DOT     p = Nothing -- Just $ toDot p
 

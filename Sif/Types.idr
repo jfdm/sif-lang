@@ -64,8 +64,8 @@ readOutFMT s =
     "dot"      => Just DOT
     "compact"  => Just COMPACT
     "string"   => Just STRING
-    "idris"    => Nothing -- TODO Just IDRIS
-    "freyja"   => Nothing -- internal
+    "freyja"   => Just FREYJA
+    "idris"    => Nothing -- @TODO Just IDRIS
     "edda"     => Nothing -- internal
     otherwise  => Nothing
 
