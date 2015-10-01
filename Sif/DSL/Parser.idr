@@ -27,20 +27,6 @@ import Sif.Error
 
 -- ------------------------------------------------------------- [ File Reader ]
 
-readFile : (String -> e) -> String -> Eff (Either e String) [FILE_IO ()]
-readFile errFunc fname = do
-    case !(open fname Read) of
-      False => pure $ Left (errFunc fname)
-      True => do
-        src <- readAcc ""
-        close
-        pure $ Right src
-  where
-    readAcc : String -> Eff String [FILE_IO (OpenFile Read)]
-    readAcc acc = if (not !(eof))
-                     then readAcc (acc ++ !(readLine))
-                     else pure acc
-
 readSifFile : Parser a
            -> String
            -> Eff (Either SifError a) [FILE_IO (), LOG]

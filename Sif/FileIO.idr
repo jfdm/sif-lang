@@ -10,15 +10,13 @@ import Sif.Error
 
 -- TODO Make more robust by returning Maybe and Either
 
-writeFile : String -> String -> Eff () SifEffs
-writeFile fname content = do
-    trace $ unwords ["Writing file:", show fname]
-    case !(open fname Write) of
-      True => do
-        writeString content
-        close
-        trace $ unwords ["Finished writing file,", show fname]
-      False => Sif.raise (CannotWriteFile fname)
-
+namespace Sif
+  writeFile : String -> String -> Eff () SifEffs
+  writeFile fname content = do
+      trace $ unwords ["Writing file:", show fname]
+      res <- File.writeFile (\x => CannotWriteFile x) fname content
+      case res of
+          Left  err => Sif.raise err
+          Right _   => trace $ unwords ["Finished writing file,", show fname]
 
 -- --------------------------------------------------------------------- [ EOF ]
