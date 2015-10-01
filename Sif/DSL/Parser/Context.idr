@@ -9,6 +9,8 @@ import Lightyear
 import Lightyear.Strings
 
 import Sif.Types
+import Sif.DSL.Parser.Utils
+import Sif.DSL.Parser.Common
 
 public
 context : Parser $ Pair String SifDomain

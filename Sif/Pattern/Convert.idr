@@ -61,6 +61,11 @@ showConvPattern DOT p =
     Nothing => Nothing
     Just r  => Just (show r)
 
+showConvPattern FREYJA p =
+  case (the (Maybe (convTy FREYJA)) (convTo FREYJA p)) of
+    Nothing => Nothing
+    Just r  => Just (show @{xml} r)
+
 showConvPattern XML p =
   case (the (Maybe (convTy XML)) (convTo XML p)) of
     Nothing => Nothing
