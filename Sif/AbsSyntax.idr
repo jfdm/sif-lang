@@ -56,4 +56,13 @@ namespace AST
            -> SifAST TyPATTERN
 
 
+  instance Show (SifAST ty) where
+    show (Req i ty t d)       = unwords ["Req", show i, show ty, show t, show d]
+    show (Problem i t d c rs) = unwords ["Problem", show i, show t, show d, show c, show rs]
+    show (Affect v i d)       = unwords ["Affect", show v, show i, show d]
+    show (Trait ty t v d as)  = unwords ["Trait", show ty, show t, show v, show d, show as]
+    show (Property t d ts)    = unwords ["Property", show t, show d, show ts]
+    show (Solution t p d c ps) = unwords ["Solution", show t, show p, show d, show c, show ps]
+    show (Pattern t d p s)     = unwords ["Pattern", show t, show d, show p, show s]
+
 -- --------------------------------------------------------------------- [ EOF ]

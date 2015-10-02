@@ -12,6 +12,7 @@ import Effect.Logging.Default
 
 import Lightyear
 import Lightyear.Strings
+import Lightyear.StringFile
 
 import Sif.DSL.Parser.Problem
 import Sif.DSL.Parser.Solution
@@ -32,11 +33,9 @@ readSifFile : Parser a
            -> Eff (Either SifError a) [FILE_IO (), LOG]
 readSifFile p fname = do
     trace $ unwords ["Parsing file:", show fname]
-    case !(readFile FileMissing fname) of
-      Left err  => pure $ Left err
-      Right src => do
-        case parse p src of
-          Left err  => pure $ Left (ParseError fname err)
-          Right res => pure $ Right res
+    res <- parseFile FileMissing ParseError p fname
+    case res of
+      Left err => pure $ Left err
+      Right  r => pure $ Right r
 
 -- --------------------------------------------------------------------- [ EOF ]

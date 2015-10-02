@@ -15,6 +15,9 @@ import Effect.StdIO
 import Effect.Logging.Default
 import Effect.Perf
 
+import Lightyear
+import Lightyear.Strings
+
 import Config.Error
 import Config.YAML
 

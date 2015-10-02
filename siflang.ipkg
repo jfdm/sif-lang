@@ -25,3 +25,10 @@ modules = Effect.Perf
         , Sif.DSL.Parser.Solution
         , Sif.DSL.Parser
         , Sif.DSL
+
+        , Sif.DSL.Test
+
+tests = Sif.DSL.Parser.Utils.runTests
+      , Sif.DSL.Parser.Common.runTests
+      , Sif.DSL.Parser.Solution.runTests
+      , Sif.DSL.Test.runTests

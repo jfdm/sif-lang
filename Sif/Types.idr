@@ -78,5 +78,6 @@ defaultDomain = MkDomain "Default" (Just "Not Specified")
 instance Eq SifDomain where
   (==) (MkDomain x xd) (MkDomain y yd) = x == y && xd == yd
 
-
+instance Show SifDomain where
+  show (MkDomain x xd) = unwords ["MkDomain", show x, show xd]
 -- --------------------------------------------------------------------- [ EOF ]

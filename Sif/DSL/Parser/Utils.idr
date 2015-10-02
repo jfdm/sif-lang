@@ -7,75 +7,67 @@
 module Sif.DSL.Parser.Utils
 
 import Lightyear
+import Lightyear.Char
 import Lightyear.Strings
 
+import Test.Parsing
+
 %default partial
-%access public
+%access private
 
-eol : Parser Char
-eol = char '\n'
+line : String -> Parser ()
+line l = do
+    token l <* spaces
+    manyTill anyChar endOfLine
+    spaces
+    pure ()
+  <?> "Line comment"
 
-anyChar : Parser Char
-anyChar = satisfy (const True)
+block : String -> String -> Parser ()
+block b e = do
+    token b <* spaces
+    manyTill anyChar (token e)
+    spaces
+    pure ()
+  <?> "Block Comment"
 
-literallyBetweenLR : Char -> Char -> Parser String
-literallyBetweenLR l r =
-    map pack $ between (lexeme $ char l) (lexeme $ char r) (some (satisfy (/= r)))
-
-literallyBetween : Char -> Parser String
-literallyBetween c = literallyBetweenLR c c
-
-manyTill : Monad m => ParserT m String a
-                   -> ParserT m String b
-                   -> ParserT m String (List a)
-manyTill p end = scan
-  where
-    scan : Monad m => ParserT m String (List a)
-    scan = do { end; return List.Nil } <|>
-           do { x <- p; xs <- scan; return (x::xs)}
-
-literal : Parser String
-literal = do
-    token "\"\"\""
-    ss <- manyTill anyChar (token "\"\"\"")
-    pure (pack ss)
-
-
+public
 comment : String -> String -> String -> Parser ()
 comment l b e = (line l)
             <|> (block b e)
-            <|> space
+            <|> spaces
             <?> "Comment"
-    where
-      line : String -> Parser ()
-      line l = do
-          token l
-          manyTill anyChar eol
-          space
-          pure ()
-        <?> "Line comment"
 
-      block : String -> String -> Parser ()
-      block b e = do
-          token b
-          manyTill anyChar (token e)
-          space
-          pure ()
-        <?> "Block Comment"
+docString : String -> Parser String
+docString m = do
+    token m <* spaces
+    d <- manyTill anyChar endOfLine
+    spaces
+    pure $ pack d
+  <?> "Doc String"
 
+public
 doc : String -> Parser String
 doc m = do
       ds <- some $ docString m
-      space
+      spaces
       pure $ concat ds
     <?> "Documentation"
-  where
-      docString : String -> Parser String
-      docString m = do
-          token m
-          d <- manyTill anyChar eol
-          space
-          pure $ pack d
-        <?> "Doc String"
+
+public
+runTests : IO ()
+runTests = do
+  putStrLn $ heading "Parsing Utility Tests"
+  canParse (Just "Line")    (line "--")       "-- I am a comment\n"
+  canParse (Just "Block")   (block "{-" "-}") "{- -- I am a comment -}"
+  canParse (Just "Docs")    (doc ">") """> I am doc
+> I am doc
+> Doc
+>
+"""
+  canParse (Just "Comment") (comment "--" "{-" "-}") """{-
+A comment
+-}"""
+
 
 -- --------------------------------------------------------------------- [ EOF ]

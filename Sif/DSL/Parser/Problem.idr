@@ -8,6 +8,7 @@ module Sif.DSL.Parser.Problem
 
 -- ----------------------------------------------------------------- [ Imports ]
 import Lightyear
+import Lightyear.Char
 import Lightyear.Strings
 
 import Sif.Types
@@ -51,7 +52,7 @@ variable getTy = do
 requirement : Parser $ SifAST TyREQ
 requirement = do
     (ty, MkVar i t d) <- variable furpsTy
-    space
+    spaces
     pure $ AST.Req i ty t d
   <?> "Requirement"
 
@@ -74,7 +75,7 @@ problem = do
     sifComment
     keyword "sif"
     string "problem"
-    eol
+    endOfLine
     sifComment
     (MkVar i t d) <- problemDef
     c <- opt context

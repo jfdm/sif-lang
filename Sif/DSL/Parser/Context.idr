@@ -6,6 +6,7 @@
 module Sif.Parser.Context
 
 import Lightyear
+import Lightyear.Char
 import Lightyear.Strings
 
 import Sif.Types
@@ -17,13 +18,13 @@ context : Parser $ Pair String SifDomain
 context = do
     keyword "sif"
     string "context"
-    eol
-    space
+    endOfLine
+    spaces
     keyword "Context"
     t <- title
     keyword "as"
     i <- ident
-    space
+    spaces
     d <- opt desc
     pure $ (i, MkDomain t d)
   <?> "Problem Specification"

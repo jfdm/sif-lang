@@ -7,9 +7,18 @@
 module Sif.DSL.Parser.Common
 
 import Lightyear
+import Lightyear.Char
 import Lightyear.Strings
 
 import Sif.DSL.Parser.Utils
+
+import Test.Parsing
+
+literal : Parser String
+literal = do
+    token "\"\"\""
+    ss <- manyTill anyChar (token "\"\"\"")
+    pure (pack ss)
 
 sifComment : Parser ()
 sifComment = comment "--" "{-" "-}" <?> "Sif Comment"
@@ -20,8 +29,7 @@ sifDoc = doc ">"
 
 descString : Parser String
 descString = literal
-         <|> (literallyBetween '\"')
-         <|> (literallyBetweenLR '{' '}')
+         <|> (quoted '"')
          <?> "Description Block"
 
 keyword : String -> Parser ()
@@ -34,15 +42,46 @@ desc : Parser $ String
 desc = do
      token "Description"
      s <- descString
-     space
+     spaces
      pure s
     <?> "Description"
 
 ident : Parser String
-ident = lexeme (map pack $ some (satisfy isAlphaNum) ) <?> "Identity"
+ident = do
+    i <- (map pack $ some alphaNum)
+    spaces
+    pure i
+  <?> "Identity"
 
 title : Parser String
-title = literallyBetween '"'  <?> "Title"
+title = do
+   t <- (quoted '"')
+   spaces
+   pure t
+  <?> "Title"
+
+runTests : IO ()
+runTests = do
+  putStrLn $ heading "Parsing Common Tests"
+  canParse (Just "Literal")     literal      "\"\"\" I am a literal\"\"\""
+  canParse (Just "Desc String") descString   "\"\"\" I am a literal\"\"\""
+  canParse (Just "Desc String") descString   "\"aaaaaa\""
+  canParse (Just "Comments")    (sifComment) """-- I am a comment\n"""
+  canParse (Just "Comments")    (sifComment) """{- I am a comment -}"""
+  canParse (Just "Doc Stringd") sifDoc       "> I am a doc\n"
+
+  parseTestG (Just "Desc")      (desc) "Description \"I am\"" "I am" (==)
+
+  parseTestG (Just "Titles")
+             title
+             "\"I am a title\""
+             "I am a title"
+             (==)
+  parseTestG (Just "Identifier")
+             ident
+             "ident"
+             "ident"
+             (==)
 
 
 -- --------------------------------------------------------------------- [ EOF ]

@@ -38,21 +38,22 @@ Solution "Symmetric Cryptography" solves infosec in std {
 	  }
 	}
   }
+
   Property "Variable Security Parameter" {
     Advantage "Greater Security" is Satisfied {
 	    Affects {
 	      Makes multiSecLevels
 		}
 	}
-   Disadvantage "Parameter Selection" is Satisfied {
+    Disadvantage "Parameter Selection" is Satisfied {
         Affects {
 		  Hurts multiSecLevels
 		}
-   }
-   Disadvantage "Parameter Computation" is Satisfied {
+    }
+    Disadvantage "Parameter Computation" is Satisfied {
        Affects {
 	     Hurts mechPerf
 	   }
+    }
    }
-  }
 }

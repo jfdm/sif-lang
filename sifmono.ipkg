@@ -10,6 +10,7 @@ pkgs = effects
      , xml
      , argparse
      , freyja
+     , test
 
 --opts = "--log 1"
 

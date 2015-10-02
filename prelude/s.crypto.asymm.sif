@@ -27,11 +27,12 @@ Solution "Asymmetric Cryptography" solves infosec in std {
     }
     Advantage "Key Pair" is Satisfied {
 	   Affects {
-	     Helps dataConf
+	     Helps dataConf, Hurts multiSecLevels
 	   }
 	}
   }
 
+  > sod
   Property "Maths Algorithms" {
     Advantage "Maths Guarantee" is Satisfied {
       Affects {
@@ -55,11 +56,14 @@ Solution "Asymmetric Cryptography" solves infosec in std {
 	      Makes multiSecLevels
 		}
 	}
+
    Disadvantage "Parameter Selection" is Satisfied {
         Affects {
 		  Hurts multiSecLevels
 		}
    }
+
+> s
    Disadvantage "Parameter Computation" is Satisfied {
        Affects {
 	     Hurts mechPerf

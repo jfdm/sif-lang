@@ -7,6 +7,7 @@
 module Sif.Commands
 
 import Lightyear
+import Lightyear.Char
 import Lightyear.Strings
 
 import Sif.Types
@@ -123,14 +124,14 @@ private
 check : Parser SifCMD
 check = do
     keyword ":check"
-    p <- literallyBetween '"'
+    p <- quoted '"'
     space
-    s <- literallyBetween '"'
+    s <- quoted '"'
     pure $ CheckExtPattern p s
 
 private
 load : Parser SifCMD
-load = (do keyword ":load"; dir <- literallyBetween '"'; return (PreludeLoad (Just dir)) )
+load = (do keyword ":load"; dir <- quoted '"'; return (PreludeLoad (Just dir)) )
     <|> (keyword ":reload" *> return (PreludeLoad Nothing))
     <?> "Loading"
 
