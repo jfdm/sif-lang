@@ -52,3 +52,5 @@ minDisrupt <- Usability "Minimal Workflow Disruption"
 > The implementation should be implemented securely.
 
 secureImpl <- Reliability "Secure Implementation"
+
+--  -------------------------------------------------------------------- [ EOF ]
