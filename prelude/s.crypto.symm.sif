@@ -1,59 +1,153 @@
 sif solution
 
+Description "Symmetric Cryptography, provides a set of functions that when combined in use provide mathematical guarantees towards the confidentiality of data."
+
+> Symmetric Cryptography defines a set of functions that allow for
+> data to be encrypted and decrypted using a shared key.
+>
+> Symmetric ciphers have been developed to facilitate fast operations
+> over large data. However to achieve such fast operations the
+> mathematics involved requires that the operations are symmetric in
+> nature and that the same key is used. Further different ciphers have
+> different modes of operation that affects the behaviour of the cipher
+> used.
 Solution "Symmetric Cryptography" solves infosec in std {
 
-  Property "Public Key Pairs" {
-    Advantage "Same Keys" is Satisfied {
-       Affects {
-          Makes recipConf
-       }
-    }
-	Disadvantage "PKI" is Satisfied {
-       Affects {
-         Hurts multiSecLevels
-       }
-    }
-    Disadvantage "Single Key" is Satisfied {
-	   Affects {
-	     Hurts dataConf,
-		 Hurts recipConf
-	   }
-	}
-  }
+  > The operations performed by the symmetric cipher are based upon
+  > well studied mathematics, and have been shown to be
+  > computationally inexpensive. Thus, the resulting ciphers are
+  > extremely efficient on large data sources.
+  Property "Mathematical Algorithm" {
 
-  Property "Maths Algorithms" {
+    > Operations based upon mathematics provides a stronger foundation
+    > upon which a cipher can be designed.
     Advantage "Maths Guarantee" is Satisfied {
-      Affects {
-        Makes dataConf
+       Affects {
+	       Helps dataConf
+		 , Helps recipConf
+	   }
+    }
+
+    > The resulting operations for operating over data are
+    > computationally cheap and are efficient over large data.
+	Advantage "Computationally Cheap" is Satisfied {
+	  Affects {
+	      Helps mechPerf
+		, Helps minDisrupt
       }
     }
-    Advantage "Computationally InExpensive" is Satisfied {
-     Affects {
-       Helps mechPerf
-     }
-    }
-    Advantage "Maths well studied" is Satisfied {
+
+	> The underlying mathematics provides demonstrable evidence over
+    > the functionality and security of the system.
+	Advantage "Maths are well studied" is Satisfied {
 	  Affects {
-	    Helps recipConf
-	  }
-	}
+	      SomePos dataConf
+		, SomePos recipConf
+		, SomePos secureImpl
+      }
+    }
+
+	> However, as maths progresses new techniques could be developed
+    > that weaken the security of the chosen schemes.
+	Disadvantage "Susceptible to Future Attacks" is WeakDen {
+	  Affects {
+	      Breaks dataConf
+		, Breaks recipConf
+      }
+    }
   }
 
-  Property "Variable Security Parameter" {
+  > Given the way in which the maths behind symmetric schemes work,
+  > the result is a set of operations that uses the same key to
+  > encrypt and decrypt data. A single key is used. This results int
+  > he problem of how to transport the key safely between sender and
+  > recipient. If this transportation is not secure and the symmetric
+  > key is leaked then the confidentiality of the sent message will
+  > not be guaranteed.
+  Property "Symmetric Keys" {
+
+    > The single symmetric key is a liability if it is not secured
+    > properly when being transported between sender and recipient.
+    Disadvantage "Single Key" is Satisfied {
+	  Affects {
+	      Hurts dataConf
+		, Hurts recipConf
+      }
+    }
+
+	> The operation of symmetric schemes are simple to understand.
+	Trait "Simple Operation" is Satisfied {
+	  Affects {
+	    Helps understandable
+      }
+    }
+  }
+
+  > Many of the ciphers used to provide symmetric cryptography can be
+  > used with varying key lengths. The length of the key will affect
+  > the security of the data.
+
+  Property "Variable Key Length" {
+
+    > Variable key lengths allow for different levels of
+    > security. Facilitating the securing of information at levels
+    > appropriate for the data.
     Advantage "Greater Security" is Satisfied {
 	    Affects {
 	      Makes multiSecLevels
 		}
 	}
-    Disadvantage "Parameter Selection" is Satisfied {
+
+	> A poorly chosen security parameter may have an adverse affect on
+    > the security of information to be protected. Weak parameter's
+    > are more likely to be defeated. However, guidance exists that
+    > can aide in the selection of these parameter's.
+
+    Disadvantage "Poor Parameter Selection" is WeakDen {
         Affects {
 		  Hurts multiSecLevels
 		}
     }
-    Disadvantage "Parameter Computation" is Satisfied {
+
+	> A poorly chosen security parameter that is /too/ long will
+    > result is large computation times. User's may be tempted to
+	> select long keys as it affords them greater security. This in
+	> turn, will result is large computation times do to increases in
+	> calculations. However, this is only the case with really really
+	> large parameters that nor not available in many specifications.
+
+    Disadvantage "Parameter Computation" is Denied {
        Affects {
 	     Hurts mechPerf
 	   }
     }
    }
+
+  > Symmetric ciphers will have different modes of operation, such as
+  > ECB and CBC. Much like the variable security parameter the choice
+  > of mode is important. Different modes have different properties
+  > and use cases.
+
+  Property "Operational Modes" {
+
+    > A symmetric cipher's mode of operation may affect the security of the data being protected, e.g. The ECB Penguin.
+    Disadvantage "Poor Mode Selection" is WeakDen {
+	  Affects {
+	  eith
+}
+}
+  }
+
+  > Initialisation Vectors are used to seed the operation with random
+  > information.
+  Property "Init Vectors" {
+
+  }
+
+  > Padding schemes are used to enusure that messages are of a
+  > consistent length.
+  Property "Padding Schemes" {
+
+  }
+
 }
