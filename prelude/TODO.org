@@ -1,11 +1,11 @@
 #+TITLE: Patterns to Model
 
 * TODO In Depth Patterns [1/2]
-** TODO Information Secrecy [0/4]
+** TODO Information Secrecy [1/4]
 *** TODO Asymmetric Crypto
-*** TODO Symmetric Crypto
 *** TODO Public Key Crypto
 *** TODO Hybrid Crypto
+*** DONE Symmetric Crypto
 ** DONE Generic Data Representation [2/2]
 *** DONE Problem
 *** DONE Solution
