@@ -126,28 +126,105 @@ Solution "Symmetric Cryptography" solves infosec in std {
   > Symmetric ciphers will have different modes of operation, such as
   > ECB and CBC. Much like the variable security parameter the choice
   > of mode is important. Different modes have different properties
-  > and use cases.
+  > and use cases. Good documentation, if provided, will alleviate
+  > these issues.
 
   Property "Operational Modes" {
 
-    > A symmetric cipher's mode of operation may affect the security of the data being protected, e.g. The ECB Penguin.
+    > A symmetric cipher's mode of operation may affect the security
+    > of the data being protected, e.g. The ECB Penguin.
+
     Disadvantage "Poor Mode Selection" is WeakDen {
 	  Affects {
-	  eith
-}
-}
+	      Hurts dataConf
+	  	, Hurts recipConf
+		, SomeNeg mechPerf
+      }
+    }
+
+	> The selection of which mode of operation to may confuse developers
+	> as to which mode is best to use or obsolete.
+    Disadvantage "Mode Choice Confusion" is WeakDen {
+	  Affects {
+          SomeNeg understandable
+		, SomeNeg minDisrupt
+      }
+    }
+
+    > The different modes of operation allow for a flexible system to
+    > be provided such that the same algorithms can be used in
+    > different places for different situations.
+
+    Advantage "Operational Flexiblity" is Satisfied {
+	  Affects {
+	      Helps minDisrupt
+		, Helps understandable
+	  }
+    }
   }
 
   > Initialisation Vectors are used to seed the operation with random
-  > information.
+  > information. A poor choice of vector could lead to errors in the
+  > computation.
+
   Property "Init Vectors" {
 
+    > IVs help with the security of the data and help defend against
+	> information leakage.
+    Advantage "IV has Secure Operation" is Satisfied {
+	  Affects {
+  	      Helps dataConf
+		, Helps recipConf
+		, SomePos mechPerf
+      }
+    }
+
+	> IVs may confuse those who are not aware of them, and may result
+    >  in proper IV usage.
+
+	Disadvantage "What's an IV?" is WeakDen {
+	  Affects {
+	      SomeNeg understandable
+      }
+    }
+
+    > Poor choice of IV can unintentionally affect the security
+    > levels, and also use of the scheme by those not aware of how to
+    > use IVs. Fortunately there are standards.
+
+	Disadvantage "Poor IV Selection" is Denied {
+	  Affects {
+	      SomeNeg dataConf
+		, SomeNeg recipConf
+		, SomeNeg mechPerf
+		, SomeNeg multiSecLevels
+      }
+    }
   }
 
-  > Padding schemes are used to enusure that messages are of a
-  > consistent length.
+  > Padding schemes are used to ensure that messages are of a
+  > consistent length. This is useful to aide in the actual operation
+  > of the symmetric ciphers and affords some protection against
+  > attacks that may harm information secrecy. However, a poorly
+  > chosen scheme may be detrimental to the security of the system.
   Property "Padding Schemes" {
 
-  }
+    > Provides guarantees towards traffic analysis.
+    Advantage "Helps Op Function" is Satisfied {
+	  Affects {
+  	      Helps dataConf
+  	    , Helps recipConf
+  	    , Helps mechPerf
+	  }
+	}
 
+	Disadvantage "Poor Padding Scheme Selection" is Denied {
+	  Affects {
+ 	      Hurts dataConf
+	    , Hurts recipConf
+	    , Hurts mechPerf
+      }
+    }
+  }
 }
+--  -------------------------------------------------------------------- [ EOF ]
