@@ -13,9 +13,7 @@ pkgs = effects
      , config
      , sifcore
 
-modules = Effect.Perf
-
-        , Sif.Error
+modules = Sif.Error
 
         , Sif.DSL.State
         , Sif.DSL.Parser.Utils

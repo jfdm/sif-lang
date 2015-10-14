@@ -12,15 +12,13 @@ pkgs = effects
      , freyja
      , test
 
---opts = "--log 1"
+opts = "--log 1"
 
 main = Sif.Main
 executable = sifc
 
 
-modules = Effect.Perf
-
-        , Sif.Types
+modules = Sif.Types
         , Sif.AbsSyntax
 
         , Sif.Pattern.Model
