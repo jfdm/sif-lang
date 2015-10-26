@@ -6,6 +6,7 @@
 module Sif.Perf
 
 import Effect.Perf
+
 import Config.YAML
 
 import Sif.Effs
@@ -76,7 +77,7 @@ toYAML m = YAMLDoc Nil inner
         , doStamps (stime m) (stamps m)]
 
 
-perfSetup : Eff () SifEffs
+perfSetup : Sif ()
 perfSetup = do
     os <- getOptions
     let (gather,display) = perf os
@@ -84,7 +85,7 @@ perfSetup = do
       then collectPMetrics display
       else pure ()
 
-displayPerfMetrics : Eff () SifEffs
+displayPerfMetrics : Sif ()
 displayPerfMetrics = do
     os <- getOptions
     mdata <- getPerfMetrics

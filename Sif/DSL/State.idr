@@ -4,7 +4,7 @@
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
 ||| State for Building Patterns from the AST.
-module Sif.DSL.Effs
+module Sif.DSL.State
 
 import Effects
 import Effect.Default

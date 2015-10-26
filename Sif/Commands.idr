@@ -3,7 +3,6 @@
 -- Copyright : (c) Jan de Muijnck-Hughes
 -- License   : see LICENSE
 -- --------------------------------------------------------------------- [ EOH ]
-
 module Sif.Commands
 
 import Lightyear

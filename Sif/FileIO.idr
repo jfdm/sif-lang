@@ -6,12 +6,13 @@
 module Sif.FileIO
 
 import Sif.Effs
+
 import Sif.Error
 
 -- TODO Make more robust by returning Maybe and Either
 
 namespace Sif
-  writeFile : String -> String -> Eff () SifEffs
+  writeFile : String -> String -> Sif ()
   writeFile fname content = do
       trace $ unwords ["Writing file:", show fname]
       res <- File.writeFile (\x => CannotWriteFile x) fname content

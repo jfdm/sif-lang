@@ -5,3 +5,6 @@ x       Date            commit  LoC     tyCHK   CodeGen Mono    exe       Commen
 4       2015-08-27      81407d0 3443    111.22  108.81  285.73  5703068   {Added logging and syntax changes.}
 5       2015-08-28      41d2a55 3408    81.49   160.44  234.38  5321407   {Rewrite and Design Patterns removed tree...}
 6       2015-09-04      3fbdc5f 3829    126.34  181.29  294.13  5560718   {Rewrite again and made doc converstion generic from backend.}
+7       2015-10-13      40c979c 4380    160.02  252.64  346.69  6370560   {Improvements I forgot}
+8       2015-10-14      40c979c 4380    147.26  234.82  367.43  6418415   {Idris with improved module chasing}
+9       2015-10-14      40c979c 4380    147.26  221.85  364.38  6418415   {Idris with improved module chasing}

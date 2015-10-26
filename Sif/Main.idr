@@ -13,6 +13,7 @@ import Sif.Pattern
 import Sif.Builder.AbsInterp
 import Sif.Builder.DirectRep
 import Sif.Effs
+
 import Sif.Error
 import Sif.Library
 import Sif.DSL.State
@@ -20,6 +21,7 @@ import Sif.DSL.Parser.Problem
 import Sif.DSL.Parser.Solution
 import Sif.DSL.Parser
 import Sif.DSL
+
 import Sif.Options
 import Sif.API
 import Sif.REPL
