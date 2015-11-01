@@ -1,7 +1,7 @@
 sif solution
 
-Description """Provides information security through the provision on
- an efficient public-key crypto-scheme."""
+Description """Information Secrecy is about keeping data confidential. Integrated Encryption Schemes are a combination of Asymmetric and Symmetric cryptography to provides information security through the provision of
+an efficient asymmetric cryptographic scheme."""
 
 > Asymmetric Schemes allow for cryptographic keys to be made separate
 > for encryption and decryption, but have an operational complexity
@@ -9,8 +9,47 @@ Description """Provides information security through the provision on
 > schemes have low operational complexity, but require the use of a
 > shared key. These schemes can be combined to provide an efficient
 > solution using asymmetric cryptography to information security.
+>
+> These schemes operate by encrypting the data under a symmetric
+> scheme, then encrypting the symmetric key under an asymmetric
+> scheme. Both the resulting cipher-texts are sent to the recipient.
 
 Solution "Hybrid Cryptography" solves infosec in std {
+
+
+  > The operations performed by the ciphers are based upon
+  > well studied mathematics.
+  Property "Mathematical Algorithms" {
+
+    > Operations based upon mathematics provides a stronger foundation
+    > upon which a cipher can be designed.
+    Advantage "Maths Guarantee" is Satisfied {
+       Affects {
+	       Helps dataConf
+		 , Helps recipConf
+	   }
+    }
+
+	> The underlying mathematics provides demonstrable evidence over
+    > the functionality and security of the system.
+	Advantage "Maths are well studied" is Satisfied {
+	  Affects {
+	      SomePos dataConf
+		, SomePos recipConf
+		, SomePos secureImpl
+      }
+    }
+
+	> However, as maths progresses new techniques could be developed
+    > that weaken the security of the chosen schemes.
+	Disadvantage "Susceptible to Future Attacks" is WeakDen {
+	  Affects {
+	      Breaks dataConf
+		, Breaks recipConf
+      }
+    }
+  }
+
 
   > A symmetric cipher to encrypt the data to be protected.
   Property "Data Encapsulation Mechanism" {
@@ -20,7 +59,7 @@ Solution "Hybrid Cryptography" solves infosec in std {
     }
 
 	> Bad algorithm leads to possible insecure data.
-    Disadvantage "Symm Algorithm Selection" is WeakSatis {
+    Trait "Symm Algorithm Selection" is WeakDen {
 	  Affects { SomeNeg dataConf }
     }
 
@@ -48,31 +87,49 @@ Solution "Hybrid Cryptography" solves infosec in std {
 
 	> Use of asymmetric crypto requires a public key infrastructure to
     > ensure that public encryption keys ownership can be attested.
-	Disadvantage "Requires PKI" is WeakSatis {
+	Disadvantage "Requires Encryption Key Attestation" is WeakSatis {
 
-	  Affects { SomeNeg recipConf }
+	  Affects { SomeNeg recipConf, SomeNeg understandable, SomeNeg minDisrupt }
     }
   }
 
-  > Variable key length
-  Property "Security Parameters" {
-    Trait "Variable Asymm Key Length" is Satisfied {
-	  Affects {Helps multiSecLevels, Hurts mechPerf}
-    }
-    Trait "Greater Security" is Satisfied {
+  > Many of the ciphers used to provide cryptography can be used with
+  > varying key lengths. The length of the key will affect the
+  > security of the data.
+
+  Property "Variable Key Length" {
+
+    > Variable key lengths allow for different levels of
+    > security. Facilitating the securing of information at levels
+    > appropriate for the data.
+    Advantage "Greater Security" is Satisfied {
 	    Affects {
-	      Helps multiSecLevels
+	      Makes multiSecLevels
 		}
 	}
-   Disadvantage "Parameter Selection" is Satisfied {
+
+	> A poorly chosen security parameter may have an adverse affect on
+    > the security of information to be protected. Weak parameter's
+    > are more likely to be defeated. However, guidance exists that
+    > can aide in the selection of these parameter's.
+
+    Disadvantage "Poor Parameter Selection" is WeakDen {
         Affects {
 		  Hurts multiSecLevels
 		}
-   }
-   Disadvantage "Parameter Computation" is Satisfied {
+    }
+
+	> A poorly chosen security parameter that is /too/ long will
+    > result is large computation times. User's may be tempted to
+	> select long keys as it affords them greater security. This in
+	> turn, will result is large computation times do to increases in
+	> calculations. However, this is only the case with really really
+	> large parameters that nor not available in many specifications.
+
+    Disadvantage "Parameter Computation" is Denied {
        Affects {
 	     Hurts mechPerf
 	   }
+    }
    }
-  }
 }

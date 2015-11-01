@@ -1,0 +1,55 @@
+sif problem
+
+> Given a public key encryption scheme in which keys are used to
+>  encrypt messages. How to ensure the ownership and relationship
+> between a public key and its creator.
+
+pki <- Problem "Encryption Key Attestation"
+
+
+> Public Keys must be linked to their creator.
+>
+> The core problem in asymmetric systems is the veracity of public key
+> ownership. Proof of ownership will ensure that messages can be
+> encrypted for the right sender.
+attestation <- Functional "Attestation of Ownership"
+
+
+> No false claims of ownership should be allowed.
+>
+
+> Users of the system should not be able to falsly claim the identity
+> of another.
+veracity <- Functional "No False Claims"
+
+> Owners should be able to revoke their keys.
+revocation <- Functional "Keys can be Revoked"
+
+
+> Mechanism should be usable by non-experts.
+>
+> A secondary usability requirement targets the level of knowledge
+> that an end-user of the solution must possess to use the solution.
+> The user should need minimal knowledge of the underlying system.
+
+understandable <- Usability "Comprehensible by Non-Experts"
+
+> The mechanism should not impact on normal operations.
+>
+> The resulting solution should have minimal impact on the workflow of
+> the user. A complex solution to use will be a solution less likely
+> to be adopted or used properly.  Having a solution that has minimal
+> workflow disruption is good.
+
+minDisrupt <- Usability "Minimal Workflow Disruption"
+
+> The implementation should be implemented securely.
+>
+> Code vulnerabilities can lead rise to security risk to ones data if
+> said vulnerabilities can be manifested by a threat.  The mechanism
+> should be implemented in a secure fashion such to minimise code
+> vulnerabilities and other attack surfaces.
+secureImpl <- Reliability "Secure Implementation"
+
+
+--  -------------------------------------------------------------------- [ EOF ]

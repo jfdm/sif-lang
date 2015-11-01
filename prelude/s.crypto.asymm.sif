@@ -1,30 +1,104 @@
 sif solution
 
-Description """Information Secrecy is about keeping data confidential. Public key encryption provides a mathematically guaranteed mechanism that allows data to be obfuscated such that only the recipient can reconstitute the messages original meaning."""
+Description """Information Secrecy is about keeping data confidential. Asymmetric encryption provides a mathematically guaranteed mechanism that allows data to be obfuscated such that only the recipient can reconstitute the messages original meaning."""
 
 
-> Public key crypto schemes are an application of asymmetric
-> cryptography in which the public/private key pair is used for
-> encryption/decryption respectively. Asymmetric crypto schemes
-> consist of three algorithms.
+> Asymmetric cryptographic schemes define a set of three functions
+> that when used together allow for data to be kept confidential
+> without the need for a shared key.
 >
-> + keygen :: Given a security parameter generates a public private key pair.
-> + encrypt :: Given a public key and a message, encrypts the message under the given public key.
-> + decrypt :: Given a private key and a ciphertext, =decrypt= returns a readable plaintext if the private key was paired with the ciphertexts encryption key.
 
+> Key behind asymmetric crypto is the idea of encyption/decryption key
+> pairs.  Data is encrypted under an encryption key such that only the
+> decryption key paired with the encryption key can decrypt the data.
+> These keys are used in conjunction with the following functions:
+>
+> + keygen  :: Given a security parameter generates a public/private key pair.
+> + encrypt :: Given a public key and a message, encrypts the message under
+>              the given public key.
+> + decrypt :: Given a private key and a ciphertext, =decrypt= returns a
+>              readable plaintext if the private key was paired with the
+>              ciphertexts encryption key.
+>
 Solution "Asymmetric Cryptography" solves infosec in std {
 
-  Property "Public Key Pairs" {
+  > The operations performed by the asymmetric cipher are based upon
+  > well studied mathematics, and have been shown to be
+  > computationally expensive. The resulting ciphers are
+  > extremely inefficient on large data sources.
+  Property "Mathematical Algorithm" {
+
+    > Operations based upon mathematics provides a stronger foundation
+    > upon which a cipher can be designed.
+    Advantage "Maths Guarantee" is Satisfied {
+       Affects {
+	       Helps dataConf
+		 , Helps recipConf
+	   }
+    }
+
+    > The resulting operations for operating over data are
+    > computationally expensive and are inefficient over large data.
+	Disadvantage "Computationally Expensive" is Satisfied {
+	  Affects {
+	      Helps mechPerf
+		, Helps minDisrupt
+      }
+    }
+
+	> The underlying mathematics provides demonstrable evidence over
+    > the functionality and security of the system.
+	Advantage "Maths are well studied" is Satisfied {
+	  Affects {
+	      SomePos dataConf
+		, SomePos recipConf
+		, SomePos secureImpl
+      }
+    }
+
+	> However, as maths progresses new techniques could be developed
+    > that weaken the security of the chosen schemes.
+	Disadvantage "Susceptible to Future Attacks" is WeakDen {
+	  Affects {
+	      Breaks dataConf
+		, Breaks recipConf
+      }
+    }
+  }
+
+
+  > The underlying maths behind asymmetric schemes results in a set of
+  > operations that require the use of key-pairs: One key for
+  > encrypting data, and the other key for decrypting data. Two linked
+  > keys are used. This allows for the encrypting keys to be
+  > distributed without the need to protect their contents. The
+  > contents of the message is kept secure as long as the maths is not
+  > broken, and the decryption key is kept safe.
+
+  Property "Encryption/Decryption Key Pairs" {
+
+    > Separate keys allow for the key distribution problem to be
+	> /solved/.
     Advantage "Different Keys" is Satisfied {
        Affects {
           Makes recipConf
        }
     }
-	Disadvantage "PKI" is Satisfied {
+
+    > A problem with asymmetric encryption is how to attest ownership
+	> of an encryption key to the intended recipient.  Recipients have
+	> to provide attestation that the encryption key is linked to
+	> them.
+	Disadvantage "Requires Encryption Key Attestation." is Satisfied {
        Affects {
-         Hurts multiSecLevels
+         Hurts recipConf
        }
     }
+
+	> As the keys are linked, this helps make data confidentiality and
+	> recipient confidentiality.  A message will only be decrypted
+	> *iff* the recipient of the message possess the decryption key
+	> paired with the encryption key.
     Advantage "Key Pair" is Satisfied {
 	   Affects {
 	     Helps dataConf, Hurts multiSecLevels
@@ -32,42 +106,43 @@ Solution "Asymmetric Cryptography" solves infosec in std {
 	}
   }
 
-  > sod
-  Property "Maths Algorithms" {
-    Advantage "Maths Guarantee" is Satisfied {
-      Affects {
-        Makes dataConf
-      }
-    }
-    Disadvantage "Computationally Expensive" is WeakSatis {
-     Affects {
-       Hurts mechPerf
-     }
-    }
-    Advantage "Maths well studied" is Satisfied {
-	  Affects {
-	    Helps recipConf
-	  }
-	}
-  }
-  Property "Variable Security Parameter" {
+  > Many of the ciphers used to provide asymmetric cryptography can be
+  > used with varying key lengths. The length of the key will affect
+  > the security of the data.
+
+  Property "Variable Key Length" {
+
+    > Variable key lengths allow for different levels of
+    > security. Facilitating the securing of information at levels
+    > appropriate for the data.
     Advantage "Greater Security" is Satisfied {
 	    Affects {
 	      Makes multiSecLevels
 		}
 	}
 
-   Disadvantage "Parameter Selection" is Satisfied {
+	> A poorly chosen security parameter may have an adverse affect on
+    > the security of information to be protected. Weak parameter's
+    > are more likely to be defeated. However, guidance exists that
+    > can aide in the selection of these parameter's.
+
+    Disadvantage "Poor Parameter Selection" is WeakDen {
         Affects {
 		  Hurts multiSecLevels
 		}
-   }
+    }
 
-> s
-   Disadvantage "Parameter Computation" is Satisfied {
+	> A poorly chosen security parameter that is /too/ long will
+    > result is large computation times. User's may be tempted to
+	> select long keys as it affords them greater security. This in
+	> turn, will result is large computation times do to increases in
+	> calculations. However, this is only the case with really really
+	> large parameters that nor not available in many specifications.
+
+    Disadvantage "Parameter Computation" is Denied {
        Affects {
 	     Hurts mechPerf
 	   }
+    }
    }
-  }
 }

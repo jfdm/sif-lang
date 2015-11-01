@@ -180,7 +180,7 @@ Solution "Symmetric Cryptography" solves infosec in std {
     }
 
 	> IVs may confuse those who are not aware of them, and may result
-    >  in proper IV usage.
+    > in proper IV usage.
 
 	Disadvantage "What's an IV?" is WeakDen {
 	  Affects {
@@ -217,6 +217,9 @@ Solution "Symmetric Cryptography" solves infosec in std {
   	    , Helps mechPerf
 	  }
 	}
+
+	> Poor padding schemes will increase the probability that traffic
+    > analysis schemes can utilise/be used on the sent data.
 
 	Disadvantage "Poor Padding Scheme Selection" is Denied {
 	  Affects {

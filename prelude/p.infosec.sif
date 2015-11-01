@@ -24,6 +24,8 @@ dataConf <- Functional "Data Confidentiality"
 
 recipConf <- Functional "Recipient Confidentiality"
 
+> Different levels of security should be permitted.
+>
 > This performance requirement represents the notion that not all data
 > needs equivalent levels of protection.  Data only needs to be
 > protected for the lifetime that the confidentiality needs to be
@@ -31,6 +33,8 @@ recipConf <- Functional "Recipient Confidentiality"
 
 multiSecLevels <- Performance "Suitable Security Level"
 
+> Protecting data should not take forever.
+>
 > This usability requirement represents the idea that the actual act
 > of securing data should not hinder upon the usage of any proposed
 > mechanism. A user of the solution must not be inconvenienced by its
@@ -38,19 +42,29 @@ multiSecLevels <- Performance "Suitable Security Level"
 
 mechPerf <- Performance "Suitable performance"
 
+> Mechanism should be usable by non-experts.
+>
 > A secondary usability requirement targets the level of knowledge
 > that an end-user of the solution must possess to use the solution.
 > The user should need minimal knowledge of the underlying system.
 
 understandable <- Usability "Comprehensible by Non-Experts"
 
+> The mechanism should not impact on normal operations.
+>
 > The resulting solution should have minimal impact on the workflow of
-> the user.
+> the user. A complex solution to use will be a solution less likely
+> to be adopted or used properly.  Having a solution that has minimal
+> workflow disruption is good.
 
 minDisrupt <- Usability "Minimal Workflow Disruption"
 
 > The implementation should be implemented securely.
-
+>
+> Code vulnerabilities can lead rise to security risk to ones data if
+> said vulnerabilities can be manifested by a threat.  The mechanism
+> should be implemented in a secure fashion such to minimise code
+> vulnerabilities and other attack surfaces.
 secureImpl <- Reliability "Secure Implementation"
 
 --  -------------------------------------------------------------------- [ EOF ]
