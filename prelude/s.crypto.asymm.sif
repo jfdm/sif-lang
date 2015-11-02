@@ -1,13 +1,11 @@
 sif solution
 
-Description """Information Secrecy is about keeping data confidential. Asymmetric encryption provides a mathematically guaranteed mechanism that allows data to be obfuscated such that only the recipient can reconstitute the messages original meaning."""
-
+Description "Information Secrecy is about keeping data confidential. Asymmetric encryption provides a mathematically guaranteed mechanism that allows data to be obfuscated such that only the recipient can reconstitute the messages original meaning."
 
 > Asymmetric cryptographic schemes define a set of three functions
 > that when used together allow for data to be kept confidential
 > without the need for a shared key.
 >
-
 > Key behind asymmetric crypto is the idea of encyption/decryption key
 > pairs.  Data is encrypted under an encryption key such that only the
 > decryption key paired with the encryption key can decrypt the data.
@@ -19,7 +17,6 @@ Description """Information Secrecy is about keeping data confidential. Asymmetri
 > + decrypt :: Given a private key and a ciphertext, =decrypt= returns a
 >              readable plaintext if the private key was paired with the
 >              ciphertexts encryption key.
->
 Solution "Asymmetric Cryptography" solves infosec in std {
 
   > The operations performed by the asymmetric cipher are based upon
@@ -33,7 +30,7 @@ Solution "Asymmetric Cryptography" solves infosec in std {
     Advantage "Maths Guarantee" is Satisfied {
        Affects {
 	       Helps dataConf
-		 , Helps recipConf
+         , Helps recipConf
 	   }
     }
 
@@ -66,7 +63,6 @@ Solution "Asymmetric Cryptography" solves infosec in std {
     }
   }
 
-
   > The underlying maths behind asymmetric schemes results in a set of
   > operations that require the use of key-pairs: One key for
   > encrypting data, and the other key for decrypting data. Two linked
@@ -89,7 +85,7 @@ Solution "Asymmetric Cryptography" solves infosec in std {
 	> of an encryption key to the intended recipient.  Recipients have
 	> to provide attestation that the encryption key is linked to
 	> them.
-	Disadvantage "Requires Encryption Key Attestation." is Satisfied {
+	Disadvantage "Requires Encryption Key Attestation" is Satisfied {
        Affects {
          Hurts recipConf
        }
@@ -101,7 +97,8 @@ Solution "Asymmetric Cryptography" solves infosec in std {
 	> paired with the encryption key.
     Advantage "Key Pair" is Satisfied {
 	   Affects {
-	     Helps dataConf, Hurts multiSecLevels
+	       Helps dataConf
+		 , Hurts multiSecLevels
 	   }
 	}
   }
