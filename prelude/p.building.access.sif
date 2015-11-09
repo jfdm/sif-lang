@@ -1,0 +1,26 @@
+sif problem
+
+> Control of access to a physical building.
+accesscontrol <- Problem "Building Access Control"
+
+> Access to the building should be restricted to an pre-authorised set
+> of people. Those not authorised to access the building will not be
+> permitted access.
+selective <- Functional "Selective Access Rights"
+
+> The entry way must provide protection.
+security <- Functional "Security"
+
+> Access to the building must be easy to perform for those authorised.
+> Those not authorised should find great difficulty obtaining access.
+effortless <- Functional "Effortless"
+
+> The means of permission must be persistent by the user.
+memory <- Functional "Permission Storage"
+
+> The mechanism of authorisation must be reliable for all authorised attempts.
+reliable <- Reliability "Access All the Time"
+
+> Administration the management of this mechanism must be easy.
+> Administration will also include the assignment and revocation of access.
+changable <- Functional "Change of Permission"
