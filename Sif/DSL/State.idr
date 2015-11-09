@@ -22,17 +22,15 @@ import Sif.Error
 
 record BuildState where
   constructor MkSState
-  getProb     : Maybe String
-  getRQs      : List (String, SifAST TyREQ)
-  pattTitle   : String
-  pattDesc    : Maybe String
-  getPFName   : String
-  getSFName   : String
-  getDomainID : Maybe String
-  getDomain   : SifDomain
+  getProbID        : Maybe String
+  getRQs           : List (String, SifAST TyREQ)
+  pattTitle        : String
+  pattDesc         : Maybe String
+  getPFName        : String
+  getSFName        : String
 
 defBuildSt : String -> String -> BuildState
-defBuildSt p s = MkSState Nothing Nil "" Nothing p s Nothing defaultDomain
+defBuildSt p s = MkSState Nothing Nil "" Nothing p s
 
 instance Default BuildState where
   default = defBuildSt "" ""

@@ -2,6 +2,9 @@ sif problem
 
 accesscontrol <- Problem "Access Control"
 
+build <- Context "Building"
+soft  <- Context "Software"
+
 control     <- Functional "Access Restriction"
 indy        <- Functional "Application Independence"
 flexi       <- Functional "Flexibility"

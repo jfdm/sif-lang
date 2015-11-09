@@ -78,13 +78,14 @@ problem = do
     endOfLine
     sifComment
     (MkVar i t d) <- problemDef
-    c <- opt context
+    c <- opt $ some context
     sifComment
     rs <- many requirement
     sifComment
     case c of
-      Nothing => pure $ (AST.Problem i t d ("std", defaultDomain) rs)
-      Just c' => pure $ (AST.Problem i t d c' rs)
+      Nothing  => pure $ (AST.Problem i t d [("std", defaultDomain)] rs)
+      Just Nil => pure $ (AST.Problem i t d [("std", defaultDomain)] rs)
+      Just cs  => pure $ (AST.Problem i t d cs rs)
   <?> "Problem Specification"
 
 -- --------------------------------------------------------------------- [ EOF ]

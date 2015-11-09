@@ -2,9 +2,15 @@ sif solution
 
 Description """Keyed Door locks and Keys can be used to restrict access to buildings."""
 
->
-Solution "Keyed Door Locks" solves accesscontrol in std {
-
+> ji
+Solution "Keyed Door Locks" solves accesscontrol in build {
+  Property "X" {
+    Trait "B" is Satisfied {
+	  Affects {
+	    Makes control
+      }
+    }
+  }
 
 
 {-

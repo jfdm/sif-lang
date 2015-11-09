@@ -21,7 +21,7 @@ namespace AST
     Problem : (ident : String)
            -> (title : String)
            -> (desc  : Maybe String)
-           -> (context : Pair String SifDomain)
+           -> (contexts : List (Pair String SifDomain))
            -> List (SifAST TyREQ)
            -> SifAST TyPROBLEM
 
@@ -43,7 +43,7 @@ namespace AST
             -> SifAST tyPROPERTY
 
     Solution : (title : String)
-            -> (probID : Pair String (Maybe String))
+            -> (probID : Pair String (Maybe String)) -- problem id and pattern desc
             -> (desc : Maybe String)
             -> (ctxtID : String)
             -> (properties : List (SifAST TyPROPERTY))
@@ -55,6 +55,14 @@ namespace AST
            -> (solution : SifAST TySOLUTION)
            -> SifAST TyPATTERN
 
+  getSolutionContextID : SifAST TySOLUTION -> String
+  getSolutionContextID (Solution _ _ _ id _) = id
+
+  getProblemDomains : SifAST TyPROBLEM -> List (String, SifDomain)
+  getProblemDomains (Problem _ _ _ cs _) = cs
+
+  compatible : SifAST TyPROBLEM -> SifAST TySOLUTION -> Maybe SifDomain
+  compatible p s = lookup (getSolutionContextID s) (getProblemDomains p)
 
   instance Show (SifAST ty) where
     show (Req i ty t d)       = unwords ["Req", show i, show ty, show t, show d]

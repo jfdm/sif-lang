@@ -73,30 +73,27 @@ buildReqE bob c q@(Req i ty t d) = do
       pure r
 
 buildProblemE : SifBuilder impl
+             -> (d : SifDomain)
              -> SifAST TyPROBLEM
-             -> DSLBuilder (d ** PROBLEM impl d)
-buildProblemE bob (Problem i t d (cID,c) rs) = do
+             -> DSLBuilder (PROBLEM impl d)
+buildProblemE bob d (Problem i t d' _ rs) = do
     trace "Building problem specification"
-    rs' <- mapE (\r => buildReqE bob c r) rs
+    rs' <- mapE (\r => buildReqE bob d r) rs
     splitTimerMsg (getPFName !getBuildState) "Building Requirements"
-    let p = mkProblem bob c t d rs'
-    updateBuildState (\st => record { getProb     = Just i
-                                    , pattTitle   = t
-                                    , getDomainID = Just cID
-                                    , getDomain   = c} st)
-    pure (_ ** p)
+    let p = mkProblem bob d t d' rs'
+    updateBuildState (\st => record { getProbID     = Just i
+                                    , pattTitle   = t} st)
+    pure p
 
-problemFromFile : SifBuilder impl
-               -> String
-               -> DSLBuilder (d ** PROBLEM impl d)
-problemFromFile bob f = do
-    trace "Fetching problem specification"
-    mkTimer f
-    startTimer f
-    (Right past) <- readSifFile problem f | Left err => Sif.raise err
-    splitTimerMsg f "Finished Parsing now building"
-    rval <- buildProblemE bob past
-    stopTimer f
+problemFromAST : SifBuilder impl
+              -> (d : SifDomain)
+              -> SifAST TyPROBLEM
+              -> DSLBuilder (PROBLEM impl d)
+problemFromAST bob d past = do
+    mkTimer (getPFName !getBuildState)
+    startTimer (getPFName !getBuildState)
+    rval <- buildProblemE bob d past
+    stopTimer (getPFName !getBuildState)
     pure $ rval
 
 -- ---------------------------------------------------------- [ Build Solution ]
@@ -138,41 +135,33 @@ buildSolutionE : SifBuilder impl
               -> (d : SifDomain)
               -> SifAST TySOLUTION
               -> DSLBuilder (SOLUTION impl d)
-buildSolutionE bob c (Solution t (pID, pDesc) d cID ps) = do
+buildSolutionE bob d (Solution t (pID, pDesc) d' _ ps) = do
   trace "Building solution specification"
   st <- getBuildState
-
-  case (getProb st, getDomainID st ) of
-    (Nothing, Nothing) => Sif.raise InternalErr
-    (_,       Nothing) => Sif.raise InternalErr
-    (Nothing, _)       => Sif.raise InternalErr
-    (Just pID', Just cID') => do
+  trace "Comparing "
+  case getProbID st of
+    Nothing   => Sif.raise InternalErr
+    Just pID' => do
       case (not (pID' == pID)) of
         True => Sif.raise (MismatchError pID pID')
-        False =>
-          case not (cID' == cID) of
-            True  => Sif.raise (MismatchError cID cID')
-            False => do
-              ps' <- mapE (\p => buildPropertyE bob c p) ps
-              splitTimerMsg (getSFName !getBuildState) "Building Properties"
-              updateBuildState (\st => record
-                  { pattTitle = unwords [pattTitle st, "through",t]
-                  , pattDesc = pDesc
-                  } st)
-              pure $ mkSolution bob c t d ps'
+        False => do
+          ps' <- mapE (\p => buildPropertyE bob d p) ps
+          splitTimerMsg (getSFName !getBuildState) "Building Properties"
+          updateBuildState (\st => record
+              { pattTitle = unwords [pattTitle st, "through",t]
+              , pattDesc = pDesc
+              } st)
+          pure $ mkSolution bob d t d' ps'
 
-solutionFromFile : SifBuilder impl
-                -> (d : SifDomain)
-                -> String
-                -> DSLBuilder (SOLUTION impl d)
-solutionFromFile bob c f = do
-    trace "Fetching Solution Specification"
-    mkTimer f
-    startTimer f
-    (Right sast) <- readSifFile solution f | Left err => Sif.raise err
-    splitTimerMsg f "Finished Parsing now building"
-    sval <- buildSolutionE bob c sast
-    stopTimer f
+solutionFromAST : SifBuilder impl
+              -> (d : SifDomain)
+              -> SifAST TySOLUTION
+              -> DSLBuilder (SOLUTION impl d)
+solutionFromAST bob d sast = do
+    mkTimer (getSFName !getBuildState)
+    startTimer (getSFName !getBuildState)
+    sval <- buildSolutionE bob d sast
+    stopTimer (getSFName !getBuildState)
     pure sval
 
 -- ----------------------------------------------------------------- [ Pattern ]
@@ -197,15 +186,37 @@ patternFromFile : SifBuilder impl
                -> String
                -> String
                -> DSLBuilder (d ** PATTERN impl d)
-patternFromFile bob p s = do
-  putBuildState (defBuildSt p s)
-  (c ** p') <- problemFromFile bob p
-  splitTimerMsg (unwords ["Building for ", p, "&", s])
-                "Finished Problem now Solution"
-  s' <- solutionFromFile bob c s
-  splitTimerMsg (unwords ["Building for ", p, "&", s])
-                "Finished Solution now Pattern"
-  res <- buildPatternE bob c p' s'
-  pure (c ** res)
+patternFromFile bob pfile sfile = do
+  putBuildState (defBuildSt pfile sfile)
+
+  trace "Parsing Specifications"
+  splitTimerMsg (unwords ["Building for ", pfile, "&", sfile])
+                "Starting Parsing"
+
+  (Right past) <- readSifFile problem pfile  | Left err => Sif.raise err
+
+  splitTimerMsg (unwords ["Building for ", pfile, "&", sfile])
+                "Finished problem parsing"
+
+  (Right sast) <- readSifFile solution sfile | Left err => Sif.raise err
+  splitTimerMsg (unwords ["Building for ", pfile, "&", sfile])
+                "Finished solution parsing"
+
+  trace "Comparing Context of Solution and Problem"
+  case compatible past sast of
+    Nothing => Sif.raise ContextMismatch
+    Just d  => do
+      p' <- problemFromAST bob d past
+
+      splitTimerMsg (unwords ["Building for ", pfile, "&", sfile])
+                   "Finished Problem now Solution"
+
+      s' <- solutionFromAST bob d sast
+
+      splitTimerMsg (unwords ["Building for ", pfile, "&", sfile])
+                   "Finished Solution now Pattern"
+
+      res <- buildPatternE bob d p' s'
+      pure (d ** res)
 
 -- --------------------------------------------------------------------- [ EOF ]

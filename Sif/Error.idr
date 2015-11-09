@@ -20,6 +20,7 @@ data SifError : Type where
   NoModeSpecified   : SifError
   NoFormatSpecified : SifError
   FeatureNotImpl    : SifError
+  ContextMismatch : SifError
 
   CannotWriteFile : String -> SifError
   NoSuchBackend   : String -> SifError
@@ -31,25 +32,26 @@ data SifError : Type where
   GeneralError    : String -> SifError
 
 instance Show SifError where
-  show IndexOutOfBounds = "Index Out of Bounds"
-  show NoSuchPattern    = "No Such Pattern"
-  show UnSuppFormat     = "Unsupported output format"
-  show ResultInvalid    = "Invalid evaluation result"
-  show NoSuchCommand    = "No such command"
-  show ImportError      = "Import Error"
-  show NoFileGiven      = "No File Given"
-  show NoModeSpecified  = "Node Mode Specified"
+  show IndexOutOfBounds  = "Index Out of Bounds"
+  show NoSuchPattern     = "No Such Pattern"
+  show UnSuppFormat      = "Unsupported output format"
+  show ResultInvalid     = "Invalid evaluation result"
+  show NoSuchCommand     = "No such command"
+  show ImportError       = "Import Error"
+  show NoFileGiven       = "No File Given"
+  show NoModeSpecified   = "Node Mode Specified"
   show NoFormatSpecified = "No output format specified"
   show FeatureNotImpl    = "Feature Not Implemented"
   show InternalErr       = "Internal Error"
+  show ContextMismatch   = "Solution Problem Context Mismatch"
 
-  show (GeneralError m)     = m
+  show (GeneralError m) = m
 
-  show (CannotWriteFile f)  = unwords ["Cannot write file:", show f]
-  show (NoSuchBackend b)    = unwords ["No Such Backend:", show b]
-  show (IDMissing id)       = unwords ["Identifier Missing:", show id]
-  show (DuplicateID id)     = unwords ["Identifier already Exists:", show id]
-  show (FileMissing fname)  = unwords ["File Missing", show fname]
+  show (CannotWriteFile f) = unwords ["Cannot write file:", show f]
+  show (NoSuchBackend b)   = unwords ["No Such Backend:", show b]
+  show (IDMissing id)      = unwords ["Identifier Missing:", show id]
+  show (DuplicateID id)    = unwords ["Identifier already Exists:", show id]
+  show (FileMissing fname) = unwords ["File Missing", show fname]
 
   show (ParseError fn err) =
       unlines [ unwords ["Error Parsing file", show fn, "error was:"]
