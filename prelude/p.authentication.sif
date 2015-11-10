@@ -1,12 +1,61 @@
 sif problem
 
+> How to authenticate entities.
 authentication <- Problem "Authentication"
 
-enrolment    <- Functional "Enrollment"
-authStep     <- Functional "Authentication Mechanism"
-changable    <- Functional "Changable"
+--  --------------------------------------------------------------- [ Contexts ]
 
+> How to authenticate without relying on technology.
+socio <- Context "Non-Technical"
+
+> How to perform authentication using a mixture of technology and
+> human interactions.
+sociotech <- Context "Socio-Technical"
+
+> How to perform authentication only using technical mechanisms.
+tech <- Context "Technical"
+
+--  ----------------------------------------------------------- [ Requirements ]
+
+> Solutions must have a means to enroll entities into the
+> authentication procedure.
+enrollment <- Functional "Enrollment"
+
+> Solutions must consist of an authentication step.
+authStep <- Functional "Authentication Mechanism"
+
+> The authentication step must be changable and re-enrollment
+> possible.
+changable <- Functional "Changable"
+
+> Authentication must be consistent and that entities with up-to-date
+> authentication details should authentication.
 consistent   <- Reliability "Authentication happens"
-timely       <- Performance "Timely Authentication"
 
-lockout      <- Functional "Able to set limited access attempts"
+> Processing authentication requests must not take forever, and be
+> timely in their duration.
+timely <- Performance "Timely Authentication"
+
+> Entities that repeatedly try to authenticate with incorrect data
+> should be locked out of the system for some predefined period of
+> time.
+lockout <- Functional "Able to set limited access attempts"
+
+> the knowledge factors: Something the user knows (e.g., a password,
+> Partial Password, pass phrase, or personal identification number
+> (PIN), challenge response (the user must answer a question, or
+> pattern), Security question
+knowledge <- Functional "Knowledge Factor"
+
+> the ownership factors: Something the user has (e.g., wrist band, ID
+> card, security token, cell phone with built-in hardware token,
+> software token, or cell phone holding a software token)
+ownership <- Functional "Ownership Factor"
+
+>  the inherence factors: Something the user is or does (e.g.,
+> fingerprint, retinal pattern, DNA sequence (there are assorted
+> definitions of what is sufficient), signature, face, voice, unique
+> bio-electric signals, or other biometric identifier).
+inherence <- Functional "Inherence Factor"
+
+--  -------------------------------------------------------------------- [ EOF ]

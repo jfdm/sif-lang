@@ -1,0 +1,27 @@
+sif solution
+
+Description """Shibboleths are challenge response phrases used for
+identification in hostile territory."""
+
+> Shibboleths are a challenge response mechanism that relies on
+> participants to know a series of challenges and responses to those
+> challenges. When challenged a an entity must return the correct
+> response.
+Solution "Shibboleths" solves authentication in socio {
+
+  > Shibboleths are a Challenge Response Mechanism.
+  Property "C-R Mechanism" {
+    > The CR values are only known to those enrolled in the process.
+    Trait "Learning C-R Values" is Satisfied {
+	  Affects { Makes enrollment
+	  		  , Helps consistent
+			  , Makes knowledge}}
+
+	> The C-R mechanism is the authentication step.
+    Trait "Act of C-R" is Satisfied {
+      Affects { Makes authStep
+	  		  , Helps consistent
+			  , Helps timely
+			  , Helps lockout}}}}
+
+--  -------------------------------------------------------------------- [ EOF ]
