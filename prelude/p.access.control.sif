@@ -36,7 +36,9 @@ effortless <- Functional "Effortless"
 > access attempts.
 reliable <- Reliability "Access All the Time"
 
-> Management of access rights to a resource must be possible. Such management will include: assignment of, amendment of, and revocation of access.
+> Management of access rights to a resource must be possible. Such
+> management will include: assignment of, amendment of, and revocation
+> of access.
 changable <- Functional "Change of Permission"
 
 > Knowledge of what access an entity has should be permissible.
