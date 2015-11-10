@@ -34,6 +34,7 @@
     "Functional" "Usability" "Reliability" "Performance" "Supportability"
     "Component" "System" "Deployment" "Admin" "Implementation"
     "Property" "Advantage" "Trait" "Description" "Disadvantage" "Affects"
+    "Context"
 ))
 ;; ----------------------------------------------------- [ Constants ]
 (defvar sif-modifiers '(

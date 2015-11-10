@@ -1,12 +1,45 @@
 sif problem
 
-accesscontrol <- Problem "Access Control"
+> The problem is about controlling access to a resource.
+accesscontrol <- Problem "Resource Access Control"
 
-build <- Context "Building"
-soft  <- Context "Software"
+> Within the physical world controlling access to a building is
+> important.  Contained within these buildings will be valuables that
+> if stolen will incur damage to the owner. Further the building might
+> contain items that should only be made accessible by authorised
+> personnel only.
+physical <- Context "Physical"
 
-control     <- Functional "Access Restriction"
-indy        <- Functional "Application Independence"
-flexi       <- Functional "Flexibility"
-ease        <- Functional "Easy Adjustment"
-simpleAdmin <- Functional "Ease of Administration"
+> Within software controlling access to resources is important.
+> Contained within a machine will be data and information that if
+> leaked will incur damage to the owner. Further, access to said data
+> might need to be restricted to authorised entities only.
+software  <- Context "Software"
+
+> Access to a resource should be restricted.
+protection <- Functional "Protection"
+
+> Access to a resource should be restricted to an pre-authorised set
+> of entities only. Those not authorised to access the resource should
+> not be permitted access.
+selective <- Functional "Selective Access Rights"
+
+> The restricted access to the resource must be persistent and
+> applicable at all times during the resource's lifetime.
+persistence <- Functional "Persistent Protection"
+
+> Access to the resource should be easy to perform for those authorised.
+> Those not authorised should find great difficulty obtaining access.
+effortless <- Functional "Effortless"
+
+> The mechanism of authorisation must be reliable for all authorised
+> access attempts.
+reliable <- Reliability "Access All the Time"
+
+> Management of access rights to a resource must be possible. Such management will include: assignment of, amendment of, and revocation of access.
+changable <- Functional "Change of Permission"
+
+> Knowledge of what access an entity has should be permissible.
+awareness <- Functional "Awareness of Access"
+
+--  -------------------------------------------------------------------- [ EOF ]

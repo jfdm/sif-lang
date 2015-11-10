@@ -1,0 +1,79 @@
+sif solution
+
+Description """Door locks are mechanisms, integrated into doors, that are combined with a token used to restrict access to the room that the door is an entry to."""
+
+> Doors provide access to buildings and rooms inside those buildings.
+> A /door lock/ is a physical mechanism paired with a set of
+> authentication tokens. This locking mechanism is integrated within
+> the door such that the door can only be unlock /iff/ the token paired
+> with the door is used.
+
+Solution "Generic Door Locks" solves accesscontrol in physical {
+
+  > The door lock contains a locking mechanism used to keep the door closed.
+  Property "Door Locking Mechanism" {
+
+    > This is what keeps the door locked. It is integrated into the
+    > door and is thus applicable at all times.
+    Advantage "Holds the Door" is Satisfied {
+	  Affects { Makes protection, Helps persistence }
+    }
+
+    > The reliability of the mechanisms is dependent on the quality of
+    > construction of the mechanism.
+    Trait "Reliability of mechanism" is WeakDen {
+	  Affects { SomeNeg reliable
+	  		  , SomeNeg protection
+			  , SomeNeg persistence
+	  }
+    }
+
+	> Locking mechanisms can be by passed through attacks i.e. Locks
+    > can be picked.
+
+    Disadvantage "Lock Picking" is WeakDen {
+	  Affects { Breaks protection, SomeNeg persistence }
+    }
+
+    > Ease of use is dependent upon the complexity of the mechanism.
+    Trait "Complexity of Mechanism Operation" is WeakSatis {
+	  Affects { Makes effortless }
+    }
+
+    > It is not clear what the default state of the door should be?
+    Disadvantage "Default State" is Denied {
+	  Affects { SomePos protection }
+    }
+
+    > Singleton, any problems with the mechanism or key requires the entire lock to be replaced.
+	Disadvantage "Singleton Issues" is WeakSatis {
+	  Affects { SomeNeg protection }
+    }
+
+  }
+
+  > The locking mechanism is used to ensure that the door is kept closed. An artefact used to lock and unlock the door.
+  Property "Access Token" {
+    > It is a token.
+	Trait "Token" is Satisfied {
+      Affects { Helps selective by "Need access to token to unlock the door."
+			  , Helps awareness by "reminder of what access a person has."
+	  }
+    }
+	Trait "Token Ownership" is WeakDen {
+	  Affects { Hurts persistence by "loose of token"
+	  		  , Hurts protection by "If token is lost/stolen access can be granted to unauthorised entities."}
+    }
+  }
+
+  > Administering access rights to doors.
+  Property "Administration" {
+    Trait "Locksmith" is Satisfied {
+	  Affects { Hurts changable by "requiring a third party to make keys"
+	  		  , Hurts selective by "requiring a third party to make keys"}
+    }
+	Trait "Trusted Locksmith" is WeakSatis {
+	  Affects { SomePos selective, SomePos changable }
+    }
+  }
+}
