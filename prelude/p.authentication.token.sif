@@ -1,7 +1,7 @@
 sif problem
 
 > How to authenticate entities.
-authentication <- Problem "Authentication"
+tokenAuth <- Problem "Token-Based Authentication"
 
 --  --------------------------------------------------------------- [ Contexts ]
 
@@ -40,5 +40,10 @@ timely <- Performance "Timely Authentication"
 > should be locked out of the system for some predefined period of
 > time.
 lockout <- Functional "Able to set limited access attempts"
+
+> the ownership factors: Something the user has (e.g., wrist band, ID
+> card, security token, cell phone with built-in hardware token,
+> software token, or cell phone holding a software token)
+ownership <- Functional "Ownership Factor"
 
 --  -------------------------------------------------------------------- [ EOF ]

@@ -1,0 +1,48 @@
+sif solution
+
+Description """ID Cards are physical tokens handed out by a governing
+authority that can be used by people to verify their identity."""
+
+> ID Cards are physical tokens handed out by a governing authority.
+> Users must enroll with the body to be issued with an ID Cards.
+
+Solution "ID Cards" solves tokenAuth in sociotech {
+
+  > The ID Cards is a token carried by people.
+  Property "ID Cards is a Token" {
+    > Only authorised bodies should be able to construct cards.
+    Trait "Assignment of Cards" is Satisfied {
+      Affects { Makes enrollment by "assignment of cards is enrollment."}}
+
+	> Specific tokens can have a validity period.
+    Advantage "Validity Period" is Satisfied {
+	  Affects { Helps consistent by "ensuring up-to-date cards."
+	  		  , Helps changable   by "renewing of cards."}}
+
+    > Cards are physical tokens.
+	Trait "Token" is Satisfied {
+      Affects { Makes ownership by "token is something you have."}}}
+
+  > Technology is Used.
+  Property "Technology" {
+      > Cards can be made electronic.
+	Trait "Machine Readable" is Satisfied {
+	  Affects { Helps consistent by "machines are 'never' wrong."
+		      , Helps timely	 by "machines operations are 'finite'."
+			  , Helps lockout	 by "processing step is 'deterministic'." }}
+
+	> Technology is not always right.
+	Disadvantage "Hackable" is WeakSatis {
+      Affects { Breaks consistent by "machines can be wrong."
+	  		  , Breaks timely     by "machine operations can be made infinite."
+			  , Breaks lockout    by "machines can be damaged/forged" }}}
+
+  > Standardised means of identification accross governing body's remit.
+  Property "Governing Body Issued" {
+    Trait "Standardised form of Identification" is Satisfied {
+	  Affects { Makes enrollment, SomePos changable }}
+
+	Trait "Standarised Mechanism" is Satisfied {
+	  Affects { Makes authStep }}}}
+
+--  -------------------------------------------------------------------- [ EOF ]

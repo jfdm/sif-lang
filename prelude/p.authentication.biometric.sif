@@ -1,7 +1,7 @@
 sif problem
 
 > How to authenticate entities.
-authentication <- Problem "Authentication"
+biometricAuth <- Problem "Biometric Authentication"
 
 --  --------------------------------------------------------------- [ Contexts ]
 
@@ -11,9 +11,6 @@ socio <- Context "Non-Technical"
 > How to perform authentication using a mixture of technology and
 > human interactions.
 sociotech <- Context "Socio-Technical"
-
-> How to perform authentication only using technical mechanisms.
-tech <- Context "Technical"
 
 --  ----------------------------------------------------------- [ Requirements ]
 
@@ -30,7 +27,7 @@ changable <- Functional "Changable"
 
 > Authentication must be consistent and that entities with up-to-date
 > authentication details should authentication.
-consistent   <- Reliability "Authentication happens"
+consistent  <- Reliability "Authentication happens"
 
 > Processing authentication requests must not take forever, and be
 > timely in their duration.
@@ -40,5 +37,11 @@ timely <- Performance "Timely Authentication"
 > should be locked out of the system for some predefined period of
 > time.
 lockout <- Functional "Able to set limited access attempts"
+
+> the inherence factors: Something the user is or does (e.g.,
+> fingerprint, retinal pattern, DNA sequence (there are assorted
+> definitions of what is sufficient), signature, face, voice, unique
+> bio-electric signals, or other biometric identifier).
+inherence <- Functional "Inherence Factor"
 
 --  -------------------------------------------------------------------- [ EOF ]

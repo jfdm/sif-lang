@@ -13,15 +13,15 @@ Solution "Shibboleths" solves authentication in socio {
   Property "C-R Mechanism" {
     > The CR values are only known to those enrolled in the process.
     Trait "Learning C-R Values" is Satisfied {
-	  Affects { Makes enrollment
-	  		  , Helps consistent
-			  , Makes knowledge}}
+	  Affects { Helps   enrollment by "users have to learn the C-R process and phrases"
+	  		  , SomePos consistent by "users will be tested, but may forget later"
+			  , Helps   changable  by "new phrases to learn"}}
 
 	> The C-R mechanism is the authentication step.
     Trait "Act of C-R" is Satisfied {
-      Affects { Makes authStep
-	  		  , Helps consistent
-			  , Helps timely
-			  , Helps lockout}}}}
+      Affects { Makes authStep    by "very nature the C-R is the authstep"
+	  		  , Helps consistent  by "predefined phrases are learned."
+			  , Helps timely      by "Two parties will now immediately result"
+			  , Helps lockout     by "clearly defined process, but confusion over which C-R pair."}}}}
 
 --  -------------------------------------------------------------------- [ EOF ]

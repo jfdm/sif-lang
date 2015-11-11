@@ -1,7 +1,7 @@
 sif problem
 
 > How to authenticate entities.
-authentication <- Problem "Authentication"
+challengeAuth <- Problem "Challenged-Based Authentication"
 
 --  --------------------------------------------------------------- [ Contexts ]
 
@@ -40,5 +40,11 @@ timely <- Performance "Timely Authentication"
 > should be locked out of the system for some predefined period of
 > time.
 lockout <- Functional "Able to set limited access attempts"
+
+> the knowledge factors: Something the user knows (e.g., a password,
+> Partial Password, pass phrase, or personal identification number
+> (PIN), challenge response (the user must answer a question, or
+> pattern), Security question
+knowledge <- Functional "Knowledge Factor"
 
 --  -------------------------------------------------------------------- [ EOF ]

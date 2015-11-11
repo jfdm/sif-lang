@@ -1,0 +1,55 @@
+sif solution
+
+Description """Digital Certificates are purely technical
+authentication mechanism used to authenticate an entity using digital tokens generated on the authenticating entity."""
+
+> Digital Certificates are digital artefacts that present machine
+> checkable proof attesting to the identity of the certificate owner.
+> These certificates are generated on the device that the entity wants
+> to authenticate against. If the certificate cannot be checked then
+> authentication fails.
+
+Solution "Digital Certificates" solves authentication in tech {
+  > Technology is Used.
+  Property "Technology" {
+    > Cards can be made electronic.
+	Trait "Machine Readable" is Satisfied {
+	  Affects { Helps consistent by "machines are 'never' wrong."
+		      , Helps timely	 by "machines operations are 'finite'."
+			  , Helps lockout	 by "processing step is 'deterministic'."}}
+
+    Trait "New Tokens can be issued" is Satisfied {
+	  Affects { Helps   changable  by "tokens can be re-written"
+	  		  , SomeNeg consistent by "token management"}}
+
+	> Technology is not always right.
+	Disadvantage "Hackable" is WeakSatis {
+      Affects { SomeNeg consistent by "machines can be wrong."
+	  		  , SomeNeg timely     by "machine operations can be made infinite."
+			  , SomeNeg lockout    by "machines can be damaged/forged"}}}
+
+  > There will be a structured description on how to issue certificates.
+  Property "Issuing Infrastructure" {
+    > Well defined mechanisms exits.
+    Trait "Standards and Protocols" is Satisfied {
+	  Affects { Makes   enrollment by "Well-Defined in standards"
+	  		  , Makes   authStep   by "Well-Defined in standards"
+			  , SomePos changable  by "Well-Defined in standards"}}
+
+    > Which mechanism to use.
+	Trait "Which Mechanisms to use" is Satisfied {
+	  Affects { Makes   authStep by "virtue of implementation."
+	  		  , SomeNeg authStep by "virtue of choice."}}}
+
+  > Certificates are tokens
+  Property "Certificates are Tokens" {
+
+    > Only authorised bodies should have ownership of the cards.
+	Trait "Certificate Assignment/Creation" is WeakSatis {
+	  Affects { Makes enrollment by "assignment of certificate."}}
+
+    > Tokens can be stolen/lost.
+    Disadvantage "Stolen/Lost Tokens" is WeakSatis {
+	  Affects { Hurts consistent by "impersonation of entities."}}}}
+
+--  -------------------------------------------------------------------- [ EOF ]
