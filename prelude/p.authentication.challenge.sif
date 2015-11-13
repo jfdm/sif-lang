@@ -19,7 +19,10 @@ tech <- Context "Technical"
 
 > Solutions must have a means to enroll entities into the
 > authentication procedure.
-enrollment <- Functional "Enrollment"
+enrollment <- Functional "Enrolment"
+
+> A proof is required that will attest to the authenticity of an entity.
+proof <- Functional "Proof of Authenticity"
 
 > Solutions must consist of an authentication step.
 authStep <- Functional "Authentication Mechanism"
@@ -40,6 +43,9 @@ timely <- Performance "Timely Authentication"
 > should be locked out of the system for some predefined period of
 > time.
 lockout <- Functional "Able to set limited access attempts"
+
+> The authentication process should not require undue effort to do.
+effortless <- Usability "Effortless Authentication"
 
 > the knowledge factors: Something the user knows (e.g., a password,
 > Partial Password, pass phrase, or personal identification number

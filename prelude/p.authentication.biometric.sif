@@ -16,7 +16,10 @@ sociotech <- Context "Socio-Technical"
 
 > Solutions must have a means to enroll entities into the
 > authentication procedure.
-enrollment <- Functional "Enrollment"
+enrollment <- Functional "Enrolment"
+
+> A proof is required that will attest to the authenticity of an entity.
+proof <- Functional "Proof of Authenticity"
 
 > Solutions must consist of an authentication step.
 authStep <- Functional "Authentication Mechanism"
@@ -27,7 +30,7 @@ changable <- Functional "Changable"
 
 > Authentication must be consistent and that entities with up-to-date
 > authentication details should authentication.
-consistent  <- Reliability "Authentication happens"
+consistent   <- Reliability "Authentication happens"
 
 > Processing authentication requests must not take forever, and be
 > timely in their duration.
@@ -37,6 +40,9 @@ timely <- Performance "Timely Authentication"
 > should be locked out of the system for some predefined period of
 > time.
 lockout <- Functional "Able to set limited access attempts"
+
+> The authentication process should not require undue effort to do.
+effortless <- Usability "Effortless Authentication"
 
 > the inherence factors: Something the user is or does (e.g.,
 > fingerprint, retinal pattern, DNA sequence (there are assorted

@@ -1,6 +1,8 @@
 sif problem
 
-> How to authenticate entities.
+> How to authenticate entities such that assurances can be made of
+> their identity.
+
 authentication <- Problem "Authentication"
 
 --  --------------------------------------------------------------- [ Contexts ]
@@ -8,18 +10,28 @@ authentication <- Problem "Authentication"
 > How to authenticate without relying on technology.
 socio <- Context "Non-Technical"
 
-> How to perform authentication using a mixture of technology and
-> human interactions.
-sociotech <- Context "Socio-Technical"
+> How to perform local authentication using a mixture of technology
+> and human interactions.
+sociotechLocal  <- Context "Socio-Technical Local"
 
-> How to perform authentication only using technical mechanisms.
-tech <- Context "Technical"
+> How to perform remote authentication using a mixture of technology
+> and human interactions.
+sociotechRemote <- Context "Socio-Technical Remote"
+
+> How to perform local authentication only using technical mechanisms.
+techLocal <- Context "Technical Remote"
+
+> How to perform remote authentication only using technical mechanisms.
+techRemote <- Context "Technical Remote"
 
 --  ----------------------------------------------------------- [ Requirements ]
 
 > Solutions must have a means to enroll entities into the
 > authentication procedure.
-enrollment <- Functional "Enrollment"
+enrollment <- Functional "Enrolment"
+
+> A proof is required that will attest to the authenticity of an entity.
+proof <- Functional "Proof of Authenticity"
 
 > Solutions must consist of an authentication step.
 authStep <- Functional "Authentication Mechanism"
@@ -41,4 +53,6 @@ timely <- Performance "Timely Authentication"
 > time.
 lockout <- Functional "Able to set limited access attempts"
 
+> The authentication process should not require undue effort to do.
+effortless <- Usability "Effortless Authentication"
 --  -------------------------------------------------------------------- [ EOF ]

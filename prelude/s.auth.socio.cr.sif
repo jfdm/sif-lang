@@ -12,35 +12,23 @@ Solution "Shibboleths" solves authentication in socio {
   > A shibboleth is a phrase whose pronunciation is known only to a
   > certain group.
   Property "Known Phrase" {
-
-    > Depending on the culture and phrased use, knowledge of how to
-	> pronounce the phrase may be more wide spread than originally
-	> thought.
-    Trait "Known to a select few" is WeakSatis {
-	  Affects { SomePos proof    by "restricting choice of phrase."
-	  		  , SomePos authStep by "phrase and knowledge of how to pronounce is restricted." }}
-
-    > The Proof comes from how it is pronounced.
     Trait "Pronunciation is the Proof" is Satisfied {
 	  Affects { Makes proof by "virtue of knowledge of how to pronounce the phrase."}}}
 
-  > Shibboleths are a Challenge Response Mechanism. For
-  > authentication, people ask for a phrase to be pronounced. If
-  > pronounced incorrectly an error is known to be made.
-  Property "Shibboleths are a C-R Mechanism" {
-
-    > The phrases used are only known to those enrolled in the process.
-    Trait "Learning Shibboleths" is Satisfied {
-	  Affects { Helps   enrollment by "users have to learn the phrases"
+  > Shibboleths are a Challenge Response Mechanism.
+  Property "C-R Mechanism" {
+    > The CR values are only known to those enrolled in the process.
+    Trait "Learning C-R Values" is Satisfied {
+	  Affects { Helps   enrollment by "users have to learn the C-R process and phrases"
 	  		  , SomePos consistent by "users will be tested, but may forget later"
 			  , Helps   changable  by "new phrases to learn"
 			  , SomePos effortless by "can be easy to learn."}}
 
 	> The C-R mechanism is the authentication step.
     Trait "Act of C-R" is Satisfied {
-      Affects { Makes authStep    by "very nature the C-R step is the auththenication step."
+      Affects { Makes authStep    by "very nature the C-R is the authstep"
 	  		  , Helps consistent  by "predefined phrases are learned."
-			  , Helps timely      by "parties will now the result immediately."
-			  , Helps lockout     by "clearly defined process, but confusion over which phrase used.."}}}}
+			  , Helps timely      by "Two parties will now immediately result"
+			  , Helps lockout     by "clearly defined process, but confusion over which C-R pair."}}}}
 
 --  -------------------------------------------------------------------- [ EOF ]
