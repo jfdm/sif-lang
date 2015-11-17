@@ -25,39 +25,39 @@ import Sif.Builder.Utils
 -- ----------------------------------------- [ Private Internal Data Structure ]
 
 data AbsInterpPriv : InterpRes ty -> SifTy -> Type where
-  priv__mkReq : (ty   : RTy)
+  PrivmkReq : (ty   : RTy)
              -> (t    : String)
              -> (desc : Maybe String)
              -> AbsInterpPriv (interpReq t) tyREQ
 
-  priv__mkProb : (title : String)
+  PrivmkProb : (title : String)
               -> (desc  : Maybe String)
               -> DList (InterpRes TyREQ) (\x => AbsInterpPriv x TyREQ) xs
               -> AbsInterpPriv (interpProb title xs) TyPROBLEM
 
-  priv__mkTLink : (cval : CValue)
+  PrivmkTLink : (cval : CValue)
                -> (req : AbsInterpPriv r TyREQ)
                -> (desc : Maybe String)
                -> AbsInterpPriv (interpAffect cval r) TyAFFECTS
 
-  priv__mkTrait : (ty : TTy)
+  PrivmkTrait : (ty : TTy)
                -> (title : String)
                -> (desc  : Maybe String)
                -> (sval  : SValue)
                -> DList (InterpRes TyAFFECTS) (\x => AbsInterpPriv x TyAFFECTS) rs
                -> AbsInterpPriv (interpTrait title sval rs ty) TyTRAIT
 
-  priv__mkProp : (title : String)
+  PrivmkProp : (title : String)
               -> (desc : Maybe String)
               -> DList (InterpRes TyTRAIT) (\x => AbsInterpPriv x TyTRAIT) ts
               -> AbsInterpPriv (interpProp title ts) TyPROPERTY
 
-  priv__mkSolt : (title : String)
+  PrivmkSolt : (title : String)
               -> (desc : Maybe String)
               -> DList (InterpRes TyPROPERTY) (\x => AbsInterpPriv x TyPROPERTY) ps
               -> AbsInterpPriv (interpSolt title ps) TySOLUTION
 
-  priv__mkPatt : (title : String)
+  PrivmkPatt : (title : String)
               -> (desc : Maybe String)
               -> AbsInterpPriv p TyPROBLEM
               -> AbsInterpPriv s TySOLUTION
@@ -95,78 +95,78 @@ data AbsInterpRep : SifTy -> SifDomain -> Type where
 -- --------------------------------------------------------------- [ Interface ]
 
 getPrivTitle : AbsInterpPriv i ty -> {auto prf : HasMData ty} -> String
-getPrivTitle (priv__mkReq _ t _)       = t
-getPrivTitle (priv__mkProb t _ _)      = t
-getPrivTitle (priv__mkTrait _ t _ _ _) = t
-getPrivTitle (priv__mkProp t _ _)      = t
-getPrivTitle (priv__mkSolt t _ _)      = t
-getPrivTitle (priv__mkPatt t _ _ _)    = t
+getPrivTitle (PrivmkReq _ t _)       = t
+getPrivTitle (PrivmkProb t _ _)      = t
+getPrivTitle (PrivmkTrait _ t _ _ _) = t
+getPrivTitle (PrivmkProp t _ _)      = t
+getPrivTitle (PrivmkSolt t _ _)      = t
+getPrivTitle (PrivmkPatt t _ _ _)    = t
 getPrivTitle _ = "Error"
 
 getPrivDesc : AbsInterpPriv i ty -> Maybe String
-getPrivDesc (priv__mkReq _ _ d)       = d
-getPrivDesc (priv__mkProb _ d rs)     = d
-getPrivDesc (priv__mkTLink _ _ d)     = d
-getPrivDesc (priv__mkTrait _ _ d _ _) = d
-getPrivDesc (priv__mkProp _ d _)      = d
-getPrivDesc (priv__mkSolt _ d _)      = d
-getPrivDesc (priv__mkPatt _ d _ _)    = d
+getPrivDesc (PrivmkReq _ _ d)       = d
+getPrivDesc (PrivmkProb _ d rs)     = d
+getPrivDesc (PrivmkTLink _ _ d)     = d
+getPrivDesc (PrivmkTrait _ _ d _ _) = d
+getPrivDesc (PrivmkProp _ d _)      = d
+getPrivDesc (PrivmkSolt _ d _)      = d
+getPrivDesc (PrivmkPatt _ d _ _)    = d
 getPrivDesc _ = Nothing
 
 getPrivRTy : {i : InterpRes TyREQ}
           -> AbsInterpPriv i TyREQ
           -> RTy
-getPrivRTy (priv__mkReq ty _ _) = ty
+getPrivRTy (PrivmkReq ty _ _) = ty
 
 getPrivTTy : {i : InterpRes TyTRAIT}
           -> AbsInterpPriv i TyTRAIT
           -> TTy
-getPrivTTy (priv__mkTrait ty _ _ _ _) = ty
+getPrivTTy (PrivmkTrait ty _ _ _ _) = ty
 
 getPrivSValue : {i : InterpRes TyTRAIT}
               -> AbsInterpPriv i TyTRAIT
               -> SValue
-getPrivSValue (priv__mkTrait _ _ _ sval as) = sval
+getPrivSValue (PrivmkTrait _ _ _ sval as) = sval
 
 getPrivCValue : {i : InterpRes TyAFFECTS}
              -> AbsInterpPriv i TyAFFECTS
              -> CValue
-getPrivCValue (priv__mkTLink cval _ _) = cval
+getPrivCValue (PrivmkTLink cval _ _) = cval
 
 getPrivProblem : {i : InterpRes TyPATTERN}
               -> AbsInterpPriv i TyPATTERN
               -> (x : InterpRes TyPROBLEM ** AbsInterpPriv x TyPROBLEM)
-getPrivProblem (priv__mkPatt _ _ p _) = (_ ** p)
+getPrivProblem (PrivmkPatt _ _ p _) = (_ ** p)
 
 getPrivSolution : {i : InterpRes TyPATTERN}
                -> AbsInterpPriv i TyPATTERN
                -> (s : InterpRes TySOLUTION ** AbsInterpPriv s TySOLUTION)
-getPrivSolution (priv__mkPatt _ _ _ s) = (_ ** s)
+getPrivSolution (PrivmkPatt _ _ _ s) = (_ ** s)
 
 getPrivReqs : {i : InterpRes TyPROBLEM}
             -> AbsInterpPriv i TyPROBLEM
             -> (xs ** DList (InterpRes TyREQ) (\x => AbsInterpPriv x TyREQ) xs)
-getPrivReqs (priv__mkProb _ _ rs) = (_ ** rs)
+getPrivReqs (PrivmkProb _ _ rs) = (_ ** rs)
 
 getPrivProperties : {i : InterpRes TySOLUTION}
                   -> AbsInterpPriv i TySOLUTION
                   -> (xs ** DList (InterpRes TyPROPERTY) (\x => AbsInterpPriv x TyPROPERTY) xs)
-getPrivProperties (priv__mkSolt _ _ ps) = (_ ** ps)
+getPrivProperties (PrivmkSolt _ _ ps) = (_ ** ps)
 
 getPrivTraits : {i : InterpRes TyPROPERTY}
              -> AbsInterpPriv i TyPROPERTY
              -> (xs ** DList (InterpRes TyTRAIT) (\x => AbsInterpPriv x TyTRAIT) xs)
-getPrivTraits (priv__mkProp _ _ ts) = (_ ** ts)
+getPrivTraits (PrivmkProp _ _ ts) = (_ ** ts)
 
 getPrivAffects : {i : InterpRes TyTRAIT}
                -> AbsInterpPriv i TyTRAIT
                -> (xs ** DList (InterpRes TyAFFECTS) (\x => AbsInterpPriv x TyAFFECTS) xs)
-getPrivAffects (priv__mkTrait _ _ _ _ as) = (_ ** as)
+getPrivAffects (PrivmkTrait _ _ _ _ as) = (_ ** as)
 
 getPrivReq : {i : InterpRes TyAFFECTS}
           -> AbsInterpPriv i TyAFFECTS
           -> (s : InterpRes TyREQ ** AbsInterpPriv s TyREQ)
-getPrivReq (priv__mkTLink _ r _) = (_ ** r)
+getPrivReq (PrivmkTLink _ r _) = (_ ** r)
 
 instance SifRepAPI AbsInterpRep where
   getTitle  (MkWrapper i) = getPrivTitle i
@@ -202,7 +202,7 @@ buildReqAbs : (d : SifDomain)
            -> String
            -> Maybe String
            -> REQUIREMENT AbsInterpRep d
-buildReqAbs _ ty s d = MkExpr $ MkWrapper $ priv__mkReq ty s d
+buildReqAbs _ ty s d = MkExpr $ MkWrapper $ PrivmkReq ty s d
 
 %inline covering
 convS : List (SifExpr ty d AbsInterpRep)
@@ -223,7 +223,7 @@ buildProblemAbs : (d : SifDomain)
                -> REQUIREMENTS AbsInterpRep d
                -> PROBLEM AbsInterpRep d
 buildProblemAbs c t d rs =
-    MkExpr $ MkWrapper $ priv__mkProb t d (Sigma.getProof $ convS rs)
+    MkExpr $ MkWrapper $ PrivmkProb t d (Sigma.getProof $ convS rs)
 
 covering
 buildAffectAbs : (d : SifDomain)
@@ -232,7 +232,7 @@ buildAffectAbs : (d : SifDomain)
               -> Maybe String
               -> AFFECT AbsInterpRep d
 buildAffectAbs _ c r d =
-    MkExpr $ MkWrapper $ priv__mkTLink c
+    MkExpr $ MkWrapper $ PrivmkTLink c
            (Sigma.getProof $ conv r) d
 
 covering
@@ -244,7 +244,7 @@ buildTraitAbs : (d : SifDomain)
              -> AFFECTS AbsInterpRep d
              -> TRAIT AbsInterpRep d
 buildTraitAbs _ ty t d s rs =
-    MkExpr $ MkWrapper $ priv__mkTrait ty t d s (Sigma.getProof $ convS rs)
+    MkExpr $ MkWrapper $ PrivmkTrait ty t d s (Sigma.getProof $ convS rs)
 
 covering
 buildPropertyAbs : (d : SifDomain)
@@ -253,7 +253,7 @@ buildPropertyAbs : (d : SifDomain)
                 -> TRAITS AbsInterpRep d
                 -> PROPERTY AbsInterpRep d
 buildPropertyAbs _ t d ts =
-    MkExpr $ MkWrapper $ priv__mkProp t d (Sigma.getProof $ convS ts)
+    MkExpr $ MkWrapper $ PrivmkProp t d (Sigma.getProof $ convS ts)
 
 covering
 buildSolutionAbs : (d : SifDomain)
@@ -262,7 +262,7 @@ buildSolutionAbs : (d : SifDomain)
                 -> PROPERTIES AbsInterpRep d
                 -> SOLUTION AbsInterpRep d
 buildSolutionAbs _ s d ps =
-    MkExpr $ MkWrapper $ priv__mkSolt s d
+    MkExpr $ MkWrapper $ PrivmkSolt s d
            (Sigma.getProof $ convS ps)
 
 covering
@@ -273,7 +273,7 @@ buildPatternAbs : (d : SifDomain)
                -> SOLUTION AbsInterpRep d
                -> PATTERN AbsInterpRep  d
 buildPatternAbs _ t d (MkExpr (MkWrapper p)) (MkExpr (MkWrapper s)) =
-    MkExpr $ MkWrapper $ priv__mkPatt t d p s
+    MkExpr $ MkWrapper $ PrivmkPatt t d p s
 
 covering
 absInterpBuilder : SifBuilder AbsInterpRep
