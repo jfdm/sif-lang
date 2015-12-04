@@ -36,10 +36,10 @@ Solution "Asymmetric Cryptography" solves infosec in std {
 
     > The resulting operations for operating over data are
     > computationally expensive and are inefficient over large data.
-	Disadvantage "Computationally Expensive" is Satisfied {
+	Disadvantage "Computationally Expensive" is Denied {
 	  Affects {
-	      Helps mechPerf
-		, Helps minDisrupt
+	      Hurts mechPerf
+		, Hurts minDisrupt
       }
     }
 
@@ -55,7 +55,7 @@ Solution "Asymmetric Cryptography" solves infosec in std {
 
 	> However, as maths progresses new techniques could be developed
     > that weaken the security of the chosen schemes.
-	Disadvantage "Susceptible to Future Attacks" is WeakDen {
+	Disadvantage "Susceptible to Future Attacks" is WeakSatis {
 	  Affects {
 	      Breaks dataConf
 		, Breaks recipConf
@@ -85,7 +85,7 @@ Solution "Asymmetric Cryptography" solves infosec in std {
 	> of an encryption key to the intended recipient.  Recipients have
 	> to provide attestation that the encryption key is linked to
 	> them.
-	Disadvantage "Requires Encryption Key Attestation" is Satisfied {
+	Disadvantage "Requires Encryption Key Attestation" is WeakDen {
        Affects {
          Hurts recipConf
        }
@@ -101,6 +101,10 @@ Solution "Asymmetric Cryptography" solves infosec in std {
 		 , Hurts multiSecLevels
 	   }
 	}
+
+   Disadvantage "Might be hard to understand" is WeakDen {
+      Affects { Hurts understandable }
+   }
   }
 
   > Many of the ciphers used to provide asymmetric cryptography can be

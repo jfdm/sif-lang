@@ -31,7 +31,7 @@ inlines s =
     Right res => res
 
 paras : Maybe String -> EddaBody
-paras Nothing  = [Para (inlines "To Added")]
+paras Nothing  = [Para (inlines "To Be Added")]
 paras (Just s) =
   case readOrgBody s of
     Left err  => [Para (inlines $ show err)]

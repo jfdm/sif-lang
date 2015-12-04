@@ -15,6 +15,15 @@ namespace Sif
     Good : List (String, Maybe SValue) -> EvalResult
     Bad  : EvalResult
 
+evalResultsToString : EvalResult -> Maybe String
+evalResultsToString Bad        = Nothing
+evalResultsToString (Good is)  = Just $ unlines $ map (\(t,s) => unwords [showSValue s,"\t==>\t", t]) is
+  where
+    showSValue : Maybe SValue -> String
+    showSValue Nothing  = "Nothing"
+    showSValue (Just x) = show x
+
+
 ||| The Meta Model API
 class SifMetaModel a where
   toString : a -> String

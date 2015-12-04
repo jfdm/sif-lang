@@ -21,9 +21,6 @@ pattern: { problem:  p.data.abstraction.sif
 pattern: { problem:  p.data.abstraction.sif
          , solution: s.factory.abstract.sif
          }
-pattern: { problem:  p.policy.enforce.sif
-         , solution: s.pep.sif
-         }
 pattern: { problem:  p.authentication.sif
          , solution: s.auth.socio.shibb.sif
          }
@@ -35,5 +32,11 @@ pattern: { problem:  p.authentication.sif
          }
 pattern: { problem:  p.authentication.token.sif
          , solution: s.tokenauth.sociotech.idcards.sif
+         }
+pattern: { problem:  p.authentication.light.sif
+         , solution: s.auth.socio.shibb.light.sif
+         }
+pattern: { problem:  p.policy.enforce.sif
+         , solution: s.pep.sif
          }
 ...

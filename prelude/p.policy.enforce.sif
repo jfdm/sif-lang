@@ -1,7 +1,52 @@
 sif problem
+-- Adapted from Policy Enforcement Pattern by Yu Zhou, Qian Zhao, Mark Perry
 
+> How to enforce policies no matter what kind of policies are required
+> to be enforced?  How to provide flexibility and adaptability to this
+> policy enforcement, to accommodate future changes?
 policyenforce <- Problem "Policy Enforcement"
 
-enforcement    <- Functional "Policy Enforcement"
-timely         <- Functional "Timely Enforcement"
-agnostic       <- Functional "Tech Agnostic"
+--  ----------------------------------------------------------- [ Requirements ]
+
+> Solution must be able to enforce policies.
+enforcement <- Functional "Policy Enforcement"
+
+> Solution must not take forever.
+timely <- Functional "Timely Enforcement"
+
+> This pattern can be applied in a wide variety of environments where
+> there are clients in a policy-controlled situation.
+agnosticDep <- Functional "Universality"
+
+> The solution should be easy to understand.
+comprehensible <- Functional "Comprehensible"
+
+> Pre-built libraries are modules for a large number of policy
+> elements that are used in a policy, such as privilege, condition and
+> action. The libraries are extensible, which means that the policy
+> elements inside can be independently developed and delivered even
+> when the system is in runtime.
+prebuilt <- Functional "Integrating pre-built policy libraries"
+
+> In a policy, there is the need for several collaborating elements to
+> reach a specific purpose. Furthermore, a policy element may invoke
+> other elements in order to complete its execution. In both
+> situations, a number of options may be available for a certain
+> operation to be completed by selecting from a range of policy
+> elements.
+flexible <- Functional "Flexible configuration"
+
+> The client should be able to implement and customise business rules
+> easily.
+customisable <- Functional "User Defined Policy Rules"
+
+> Policies should be stored in a repository and managed by a central
+> instance.
+central <- Functional "Central Policy Handling"
+
+> Runtime implementation of customizable and dynamic systems often
+> decreases the efficiency because runtime indirections, lookup
+> mechanisms, and plain text parsing/interpretation place an overhead
+> on the system.
+efficiency <- Functional "Efficiency"
+--  -------------------------------------------------------------------- [ EOF ]

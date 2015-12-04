@@ -33,7 +33,7 @@ Solution "Shibboleths" solves authentication in socio {
     Trait "Learning Shibboleths" is Satisfied {
 	  Affects { Helps   enrollment by "users have to learn the phrases"
 	  		  , SomePos consistent by "users will be tested, but may forget later"
-			  , Helps   changable  by "new phrases to learn"
+			  , Helps   changeable by "new phrases to learn"
 			  , SomePos effortless by "can be easy to learn."}}
 
 	> The C-R mechanism is the authentication step.

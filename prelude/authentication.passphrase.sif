@@ -1,6 +1,6 @@
 sif problem
 
-> Doing password based authentication mechanisms.
+> Doing passphrase based authentication mechanisms.
 >
 > Authentication is about proving to an entity who you are. With
 > password based authentication, this 'proof' comes in the form of a

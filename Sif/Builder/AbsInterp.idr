@@ -82,7 +82,7 @@ evalPatternAbs : {i : InterpRes TyPATTERN}
 evalPatternAbs p =
     case evalModel (getModel p) Nothing of
       BadModel  => Bad
-      Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) gs
+      Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) (getGNodes gs)
 
 
 -- Technically, cheating by not propagating the domain across the

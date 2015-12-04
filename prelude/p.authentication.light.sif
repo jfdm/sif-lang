@@ -1,0 +1,22 @@
+sif problem
+
+authentication <- Problem "Authentication"
+
+--  --------------------------------------------------------------- [ Contexts ]
+socio <- Context "Non-Technical"
+sociotechLocal  <- Context "Socio-Technical Local"
+sociotechRemote <- Context "Socio-Technical Remote"
+techLocal <- Context "Technical Remote"
+techRemote <- Context "Technical Remote"
+
+--  ----------------------------------------------------------- [ Requirements ]
+
+enrollment <- Functional "Enrolment"
+proof <- Functional "Proof of Authenticity"
+authStep <- Functional "Authentication Mechanism"
+changable <- Functional "Changable"
+consistent   <- Reliability "Authentication happens"
+timely <- Performance "Timely Authentication"
+lockout <- Functional "Able to set limited access attempts"
+effortless <- Usability "Effortless Authentication"
+--  -------------------------------------------------------------------- [ EOF ]

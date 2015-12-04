@@ -6,42 +6,45 @@ authority that can be used by people to verify their identity."""
 > ID Cards are physical tokens handed out by a governing authority.
 > Users must enroll with the body to be issued with an ID Cards.
 
-Solution "ID Cards" solves authentication in sociotech {
+Solution "ID Cards" solves authentication in sociotechLocal {
 
   > The ID Cards is a token carried by people.
   Property "ID Cards is a Token" {
     > Only authorised bodies should be able to construct cards.
     Trait "Assignment of Cards" is Satisfied {
-      Affects { Makes enrollment by "assignment of cards is enrollment."}}
+      Affects { Makes enrollment by "assignment of cards is enrollment."
+	  		  , Makes proof}}
 
     > Tokens can be stolen/lost.
-    Disadvantage "Stolen/Lost Tokens" is WeakSatis {
+    Disadvantage "Stolen/Lost Tokens" is WeakDen {
 	  Affects { Hurts consistent by "impersonation of entities."}}
 
 	> Specific tokens can have a validity period.
     Advantage "Validity Period" is Satisfied {
 	  Affects { Helps consistent by "ensuring up-to-date cards."
-	  		  , Helps changable  by "renewing of cards."}}}
+	  		  , Helps changeable by "renewing of cards."}}}
 
   > Technology is Used.
   Property "Technology" {
       > Cards can be made electronic.
 	Trait "Machine Readable" is Satisfied {
-	  Affects { Helps consistent by "machines are 'never' wrong."
-		      , Helps timely	 by "machines operations are 'finite'."
-			  , Helps lockout	 by "processing step is 'deterministic'."}}
+	  Affects { Makes consistent by "machines are 'never' wrong."
+		      , Makes timely	 by "machines operations are 'finite'."
+			  , Makes lockout	 by "processing step is 'deterministic'."
+			  , Makes effortless by "using technology"}}
 
 	> Technology is not always right.
 	Disadvantage "Hackable" is WeakSatis {
-      Affects { Breaks consistent by "machines can be wrong."
-	  		  , Breaks timely     by "machine operations can be made infinite."
-			  , Breaks lockout    by "machines can be damaged/forged"}}}
+      Affects { Hurts consistent by "machines can be wrong."
+	  		  , Hurts timely     by "machine operations can be made infinite."
+			  , Hurts lockout    by "machines can be damaged/forged"}}}
 
   > Standardised means of identification accross governing body's remit.
   Property "Governing Body Issued" {
     Trait "Standardised form of Identification" is Satisfied {
 	  Affects { Makes   enrollment by "Well Defined things"
-	          , SomePos changable  by "Well Defined things"}}
+	          , SomePos changeable by "Well Defined things"
+			  , SomeNeg effortless by "Hard to use"}}
 
 	Trait "Standarised Mechanism" is Satisfied {
 	  Affects { Makes authStep }}}}

@@ -42,7 +42,7 @@ Solution "Hybrid Cryptography" solves infosec in std {
 
 	> However, as maths progresses new techniques could be developed
     > that weaken the security of the chosen schemes.
-	Disadvantage "Susceptible to Future Attacks" is WeakDen {
+	Disadvantage "Susceptible to Future Attacks" is WeakSatis {
 	  Affects {
 	      Breaks dataConf
 		, Breaks recipConf
@@ -126,7 +126,7 @@ Solution "Hybrid Cryptography" solves infosec in std {
 	> calculations. However, this is only the case with really really
 	> large parameters that nor not available in many specifications.
 
-    Disadvantage "Parameter Computation" is Denied {
+    Disadvantage "Parameter Computation" is Satisfied {
        Affects {
 	     Hurts mechPerf
 	   }

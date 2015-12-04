@@ -1,0 +1,28 @@
+sif solution
+
+Solution "Shibboleths" solves authentication in socio {
+
+  Property "Known Phrase" {
+
+    Trait "Known to a select few" is WeakSatis {
+	  Affects { SomePos proof
+	          , SomePos authStep }}
+
+    Trait "Pronunciation is the Proof" is Satisfied {
+	  Affects { Makes proof, Helps authStep }}}
+
+  Property "Shibboleths are a C-R Mechanism" {
+
+    Trait "Learning Shibboleths" is Satisfied {
+	  Affects { Helps   enrollment
+	  		  , SomePos consistent
+			  , Helps   changable
+			  , SomePos effortless }}
+
+    Trait "Act of C-R" is Satisfied {
+      Affects { Makes authStep
+	  		  , Helps consistent
+			  , Helps timely
+			  , Helps lockout}}}}
+
+--  -------------------------------------------------------------------- [ EOF ]

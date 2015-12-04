@@ -146,9 +146,9 @@ Solution "OO Factories" solves adt in std {
   > interfaces.
   Property "Not Language Agnostic" {
 
-	Disadvantage "OO Specific Technologies" is WeakSatis {
+	Disadvantage "OO Specific Technologies" is Denied {
 	  Affects {
-	    SomeNeg languageAgnostic
+	    Breaks languageAgnostic
 	  }
     }
   }

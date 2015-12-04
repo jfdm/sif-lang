@@ -9,7 +9,7 @@ authentication mechanism used to authenticate an entity using digital tokens gen
 > to authenticate against. If the certificate cannot be checked then
 > authentication fails.
 
-Solution "Digital Certificates" solves authentication in tech {
+Solution "Digital Certificates" solves authentication in techRemote {
   > Technology is Used.
   Property "Technology" {
     > Cards can be made electronic.
@@ -19,7 +19,7 @@ Solution "Digital Certificates" solves authentication in tech {
 			  , Helps lockout	 by "processing step is 'deterministic'."}}
 
     Trait "New Tokens can be issued" is Satisfied {
-	  Affects { Helps   changable  by "tokens can be re-written"
+	  Affects { Helps   changeable by "tokens can be re-written"
 	  		  , SomeNeg consistent by "token management"}}
 
 	> Technology is not always right.
@@ -34,7 +34,7 @@ Solution "Digital Certificates" solves authentication in tech {
     Trait "Standards and Protocols" is Satisfied {
 	  Affects { Makes   enrollment by "Well-Defined in standards"
 	  		  , Makes   authStep   by "Well-Defined in standards"
-			  , SomePos changable  by "Well-Defined in standards"}}
+			  , SomePos changeable by "Well-Defined in standards"}}
 
     > Which mechanism to use.
 	Trait "Which Mechanisms to use" is Satisfied {

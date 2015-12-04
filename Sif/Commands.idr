@@ -131,6 +131,7 @@ check = do
 private
 load : Parser SifCMD
 load = (do keyword ":load"; dir <- quoted '"'; return (PreludeLoad (Just dir)) )
+    <|> (keyword ":r" *> return (PreludeLoad Nothing))
     <|> (keyword ":reload" *> return (PreludeLoad Nothing))
     <?> "Loading"
 

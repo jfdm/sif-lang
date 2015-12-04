@@ -32,8 +32,8 @@ Solution "Symmetric Cryptography" solves infosec in std {
     > computationally cheap and are efficient over large data.
 	Advantage "Computationally Cheap" is Satisfied {
 	  Affects {
-	      Helps mechPerf
-		, Helps minDisrupt
+	      Makes mechPerf
+		, Makes minDisrupt
       }
     }
 
@@ -68,10 +68,10 @@ Solution "Symmetric Cryptography" solves infosec in std {
 
     > The single symmetric key is a liability if it is not secured
     > properly when being transported between sender and recipient.
-    Disadvantage "Single Key" is Satisfied {
+    Disadvantage "Single Key" is Denied {
 	  Affects {
-	      Hurts dataConf
-		, Hurts recipConf
+	      Breaks dataConf
+		, Breaks recipConf
       }
     }
 
@@ -182,7 +182,7 @@ Solution "Symmetric Cryptography" solves infosec in std {
 	> IVs may confuse those who are not aware of them, and may result
     > in proper IV usage.
 
-	Disadvantage "What's an IV?" is WeakDen {
+	Disadvantage "What's an IV?" is WeakSatis {
 	  Affects {
 	      SomeNeg understandable
       }

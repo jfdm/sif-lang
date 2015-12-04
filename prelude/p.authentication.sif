@@ -38,7 +38,7 @@ authStep <- Functional "Authentication Mechanism"
 
 > The authentication step must be changable and re-enrollment
 > possible.
-changable <- Functional "Changable"
+changeable <- Functional "Changable"
 
 > Authentication must be consistent and that entities with up-to-date
 > authentication details should authentication.

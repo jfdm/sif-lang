@@ -131,5 +131,9 @@ interpPatt : InterpRes TyPROBLEM
           -> InterpRes TyPATTERN
 interpPatt (IProb rP m) (ISolt rS is) = IPatt (insertDecls is m)
 
+-- --------------------------------------------------------------- [ Filtering ]
+
+getGNodes : List GoalNode -> List GoalNode
+getGNodes = filter (\x => getNodeTy x == GOALty)
 
 -- --------------------------------------------------------------------- [ EOF ]

@@ -158,7 +158,7 @@ instance SifRepAPI DirectRep where
   evalPattern p =
       case evalModel (getGModel p) Nothing of
         BadModel  => Bad
-        Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) gs
+        Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) (getGNodes gs)
 
   fetchMetaModel p = MkModel $ getGModel p
 

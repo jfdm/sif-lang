@@ -48,7 +48,7 @@ convTo CMARK   p = Just $ markdown $ toEdda p
 convTo COMPACT p = Just $ Sif.toString p
 convTo STRING  p = Just $ Sif.toString p
 
-convTo DOT     p = Nothing -- Just $ toDot p
+convTo DOT     p = Nothing
 
 convTo IDRIS   p = Nothing
 
