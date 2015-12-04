@@ -38,20 +38,30 @@ comment l b e = (line l)
             <|> spaces
             <?> "Comment"
 
-docString : String -> Parser String
-docString m = do
+nonEmptyDocString : String -> Parser String
+nonEmptyDocString m = do
     token m <* spaces
     d <- manyTill anyChar endOfLine
     spaces
     pure $ pack d
-  <?> "Doc String"
+  <?> "Text Doc String"
+
+emptyDocString : String -> Parser String
+emptyDocString m = do
+    string m
+    endOfLine
+    pure "\n\n"
+  <?> "Empty Doc String"
+
+docString : String -> Parser String
+docString m = emptyDocString m <|> nonEmptyDocString m
 
 public
 doc : String -> Parser String
 doc m = do
-      ds <- some $ docString m
+      ds <- some $ (docString m <* spaces)
       spaces
-      pure $ concat ds
+      pure $ unwords ds
     <?> "Documentation"
 
 public

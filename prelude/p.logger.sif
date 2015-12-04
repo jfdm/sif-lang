@@ -2,6 +2,8 @@ sif problem
 
 logging <- Problem "Logging"
 
+--  ----------------------------------------------------------- [ Requirements ]
+
 logs       <- Functional "Must capture infomation."
 persitance <- Functional "Logs must be kept."
 levels     <- Functional "Logging Levels"
@@ -10,3 +12,6 @@ integrity  <- Reliability "Logs must not be modified"
 secure     <- Functional "Logs must not be kept confidential"
 leakage    <- Functional "Logs must not leak information"
 config     <- Usability "Mechanism must be configurable."
+
+
+--  -------------------------------------------------------------------- [ EOF ]
