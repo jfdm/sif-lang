@@ -162,7 +162,7 @@ convertPattern p = EddaRaw as (intersperse (Empty STAR) body)
     body = [mkDescPara (SifExpr.getDesc p)] ++ dom ++ prob ++ sol
 
 
-public
+export
 toEdda : PATTERN impl d -> Edda PRIME MODEL
 toEdda pdoc = refineEdda (convertPattern pdoc)
 

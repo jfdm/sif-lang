@@ -16,6 +16,7 @@ import Sif.AbsSyntax
 import Sif.DSL.Parser.Problem
 import Sif.DSL.Parser.Solution
 
+export
 runTests : IO ()
 runTests = do
   putStrLn $ heading "Complete File Tests"

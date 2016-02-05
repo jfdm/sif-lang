@@ -14,11 +14,11 @@ import public Sif.Pattern.API
 import public Sif.Pattern.Convert
 
 %default partial
-%access public
+%access export
 
 -- --------------------------------------------------- [ Public Data Structure ]
 
-instance Show (PATTERN impl d) where
+Show (PATTERN impl d) where
   show x =
     case showConvPattern STRING x of
       Nothing => show $ "Internal Err"

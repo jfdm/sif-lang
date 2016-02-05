@@ -9,8 +9,11 @@ import GRL.Lang.GLang
 import Sif.Types
 import Sif.Pattern.Model
 
+%access export
+
 namespace AST
 
+  public export
   data SifAST : SifTy -> Type where
     Req : (ident : String)
        -> (ty    : RTy)
@@ -64,7 +67,7 @@ namespace AST
   compatible : SifAST TyPROBLEM -> SifAST TySOLUTION -> Maybe SifDomain
   compatible p s = lookup (getSolutionContextID s) (getProblemDomains p)
 
-  instance Show (SifAST ty) where
+  Show (SifAST ty) where
     show (Req i ty t d)       = unwords ["Req", show i, show ty, show t, show d]
     show (Problem i t d c rs) = unwords ["Problem", show i, show t, show d, show c, show rs]
     show (Affect v i d)       = unwords ["Affect", show v, show i, show d]

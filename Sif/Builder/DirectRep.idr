@@ -16,16 +16,17 @@ import Edda.Reader.Org
 import XML.DOM
 
 import Sif.Types
+import Sif.Pattern.Model
 import Sif.Pattern
 import Sif.Builder.Utils
 
 -- -------------------------------------------------------------- [ Directives ]
 
-%access public
+%access private
 %default partial
 
 -- ----------------------------------------- [ Private Internal Data Structure ]
-
+export
 data DirectRep : SifTy -> SifDomain -> Type where
   DirectMkReq : (ty   : RTy)
              -> (t    : String)
@@ -139,7 +140,7 @@ getGModel p = extract (toGRL p)
 
 -- ------------------------------------------------------ [ Builder Definition ]
 
-instance SifRepAPI DirectRep where
+SifRepAPI DirectRep where
   getTitle  x = getDirectTitle x
   getDesc     = getDirectDesc
   getTTy      = getDirectTTy
@@ -160,7 +161,7 @@ instance SifRepAPI DirectRep where
         BadModel  => Bad
         Result gs => Good $ map (\x => (getNodeTitle x, getSValue x)) (getGNodes gs)
 
-  fetchMetaModel p = MkModel $ getGModel p
+  fetchMetaModel p = mkMetaModel $ getGModel p
 
 -- ------------------------------------------------------------- [ The Builder ]
 
@@ -225,6 +226,7 @@ buildPatternDir : (d : SifDomain)
                -> PATTERN DirectRep d
 buildPatternDir _ t d p s = MkExpr $ DirectMkPatt t d (conv p) (conv s)
 
+export
 directBuilder : SifBuilder DirectRep
 directBuilder = MkSifBuilder
     buildReqDir
@@ -235,6 +237,7 @@ directBuilder = MkSifBuilder
     buildSolutionDir
     buildPatternDir
 
+export
 backendDirectRep : SifBackend
 backendDirectRep = MkBackend "direct" directBuilder
 

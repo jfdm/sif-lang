@@ -41,7 +41,7 @@ import Sif.Options
 import Sif.Prelude
 
 %default partial
-%access public
+%access export
 
 
 ||| Print results of evaluation

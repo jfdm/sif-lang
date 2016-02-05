@@ -114,7 +114,7 @@ solHeader = do
       pure (d, t, pID, cID)
   <?> "Solution Header"
 
-public
+export
 solution : Parser $ (SifAST TySOLUTION)
 solution = do
       doctype
@@ -124,7 +124,7 @@ solution = do
       pure $ AST.Solution t (pID,pd) d cID ps
     <?> "Solution"
 
-public
+export
 runTests : IO ()
 runTests = do
   putStrLn $ heading "Parsing Solution Tests"

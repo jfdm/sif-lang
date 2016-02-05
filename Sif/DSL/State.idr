@@ -15,11 +15,11 @@ import Sif.Pattern
 import Sif.Error
 
 -- -------------------------------------------------------------- [ Directives ]
-%access public
+%access export
 %default total
 
 -- -------------------------------------------------------------------- [ Body ]
-
+public export
 record BuildState where
   constructor MkSState
   getProbID        : Maybe String
@@ -32,7 +32,7 @@ record BuildState where
 defBuildSt : String -> String -> BuildState
 defBuildSt p s = MkSState Nothing Nil "" Nothing p s
 
-instance Default BuildState where
+Default BuildState where
   default = defBuildSt "" ""
 
 -- --------------------------------------------------------------------- [ EOF ]

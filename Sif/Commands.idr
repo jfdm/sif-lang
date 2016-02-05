@@ -16,11 +16,10 @@ import Sif.DSL.Parser.Utils
 -- -------------------------------------------------------------- [ DIrectives ]
 
 %default partial
-%access public
+%access private
 
 -- ---------------------------------------------------------------- [ Commands ]
-
-public
+public export
 data SifCMD : Type where
   ShowPattern : Nat -> Maybe SifOutFormat -> Maybe String -> SifCMD
   ListLib     : SifCMD
@@ -31,6 +30,7 @@ data SifCMD : Type where
   Help        : SifCMD
 
 
+export
 showHelp : String
 showHelp = """
 Command                 | Description
@@ -49,6 +49,7 @@ Command                 | Description
 """
 
 covering
+export
 getCmdIndex : SifCMD -> Maybe Nat
 getCmdIndex Help                  = Nothing
 getCmdIndex Quit                  = Nothing
@@ -58,7 +59,6 @@ getCmdIndex (EvalPattern n)       = Just n
 getCmdIndex (CheckExtPattern _ _) = Nothing
 getCmdIndex (PreludeLoad _)       = Nothing
 
-private
 display : Parser SifCMD
 display = do
     string ":display"
@@ -67,7 +67,6 @@ display = do
     pure $ ShowPattern (cast $ abs i) (Just COMPACT) Nothing
   <?> "Show Pattern"
 
-private
 convert : Parser SifCMD
 convert = do
     string ":convert"
@@ -79,14 +78,12 @@ convert = do
   <?> "Save Pattern"
 
 
-private
 list : Parser SifCMD
 list = do
     string ":list"
     pure ListLib
   <?> "List libs"
 
-private
 save : Parser SifCMD
 save = do
     string ":save"
@@ -99,7 +96,6 @@ save = do
     pure $ ShowPattern (cast $ abs i) (readOutFMT fmt) (Just fname)
   <?> "Save Pattern"
 
-private
 eval : Parser SifCMD
 eval = do
     string ":eval"
@@ -108,18 +104,15 @@ eval = do
     pure $ EvalPattern (cast $ abs i)
   <?> "Eval Command"
 
-private
 quit : Parser SifCMD
 quit = (string ":q"    *> return Quit)
       <|> (string ":quit" *> return Quit)
       <|> (string ":exit" *> return Quit)
 
-private
 help : Parser SifCMD
 help = (string ":?"    *> return Help)
    <|> (string ":help" *> return Help)
 
-private
 check : Parser SifCMD
 check = do
     keyword ":check"
@@ -128,7 +121,6 @@ check = do
     s <- quoted '"'
     pure $ CheckExtPattern p s
 
-private
 load : Parser SifCMD
 load = (do keyword ":load"; dir <- quoted '"'; return (PreludeLoad (Just dir)) )
     <|> (keyword ":r" *> return (PreludeLoad Nothing))
@@ -147,7 +139,7 @@ cmd = display
   <|> help
   <?> "Command"
 
-public
+export
 parseCMD : String -> Either String SifCMD
 parseCMD s = parse cmd s
 

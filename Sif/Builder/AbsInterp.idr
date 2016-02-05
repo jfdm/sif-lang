@@ -19,7 +19,7 @@ import Sif.Builder.Utils
 
 -- -------------------------------------------------------------- [ Directives ]
 
--- %access private
+%access private
 %default total
 
 -- ----------------------------------------- [ Private Internal Data Structure ]
@@ -87,7 +87,7 @@ evalPatternAbs p =
 
 -- Technically, cheating by not propagating the domain across the
 -- inner inner type but it is okay IMHO.
-
+export
 data AbsInterpRep : SifTy -> SifDomain -> Type where
   MkWrapper : {i : InterpRes ty} -> AbsInterpPriv i ty -> AbsInterpRep ty d
 
@@ -168,7 +168,8 @@ getPrivReq : {i : InterpRes TyAFFECTS}
           -> (s : InterpRes TyREQ ** AbsInterpPriv s TyREQ)
 getPrivReq (PrivmkTLink _ r _) = (_ ** r)
 
-instance SifRepAPI AbsInterpRep where
+
+SifRepAPI AbsInterpRep where
   getTitle  (MkWrapper i) = getPrivTitle i
   getDesc   (MkWrapper i) = getPrivDesc  i
   getTTy    (MkWrapper x) = getPrivTTy x
@@ -192,7 +193,7 @@ instance SifRepAPI AbsInterpRep where
         g = getModel p
 
         m : MetaModel
-        m = MkModel g
+        m = mkMetaModel g
 
 -- ------------------------------------------------------------- [ The Builder ]
 
@@ -276,6 +277,7 @@ buildPatternAbs _ t d (MkExpr (MkWrapper p)) (MkExpr (MkWrapper s)) =
     MkExpr $ MkWrapper $ PrivmkPatt t d p s
 
 covering
+export
 absInterpBuilder : SifBuilder AbsInterpRep
 absInterpBuilder = MkSifBuilder
     buildReqAbs
@@ -287,6 +289,7 @@ absInterpBuilder = MkSifBuilder
     buildPatternAbs
 
 covering
+export
 backendAbsInterp : SifBackend
 backendAbsInterp = MkBackend "interp" absInterpBuilder
 

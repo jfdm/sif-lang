@@ -10,6 +10,7 @@ import Sif.Effs
 import Sif.Error
 
 -- TODO Make more robust by returning Maybe and Either
+%access export
 
 namespace Sif
   writeFile : String -> String -> Sif ()

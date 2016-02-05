@@ -21,8 +21,10 @@ import Sif.Pattern.Convert.String
 import Sif.Pattern.Convert.Freyja
 
 %default partial
+%access export
 
 covering
+public export
 convTy : SifOutFormat -> Type
 convTy LATEX   = String
 convTy CMARK   = String

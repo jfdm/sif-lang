@@ -13,7 +13,7 @@ import Sif.Types
 import Sif.DSL.Parser.Utils
 import Sif.DSL.Parser.Common
 
-public
+export
 context : Parser $ Pair String SifDomain
 context = do
     keyword "sif"

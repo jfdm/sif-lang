@@ -13,11 +13,13 @@ import Sif.Types
 
 import Effect.Logging.Level
 
+%access export
 -- ----------------------------------------------------------------- [ Options ]
 
+public export
 data SifMode = Eval | Check | Conv | REPL | VERS | HELP
 
-instance Show SifMode where
+Show SifMode where
   show Eval  = "Eval"
   show Check = "Check"
   show Conv  = "Conv"
@@ -25,7 +27,7 @@ instance Show SifMode where
   show VERS  = "VERSION"
   show HELP  = "HELP"
 
-instance Eq SifMode where
+Eq SifMode where
   (==) Eval  Eval  = True
   (==) Check Check = True
   (==) Conv  Conv  = True
@@ -34,7 +36,7 @@ instance Eq SifMode where
   (==) HELP  HELP  = True
   (==) _     _     = False
 
-
+public export
 record SifOpts where
   constructor MkSOpts
   pSpec      : Maybe String
@@ -53,7 +55,7 @@ defOpts = MkSOpts
     Nothing Nothing (Just REPL) Nothing Nothing Nothing
     True OFF (Just "interp") (MkPair False False)
 
-instance Default SifOpts where
+Default SifOpts where
   default = defOpts
 
 strToLog : String -> (n ** LogLevel n)

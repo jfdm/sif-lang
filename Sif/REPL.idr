@@ -24,7 +24,7 @@ import Sif.API
 import Sif.Commands
 
 %default partial
-%access public
+
 -- -------------------------------------------------------------------- [ Effs ]
 
 sifBanner : String
@@ -108,7 +108,7 @@ runREPL = do
 
 
 ||| A Viewer to view a library of patterns.
-public
+export
 sifREPL : Eff () SifEffs
 sifREPL =
   case banner !(getOptions) of

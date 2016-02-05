@@ -6,6 +6,8 @@
 module Sif.Types
 
 import public Freyja.Common
+
+%access public export
 -- ----------------------------------------------- [ Problems and Requirements ]
 
 -- Encoding of CONTROL | CODE | ACTION ??
@@ -29,7 +31,7 @@ data HasMData : SifTy -> Type where
 data SifOutFormat = ORG  | LATEX   | CMARK | XML    | DOT
                   | EDDA | COMPACT | IDRIS | STRING | FREYJA
 
-instance Eq SifOutFormat where
+Eq SifOutFormat where
   (==) LATEX   LATEX   = True
   (==) CMARK   CMARK   = True
   (==) ORG     ORG     = True
@@ -42,7 +44,7 @@ instance Eq SifOutFormat where
   (==) FREYJA  FREYJA  = True
   (==) _       _       = False
 
-instance Show SifOutFormat where
+Show SifOutFormat where
   show LATEX   = "LaTeX"
   show CMARK   = "CommonMark"
   show ORG     = "Org"
@@ -54,6 +56,7 @@ instance Show SifOutFormat where
   show STRING  = "String"
   show FREYJA  = "Freyja"
 
+export
 readOutFMT : String -> Maybe SifOutFormat
 readOutFMT s =
   case toLower s of
@@ -72,12 +75,13 @@ readOutFMT s =
 
 data SifDomain = MkDomain String (Maybe String)
 
+export
 defaultDomain : SifDomain
 defaultDomain = MkDomain "Default" (Just "Not Specified")
 
-instance Eq SifDomain where
+Eq SifDomain where
   (==) (MkDomain x xd) (MkDomain y yd) = x == y && xd == yd
 
-instance Show SifDomain where
+Show SifDomain where
   show (MkDomain x xd) = unwords ["MkDomain", show x, show xd]
 -- --------------------------------------------------------------------- [ EOF ]

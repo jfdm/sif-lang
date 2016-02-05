@@ -35,14 +35,6 @@ import Sif.DSL.Parser
 
 -- @TODO de exception this...
 
-BuildEffs : List EFFECT
-BuildEffs = [ FILE_IO ()
-            , LOG
-            , PERF
-            , 'sif    ::: EXCEPTION SifError
-            , 'bstate ::: STATE BuildState
-            ]
-
 -- ----------------------------------------------------------- [ Build Helpers ]
 
 getBuildState : Eff BuildState ['bstate ::: STATE BuildState]
@@ -54,8 +46,14 @@ putBuildState st = 'bstate :- put st
 updateBuildState : (BuildState -> BuildState) -> Eff () ['bstate ::: STATE BuildState]
 updateBuildState f = 'bstate :- update (\st => f st)
 
+public export
 DSLBuilder : Type -> Type
-DSLBuilder rTy = Eff rTy BuildEffs
+DSLBuilder rTy = Eff rTy [ FILE_IO ()
+                         , LOG
+                         , PERF
+                         , 'sif    ::: EXCEPTION SifError
+                         , 'bstate ::: STATE BuildState
+                         ]
 
 -- ----------------------------------------------------------- [ Build Problem ]
 
@@ -181,7 +179,7 @@ buildPatternE bob c p s = do
                            , getSFName st]) "Finished Pattern"
     pure res
 
-public
+export
 patternFromFile : SifBuilder impl
                -> String
                -> String

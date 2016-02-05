@@ -9,7 +9,7 @@ import Effects
 import Effect.State
 
 import Data.AVL.Dict
-import Data.Sigma.DList
+import Data.DList
 import GRL.Lang.GLang
 
 import XML.DOM
@@ -159,7 +159,7 @@ convertPattern pat = do
           <++> ("name" <+=> t)
 
 namespace Sif
-  public
+  export
   toXML : PATTERN impl d -> Document DOCUMENT
   toXML p = mkDocument root
     where

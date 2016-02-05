@@ -12,14 +12,15 @@ import Sif.Pattern
 
 -- -------------------------------------------------------------- [ Directives ]
 
-%access public
+%access export
 %default partial
 
 -- --------------------------------------------------- [ Interpretation Result ]
 
-instance SifMetaModel GModel where
+SifMetaModel GModel where
   toString x = GLang.toString x
 
+public export
 data InterpRes : SifTy -> Type where
   IReq    : GLang ELEM -> InterpRes TyREQ
   IProb   : GLang ELEM -> GModel               -> InterpRes TyPROBLEM

@@ -8,7 +8,7 @@ module Sif.Prelude
 import public Config.Error
 import public Config.YAML
 
-%access public
+%access export
 
 
 -- ------------------------------------------------------------ [ YAML Parsing ]

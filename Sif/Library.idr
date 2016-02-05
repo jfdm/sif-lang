@@ -11,19 +11,20 @@ import Effect.Default
 import Sif.Types
 import Sif.Pattern
 
-import public Data.Sigma.DList
+import public Data.DList
 import public Data.AVL.Dict
 
 -- -------------------------------------------------------------- [ Directives ]
-%access public
+%access export
 
 -- --------------------------------------------------------- [ Data Structures ]
-
+public export
 record LibEntry (impl : SifTy -> SifDomain -> Type) where
   constructor MkEntry
   idx   : Nat
   entry : PATTERN impl d
 
+public export
 record SifLib where
   constructor MkSLib
   counter : Nat
@@ -41,7 +42,7 @@ addToLibraryM xs lib = foldl (flip $ addToLibrary) lib xs
 defaultLib : SifLib
 defaultLib = emptyLib
 
-instance Default SifLib where
+Default SifLib where
   default = defaultLib
 
 getLibraryIndex : SifLib -> Dict Nat String

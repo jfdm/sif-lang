@@ -78,7 +78,7 @@ convertPattern p =
       , convertSolution $ SifExpr.getSolution p]
 
 namespace Sif
-  public
+  export
   toString : PATTERN impl d -> String
   toString p = convertPattern p
 

@@ -69,7 +69,7 @@ problemDef = do
     pure var
   <?> "Problem"
 
-public
+export
 problem : Parser $ SifAST TyPROBLEM
 problem = do
     sifComment

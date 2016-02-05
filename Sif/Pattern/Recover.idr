@@ -6,7 +6,7 @@
 module Sif.Pattern.Recover
 
 import Data.AVL.Dict
-import Data.Sigma.DList
+import Data.DList
 import GRL.Lang.GLang
 
 import XML.DOM
@@ -119,7 +119,7 @@ recoverSolution bob c s = mkSolution bob c n d ps
 
 -- -------------------------------------------------------------------- [ Main ]
 
-public
+export
 fromFreya : SifBuilder impl
          -> PatternDoc
          -> (d ** PATTERN impl d)

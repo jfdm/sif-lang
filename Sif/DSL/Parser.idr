@@ -24,7 +24,7 @@ import Sif.Error
 -- -------------------------------------------------------------- [ Directives ]
 
 %default partial
-%access public
+%access export
 
 -- ------------------------------------------------------------- [ File Reader ]
 

@@ -14,6 +14,8 @@ import Sif.DSL.Parser.Utils
 
 import Test.Parsing
 
+%access export
+
 literal : Parser String
 literal = do
     token "\"\"\""

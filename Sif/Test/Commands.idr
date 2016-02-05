@@ -64,7 +64,7 @@ testShow = do
       (==)
 
 
-
+export
 runTests : IO ()
 runTests = do
   putStrLn $ heading "Testing Command Parsing"

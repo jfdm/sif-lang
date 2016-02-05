@@ -12,28 +12,37 @@ import public GRL.Model
 import public GRL.Builder
 import public GRL.Pretty
 
-%access public
+%access export
 %default total
 
 -- ------------------------------------------------------------------- [ Types ]
 
+public export
 data FTy = FuncTy | UsabTy  | ReliTy | PerfTy | SuppTy
+
+public export
 data ATy = CodeTy | ControlTy | ActionTy
+
+public export
 data LTy = ActLink | AffLink
 
+public export
 data PMTy = Req FTy | Act ATy | Link LTy | Sub GStructTy
 
 -- ------------------------------------------------------- [ Meta Typing Rules ]
 
+public export
 data ValidLink : LTy -> PMTy -> PMTy -> Type where
   RAct : ValidLink ty (Req x) (Req y)
   MAct : ValidLink ty (Act x) (Req y)
   AAct : ValidLink ty (Act y) (Act y)
 
+public export
 data ValidDecomp : PMTy -> PMTy -> Type where
   SubR : ValidDecomp (Req x) (Req y)
   SubM : ValidDecomp (Act x) (Act y)
 
+public export
 data ValidDecomps : PMTy -> List PMTy -> Type where
   Nil  : ValidDecomps x Nil
   (::) : (x : PMTy)
@@ -44,6 +53,7 @@ data ValidDecomps : PMTy -> List PMTy -> Type where
 
 -- ------------------------------------------ [ Abstract Syntax & Typing Rules ]
 
+public export
 data PModel : PMTy -> GTy -> Type where
   MkReq    : (ty : FTy) -> String -> PModel (Req ty) ELEM
   MkAction : (ty : ATy) -> String -> Maybe SValue -> PModel (Act ty) ELEM
@@ -61,27 +71,35 @@ data PModel : PMTy -> GTy -> Type where
 
 -- ----------------------------------------------------- [ Typing Type-Aliases ]
 
+public export
 FUNCTIONAL : Type
 FUNCTIONAL = PModel (Req FuncTy) ELEM
 
+public export
 USABILITY : Type
 USABILITY = PModel (Req UsabTy) ELEM
 
+public export
 RELIABILITY : Type
 RELIABILITY = PModel (Req ReliTy) ELEM
 
+public export
 PERFORMANCE : Type
 PERFORMANCE = PModel (Req PerfTy) ELEM
 
+public export
 SUPPORTABILITY : Type
 SUPPORTABILITY = PModel (Req SuppTy) ELEM
 
+public export
 CODEACTION : Type
 CODEACTION = PModel (Act CodeTy) ELEM
 
+public export
 CONTROL : Type
 CONTROL = PModel (Act ControlTy) ELEM
 
+public export
 ACTION : Type
 ACTION = PModel (Act ActionTy) ELEM
 
@@ -121,7 +139,7 @@ syntax [a] "|=" [bs] = MkSub IORty a bs
 
 -- ------------------------------------------------------------- [ Interpreter ]
 
-instance GRL (\ty => PModel x ty) where
+GRL (\ty => PModel x ty) where
   mkElem (MkReq ty  t)        = Elem GOALty t Nothing
   mkElem (MkAction ty t sval) = Elem TASKty t sval
 

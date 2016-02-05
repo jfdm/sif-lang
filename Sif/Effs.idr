@@ -26,10 +26,10 @@ import Sif.Library
 import Sif.Options
 
 -- -------------------------------------------------------------- [ Directives ]
-%access public
+%access export
 
 -- -------------------------------------------------------------- [ State Defs ]
-
+public export
 record SifState where
   constructor MkSifState
   opts    : SifOpts
@@ -37,7 +37,7 @@ record SifState where
   bends   : List SifBackend
   builder : SifBackend
 
-instance Default SifState where
+Default SifState where
   default = MkSifState
       defOpts
       defaultLib
@@ -45,7 +45,7 @@ instance Default SifState where
       backendAbsInterp
 
 -- -------------------------------------------------------------------- [ Effs ]
-
+public export
 SifEffs : List EFFECT
 SifEffs = [ FILE_IO ()
           , SYSTEM
@@ -57,6 +57,7 @@ SifEffs = [ FILE_IO ()
           , 'sstate   ::: STATE SifState
           ]
 
+public export
 Sif : Type -> Type
 Sif rTy = Eff rTy SifEffs
 

@@ -8,3 +8,4 @@ x       Date            commit  LoC     tyCHK   CodeGen Mono    exe       Commen
 7       2015-10-13      40c979c 4380    160.02  252.64  346.69  6370560   {Improvements I forgot}
 8       2015-10-14      40c979c 4380    147.26  234.82  367.43  6418415   {Idris with improved module chasing}
 9       2015-10-14      40c979c 4380    147.26  221.85  364.38  6418415   {Idris with improved module chasing}
+10      2016-02-05      0f17d29 4494    153.20  255.11  371.94  6437511   {Idris visibility improvements}

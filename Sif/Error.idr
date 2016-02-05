@@ -8,6 +8,8 @@ module Sif.Error
 import Effects
 import Effect.Exception
 
+%access public export
+
 data SifError : Type where
   IndexOutOfBounds  : SifError
   NoSuchPattern     : SifError
@@ -31,7 +33,7 @@ data SifError : Type where
   MismatchError   : String -> String -> SifError
   GeneralError    : String -> SifError
 
-instance Show SifError where
+Show SifError where
   show IndexOutOfBounds  = "Index Out of Bounds"
   show NoSuchPattern     = "No Such Pattern"
   show UnSuppFormat      = "Unsupported output format"

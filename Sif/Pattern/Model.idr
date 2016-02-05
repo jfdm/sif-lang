@@ -8,9 +8,11 @@ module Sif.Pattern.Model
 import Sif.Types
 import GRL.Lang.GLang
 
+%access export
 -- --------------------------------------------------- [ Public Data Structure ]
 
 namespace Sif
+  public export
   data EvalResult : Type where
     Good : List (String, Maybe SValue) -> EvalResult
     Bad  : EvalResult
@@ -25,16 +27,21 @@ evalResultsToString (Good is)  = Just $ unlines $ map (\(t,s) => unwords [showSV
 
 
 ||| The Meta Model API
-class SifMetaModel a where
+interface SifMetaModel a where
   toString : a -> String
 
+public export
 data MetaModel : Type where
   MkModel : SifMetaModel a => a -> MetaModel
+
+mkMetaModel : SifMetaModel a => a -> MetaModel
+mkMetaModel = MkModel
 
 namespace Pattern
 
   ||| The Representation API
-  class SifRepAPI (impl : SifTy -> SifDomain -> Type) where
+  export
+  interface SifRepAPI (impl : SifTy -> SifDomain -> Type) where
       getTitle  : impl ty d -> {auto prf : HasMData ty} -> String
       getDesc   : impl ty d -> Maybe String
       getRTy    : impl TyREQ     d -> RTy
@@ -57,9 +64,10 @@ namespace Pattern
       getDomain : impl ty d -> SifDomain
       getDomain {d} _ = d
 
-instance SifMetaModel MetaModel where
+SifMetaModel MetaModel where
   toString (MkModel m) = toString m
 
+public export
 data SifExpr : SifTy
             -> SifDomain
             -> (impl : SifTy -> SifDomain -> Type)
@@ -124,6 +132,7 @@ namespace SifExpr
 
 ||| Factories for building concrete representations
 |||
+public export
 record SifBuilder (impl : SifTy -> SifDomain -> Type) where
   constructor MkSifBuilder
   buildReq : (d : SifDomain)
@@ -171,6 +180,7 @@ record SifBuilder (impl : SifTy -> SifDomain -> Type) where
               -> SifExpr TySOLUTION d impl
               -> SifExpr TyPATTERN  d impl
 
+public export
 record SifBackend where
     constructor MkBackend
     name    : String

@@ -31,7 +31,7 @@ block b e = do
     pure ()
   <?> "Block Comment"
 
-public
+export
 comment : String -> String -> String -> Parser ()
 comment l b e = (line l)
             <|> (block b e)
@@ -56,7 +56,7 @@ emptyDocString m = do
 docString : String -> Parser String
 docString m = emptyDocString m <|> nonEmptyDocString m
 
-public
+export
 doc : String -> Parser String
 doc m = do
       ds <- some $ (docString m <* spaces)
@@ -64,7 +64,7 @@ doc m = do
       pure $ unwords ds
     <?> "Documentation"
 
-public
+export
 runTests : IO ()
 runTests = do
   putStrLn $ heading "Parsing Utility Tests"

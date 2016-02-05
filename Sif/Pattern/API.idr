@@ -6,62 +6,82 @@
 module Sif.Pattern.API
 
 import GRL.Lang.GLang
+
 import Sif.Types
 import Sif.Pattern.Model
 
+%access export
 -- ----------------------------------------------------------- [ Type Synonyms ]
 
+public export
 FUNCTIONAL : (impl : SifTy -> SifDomain -> Type) -> SifDomain -> Type
 FUNCTIONAL impl d = SifExpr TyREQ d impl
 
+public export
 USABILITY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 USABILITY impl d = SifExpr TyREQ d impl
 
+public export
 RELIABILITY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 RELIABILITY impl d = SifExpr TyREQ d impl
 
+public export
 PERFORMANCE : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 PERFORMANCE impl d = SifExpr TyREQ d impl
 
+public export
 SUPPORTABILITY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 SUPPORTABILITY impl d = SifExpr TyREQ d impl
 
+public export
 REQUIREMENT : (impl : SifTy -> SifDomain -> Type) -> SifDomain -> Type
 REQUIREMENT impl d = SifExpr TyREQ d impl
 
+public export
 REQUIREMENTS : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 REQUIREMENTS impl d = List (REQUIREMENT impl d)
 
+public export
 PROBLEM : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 PROBLEM impl d = SifExpr TyPROBLEM d impl
 
+public export
 ADVANTAGE : (impl : SifTy -> SifDomain -> Type) -> SifDomain -> Type
 ADVANTAGE impl d = SifExpr TyTRAIT d impl
 
+public export
 DISADVANTAGE : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 DISADVANTAGE impl d = SifExpr TyTRAIT d impl
 
+public export
 TRAIT : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 TRAIT impl d = SifExpr TyTRAIT d impl
 
+public export
 TRAITS : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 TRAITS impl d = List (TRAIT impl d)
 
+public export
 AFFECT : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 AFFECT impl d = SifExpr TyAFFECTS d impl
 
+public export
 AFFECTS : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 AFFECTS impl d = List (AFFECT impl d)
 
+public export
 PROPERTY : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 PROPERTY impl d = SifExpr TyPROPERTY d impl
 
+public export
 PROPERTIES : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 PROPERTIES impl d = List (PROPERTY impl d)
 
+public export
 SOLUTION : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 SOLUTION impl d = SifExpr TySOLUTION d impl
 
+public export
 PATTERN : (SifTy -> SifDomain -> Type) -> SifDomain -> Type
 PATTERN impl d = SifExpr TyPATTERN d impl
 

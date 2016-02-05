@@ -6,7 +6,7 @@
 module Sif.Pattern.Convert.Freyja
 
 import Data.AVL.Dict
-import Data.Sigma.DList
+import Data.DList
 import GRL.Lang.GLang
 
 import XML.DOM
@@ -173,7 +173,7 @@ convertPattern p = MkPDoc n d md c p' s e ss Nil
     ss = [MkStudy (inlines "To be determined") e e]
 
 namespace Sif
-  public
+  export
   toFreyja : PATTERN impl d -> PatternDoc
   toFreyja p = convertPattern p
 -- --------------------------------------------------------------------- [ EOF ]
