@@ -80,13 +80,13 @@ convOpts : Arg -> SifOpts -> Maybe SifOpts
 convOpts (Files xs)     o = Nothing
 convOpts (KeyValue k v) o =
   case k of
-    "prelude"    => Just $ record {prelude = Just v}                o
-    "problem"    => Just $ record {pSpec   = Just v}                o
-    "solution"   => Just $ record {sSpec   = Just v}                o
-    "out"        => Just $ record {out     = Just v}                o
-    "to"         => Just $ record {to      = readOutFMT v}          o
-    "log"        => Just $ record {loglvl  = getProof $ strToLog v} o
-    "backend"    => Just $ record {backend = Just v}                o
+    "prelude"    => Just $ record {prelude = Just v}           o
+    "problem"    => Just $ record {pSpec   = Just v}           o
+    "solution"   => Just $ record {sSpec   = Just v}           o
+    "out"        => Just $ record {out     = Just v}           o
+    "to"         => Just $ record {to      = readOutFMT v}     o
+    "log"        => Just $ record {loglvl  = snd $ strToLog v} o
+    "backend"    => Just $ record {backend = Just v}           o
     otherwise    => Nothing
 convOpts (Flag x) o =
   case x of

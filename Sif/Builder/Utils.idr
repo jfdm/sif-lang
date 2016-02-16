@@ -82,7 +82,7 @@ interpTrait s m es ty = ITrait node cs
 interpProp : String
           -> List (InterpRes TyTRAIT)
           -> InterpRes TyPROPERTY
-interpProp s ts = IProp pelem (Sigma.getProof elems)
+interpProp s ts = IProp pelem (snd elems)
   where
     pelem : GLang ELEM
     pelem = mkTask ("Property: " ++ s)
@@ -101,14 +101,14 @@ interpProp s ts = IProp pelem (Sigma.getProof elems)
 
     elems : (fs ** DList GTy GLang fs)
     elems =  (_ ** [pelem]
-                ++ Sigma.getProof newES
-                ++ Sigma.getProof newIS
+                ++ snd newES
+                ++ snd newIS
                 ++ [newCS])
 
 interpSolt : String
           -> List (InterpRes TyPROPERTY)
           -> InterpRes TySOLUTION
-interpSolt s ps = ISolt root (Sigma.getProof elems)
+interpSolt s ps = ISolt root (snd elems)
   where
     root : GLang ELEM
     root = mkTask ("Solution: " ++ s)
@@ -125,7 +125,7 @@ interpSolt s ps = ISolt root (Sigma.getProof elems)
     getDecls = foldr (\e,res => doGet e res) (_ ** DList.Nil)  ps
 
     elems : (es ** DList GTy GLang es)
-    elems = (_ ** [root, cs] ++ (Sigma.getProof getDecls))
+    elems = (_ ** [root, cs] ++ (snd getDecls))
 
 interpPatt : InterpRes TyPROBLEM
           -> InterpRes TySOLUTION

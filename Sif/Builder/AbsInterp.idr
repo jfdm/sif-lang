@@ -20,7 +20,7 @@ import Sif.Builder.Utils
 -- -------------------------------------------------------------- [ Directives ]
 
 %access private
-%default total
+%default partial
 
 -- ----------------------------------------- [ Private Internal Data Structure ]
 
@@ -75,7 +75,6 @@ getModel {x} _ = extract x
 
 -- ------------------------------------------------------ [ Builder Definition ]
 
-covering
 evalPatternAbs : {i : InterpRes TyPATTERN}
               -> AbsInterpPriv i TyPATTERN
               -> Sif.EvalResult
@@ -177,14 +176,14 @@ SifRepAPI AbsInterpRep where
   getSValue (MkWrapper x) = getPrivSValue x
   getCValue (MkWrapper x) = getPrivCValue x
 
-  getProblem    (MkWrapper x) = MkWrapper $ Sigma.getProof $ getPrivProblem x
-  getSolution   (MkWrapper x) = MkWrapper $ Sigma.getProof $ getPrivSolution x
+  getProblem    (MkWrapper x) = MkWrapper $ snd $ getPrivProblem x
+  getSolution   (MkWrapper x) = MkWrapper $ snd $ getPrivSolution x
 
-  getReqs       (MkWrapper x) = map (\(prf ** i) => MkWrapper i) $ toLDP $  (Sigma.getProof (getPrivReqs x))
-  getProperties (MkWrapper x) = map (\(prf ** i) => MkWrapper i) $ toLDP $  (Sigma.getProof (getPrivProperties x))
-  getTraits     (MkWrapper x) = map (\(prf ** i) => MkWrapper i) $ toLDP $  (Sigma.getProof (getPrivTraits x))
-  getAffects    (MkWrapper x) = map (\(prf ** i) => MkWrapper i) $ toLDP $ (Sigma.getProof (getPrivAffects x))
-  getReq        (MkWrapper x) = MkWrapper $ Sigma.getProof $ getPrivReq x
+  getReqs       (MkWrapper x) = map (\(prf ** i) => MkWrapper i) $ toLDP $  (snd  (getPrivReqs x))
+  getProperties (MkWrapper x) = map (\(prf ** i) => MkWrapper i) $ toLDP $  (snd  (getPrivProperties x))
+  getTraits     (MkWrapper x) = map (\(prf ** i) => MkWrapper i) $ toLDP $  (snd  (getPrivTraits x))
+  getAffects    (MkWrapper x) = map (\(prf ** i) => MkWrapper i) $ toLDP $ (snd (getPrivAffects x))
+  getReq        (MkWrapper x) = MkWrapper $ snd $ getPrivReq x
 
   evalPattern (MkWrapper p)    = evalPatternAbs p
   fetchMetaModel (MkWrapper p) = m
@@ -224,7 +223,7 @@ buildProblemAbs : (d : SifDomain)
                -> REQUIREMENTS AbsInterpRep d
                -> PROBLEM AbsInterpRep d
 buildProblemAbs c t d rs =
-    MkExpr $ MkWrapper $ PrivmkProb t d (Sigma.getProof $ convS rs)
+    MkExpr $ MkWrapper $ PrivmkProb t d (snd $ convS rs)
 
 covering
 buildAffectAbs : (d : SifDomain)
@@ -234,7 +233,7 @@ buildAffectAbs : (d : SifDomain)
               -> AFFECT AbsInterpRep d
 buildAffectAbs _ c r d =
     MkExpr $ MkWrapper $ PrivmkTLink c
-           (Sigma.getProof $ conv r) d
+           (snd $ conv r) d
 
 covering
 buildTraitAbs : (d : SifDomain)
@@ -245,7 +244,7 @@ buildTraitAbs : (d : SifDomain)
              -> AFFECTS AbsInterpRep d
              -> TRAIT AbsInterpRep d
 buildTraitAbs _ ty t d s rs =
-    MkExpr $ MkWrapper $ PrivmkTrait ty t d s (Sigma.getProof $ convS rs)
+    MkExpr $ MkWrapper $ PrivmkTrait ty t d s (snd $ convS rs)
 
 covering
 buildPropertyAbs : (d : SifDomain)
@@ -254,7 +253,7 @@ buildPropertyAbs : (d : SifDomain)
                 -> TRAITS AbsInterpRep d
                 -> PROPERTY AbsInterpRep d
 buildPropertyAbs _ t d ts =
-    MkExpr $ MkWrapper $ PrivmkProp t d (Sigma.getProof $ convS ts)
+    MkExpr $ MkWrapper $ PrivmkProp t d (snd $ convS ts)
 
 covering
 buildSolutionAbs : (d : SifDomain)
@@ -264,7 +263,7 @@ buildSolutionAbs : (d : SifDomain)
                 -> SOLUTION AbsInterpRep d
 buildSolutionAbs _ s d ps =
     MkExpr $ MkWrapper $ PrivmkSolt s d
-           (Sigma.getProof $ convS ps)
+           (snd $ convS ps)
 
 covering
 buildPatternAbs : (d : SifDomain)

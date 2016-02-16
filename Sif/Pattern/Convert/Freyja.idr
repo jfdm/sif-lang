@@ -39,7 +39,7 @@ paras (Just s) =
 
 -- ------------------------------------------------------------ [ Requirements ]
 
-convertReq : REQUIREMENT impl d -> Sigma RTy Requirement
+convertReq : REQUIREMENT impl d -> DPair RTy Requirement
 convertReq r = (ty ** MkReq ty n d)
   where
     n : EddaString
@@ -52,7 +52,7 @@ convertReq r = (ty ** MkReq ty n d)
     ty = SifExpr.getRTy r
 
 convertProblem : PROBLEM impl d -> Problem
-convertProblem p = MkProblem n d (getProof rs)
+convertProblem p = MkProblem n d (snd rs)
   where
     n : EddaString
     n = inlines (SifExpr.getTitle p)
@@ -67,12 +67,12 @@ convertProblem p = MkProblem n d (getProof rs)
 
 
 convertAffect : AFFECT impl d -> Affect
-convertAffect a = MkAffect c (getProof r) d
+convertAffect a = MkAffect c (snd r) d
   where
     c : CValue
     c = SifExpr.getCValue a
 
-    r : (Sigma RTy Requirement)
+    r : (DPair RTy Requirement)
     r = convertReq $ SifExpr.getReq a
 
     d : Maybe EddaBody
@@ -82,7 +82,7 @@ convertAffect a = MkAffect c (getProof r) d
 
 -- ------------------------------------------------------------------- [ Trait ]
 
-convertTrait : TRAIT impl d -> Sigma TTy Trait
+convertTrait : TRAIT impl d -> DPair TTy Trait
 convertTrait t = (ty ** MkTrait ty n d (SifExpr.getSValue t) as)
   where
     ty : TTy
@@ -101,7 +101,7 @@ convertTrait t = (ty ** MkTrait ty n d (SifExpr.getSValue t) as)
 -- ---------------------------------------------------------------- [ Property ]
 
 convertProperty : PROPERTY impl d -> Property
-convertProperty p = MkProperty t d (getProof ts)
+convertProperty p = MkProperty t d (snd ts)
   where
     t : EddaString
     t = inlines (SifExpr.getTitle p)

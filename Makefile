@@ -10,7 +10,7 @@ IOLIB   := siflang
 EXE     := sifexe
 MONO    := sifmono
 
-.PHONY: doc clobber check clean core dsl exe linecount all monolithic perfbuild
+.PHONY: doc clobber check clean core dsl exe linecount all monolithic perfbuild install
 
 core:
 	${IDRIS} --build ${LANGLIB}.ipkg
@@ -24,6 +24,9 @@ exe:
 	${IDRIS} --build ${EXE}.ipkg
 
 all: core dsl exe
+
+install: core dsl
+
 
 monolithic:
 	${IDRIS} --build ${MONO}.ipkg
