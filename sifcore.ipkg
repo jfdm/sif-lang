@@ -4,6 +4,7 @@ pkgs = effects
      , containers
      , lightyear
      , test
+     , testparse
      , grl
      , edda
      , graphviz

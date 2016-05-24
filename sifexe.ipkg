@@ -3,6 +3,7 @@ package sifexe
 pkgs = effects
      , containers
      , test
+     , testparse
      , grl
      , edda
      , freyja

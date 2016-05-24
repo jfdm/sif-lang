@@ -11,6 +11,7 @@ pkgs = effects
      , argparse
      , freyja
      , test
+     , testparse
 
 --opts = "--log 1"
 
